@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Members Lounge Weddings</title>
+
+<style>
+body {
+  margin:0;
+  font-family: 'Century Gothic', sans-serif;
+  background:#0b0b0b;
+  color:white;
+}
+.container {
+  max-width:600px;
+  margin:auto;
+  padding:20px;
+}
+.card {
+  background:#121212;
+  padding:20px;
+  border-radius:16px;
+  margin-bottom:20px;
+}
+button {
+  background:#c8a75a;
+  border:none;
+  padding:10px 15px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:bold;
+}
+input {
+  width:100%;
+  padding:8px;
+  border-radius:8px;
+  border:none;
+  margin-bottom:10px;
+}
+h1 { text-align:center; }
+.gold { color:#c8a75a; font-weight:bold; }
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>MEMBERS LOUNGE</h1>
+<p style="text-align:center;">Wedding Experience Portal</p>
+
+<div class="card">
+<h2>Guest Numbers</h2>
+Adults:
+<input type="number" id="adults" value="100">
+Children (<12):
+<input type="number" id="children" value="10">
+<label>
+<input type="checkbox" id="drinks"> Add 4hr Drinks Package ($20pp)
+</label>
+<button onclick="calculate()">Calculate Quote</button>
+</div>
+
+<div class="card">
+<h2>Final Quote</h2>
+<p>Catering (Adults @ $99): <span id="catering">$0</span></p>
+<p>Children (@ $30): <span id="kids">$0</span></p>
+<p>Drinks: <span id="drinksTotal">$0</span></p>
+<hr>
+<h3>Total: <span class="gold" id="total">$0</span></h3>
+</div>
+
+</div>
+
+<script>
+function format(n){
+  return "$" + n.toLocaleString();
+}
+
+function calculate(){
+  let adults = parseInt(document.getElementById('adults').value)||0;
+  let children = parseInt(document.getElementById('children').value)||0;
+  let drinks = document.getElementById('drinks').checked;
+
+  let catering = adults * 99;
+  let kids = children * 30;
+  let drinksTotal = drinks ? adults * 20 : 0;
+
+  let total = catering + kids + drinksTotal;
+
+  document.getElementById('catering').innerText = format(catering);
+  document.getElementById('kids').innerText = format(kids);
+  document.getElementById('drinksTotal').innerText = format(drinksTotal);
+  document.getElementById('total').innerText = format(total);
+}
+</script>
+
+</body>
+</html>
