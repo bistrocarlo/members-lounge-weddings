@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Members Lounge | Wedding Tasting</title>
+  <style>
+    :root{
+      --bg:#0b0c10;
+      --card:#12141b;
+      --muted:#a7adbb;
+      --text:#f4f6fb;
+      --line:rgba(255,255,255,.10);
+      --accent:#d7b86a;
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 20% -10%, rgba(215,184,106,.20), transparent 60%),
+                  radial-gradient(1000px 500px at 90% 0%, rgba(255,255,255,.08), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+    header{
+      padding:28px 18px 14px;
+      text-align:center;
+    }
+    .brand{
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      justify-content:center;
+      padding:10px 14px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background: rgba(255,255,255,.03);
+      backdrop-filter: blur(6px);
+    }
+    .brand b{letter-spacing:.12em; font-size:12px}
+    h1{margin:16px 0 6px; font-size:28px}
+    .sub{color:var(--muted); font-size:14px}
+    main{
+      max-width:1100px;
+      margin:0 auto;
+      padding:14px 18px 60px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+    }
+    @media(min-width:900px){
+      .grid{grid-template-columns: 1fr 1fr;}
+      .span2{grid-column: 1 / -1;}
+    }
+    .card{
+      background: rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      padding:16px;
+    }
+    .card h2{
+      margin:0 0 10px;
+      font-size:16px;
+      letter-spacing:.02em;
+    }
+    label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin:10px 0 6px;
+    }
+    input, select{
+      width:100%;
+      padding:12px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.25);
+      color: var(--text);
+      outline:none;
+    }
+    input::placeholder{color:rgba(244,246,251,.45)}
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    .course{
+      margin-top:10px;
+      border-top:1px solid var(--line);
+      padding-top:12px;
+    }
+    .course h3{
+      margin:0 0 8px;
+      font-size:14px;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(215,184,106,.12);
+      border:1px solid rgba(215,184,106,.35);
+      color: var(--text);
+      font-size:12px;
+      margin:6px 6px 0 0;
+    }
+    .count{
+      color:var(--muted);
+      font-size:12px;
+      margin-top:6px;
+    }
+    .muted{color:var(--muted)}
+    footer{
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
+      padding:16px 0 26px;
+    }
+    .warn{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,166,0,.35);
+      background: rgba(255,166,0,.10);
+      color:#ffe9bf;
+      display:none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">💍 <b>THE MEMBERS LOUNGE</b></div>
+    <h1>Wedding Tasting App</h1>
+    <div class="sub">Reggio Calabria Club, Parkville</div>
+  </header>
+
+  <main class="grid">
+    <section class="card">
+      <h2>Couple Details</h2>
+      <label for="couple">Couple Name</label>
+      <input id="couple" placeholder="e.g., Laura & Daniel" />
+
+      <label for="date">Event Date</label>
+      <input id="date" placeholder="e.g., Saturday 10 October 2026" />
+
+      <div class="row">
+        <div>
+          <label for="adults">Estimated Adults</label>
+          <input id="adults" type="number" min="0" value="120" />
+        </div>
+        <div>
+          <label for="children">Estimated Children</label>
+          <input id="children" type="number" min="0" value="20" />
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Drinks Package</h2>
+      <label for="drinks">Choose Drinks Package</label>
+      <select id="drinks">
+        <option>Standard – $55pp</option>
+        <option>Premium – $75pp</option>
+        <option>Luxury – $95pp</option>
+        <option>Cash Bar</option>
+      </select>
+      <div class="muted" style="margin-top:10px">
+        Simple original version: no calculations, just selections + summary.
+      </div>
+    </section>
+
+    <section class="card span2" id="tasting">
+      <h2>Select up to 6 items per course</h2>
+
+      <div class="course" data-course="Canapés">
+        <h3>Canapés</h3>
+        <div class="row">
+          <div><label><input type="checkbox" value="Arancini"> Arancini</label></div>
+          <div><label><input type="checkbox" value="Mini Polpette"> Mini Polpette</label></div>
+          <div><label><input type="checkbox" value="Calamari Fritti"> Calamari Fritti</label></div>
+          <div><label><input type="checkbox" value="Bruschetta"> Bruschetta</label></div>
+          <div><label><input type="checkbox" value="Prosciutto & Melon"> Prosciutto & Melon</label></div>
+          <div><label><input type="checkbox" value="Caprese Skewer"> Caprese Skewer</label></div>
+          <div><label><input type="checkbox" value="Prawn Cocktail"> Prawn Cocktail</label></div>
+          <div><label><input type="checkbox" value="Parmigiana Bites"> Parmigiana Bites</label></div>
+        </div>
+        <div class="count" id="count-Canapés">0/6 selected</div>
+        <div class="warn" id="warn-Canapés">Maximum 6 selections for Canapés.</div>
+      </div>
+
+      <div class="course" data-course="Entrées">
+        <h3>Entrées</h3>
+        <div class="row">
+          <div><label><input type="checkbox" value="Antipasto Misto"> Antipasto Misto</label></div>
+          <div><label><input type="checkbox" value="Octopus Salad"> Octopus Salad</label></div>
+          <div><label><input type="checkbox" value="Burrata & Tomato"> Burrata & Tomato</label></div>
+          <div><label><input type="checkbox" value="Carpaccio"> Carpaccio</label></div>
+          <div><label><input type="checkbox" value="Eggplant Involtini"> Eggplant Involtini</label></div>
+          <div><label><input type="checkbox" value="Calabrian Chili Prawns"> Calabrian Chili Prawns</label></div>
+        </div>
+        <div class="count" id="count-Entrées">0/6 selected</div>
+        <div class="warn" id="warn-Entrées">Maximum 6 selections for Entrées.</div>
+      </div>
+
+      <div class="course" data-course="Mains">
+        <h3>Mains</h3>
+        <div class="row">
+          <div><label><input type="checkbox" value="Lamb Shanks"> Lamb Shanks</label></div>
+          <div><label><input type="checkbox" value="Barramundi Lemon Butter"> Barramundi Lemon Butter</label></div>
+          <div><label><input type="checkbox" value="Char Grilled Chicken"> Char Grilled Chicken</label></div>
+          <div><label><input type="checkbox" value="Veal Scallopini"> Veal Scallopini</label></div>
+          <div><label><input type="checkbox" value="Roast Porchetta"> Roast Porchetta</label></div>
+          <div><label><input type="checkbox" value="Vegetarian Lasagna"> Vegetarian Lasagna</label></div>
+        </div>
+        <div class="count" id="count-Mains">0/6 selected</div>
+        <div class="warn" id="warn-Mains">Maximum 6 selections for Mains.</div>
+      </div>
+
+      <div class="course" data-course="Desserts">
+        <h3>Desserts</h3>
+        <div class="row">
+          <div><label><input type="checkbox" value="Mini Cannoli"> Mini Cannoli</label></div>
+          <div><label><input type="checkbox" value="Tiramisu"> Tiramisu</label></div>
+          <div><label><input type="checkbox" value="Baklava"> Baklava</label></div>
+          <div><label><input type="checkbox" value="Panna Cotta"> Panna Cotta</label></div>
+          <div><label><input type="checkbox" value="Chocolate Mousse"> Chocolate Mousse</label></div>
+          <div><label><input type="checkbox" value="Gelato"> Gelato</label></div>
+        </div>
+        <div class="count" id="count-Desserts">0/6 selected</div>
+        <div class="warn" id="warn-Desserts">Maximum 6 selections for Desserts.</div>
+      </div>
+
+      <div class="course" data-course="Supper">
+        <h3>Supper</h3>
+        <div class="row">
+          <div><label><input type="checkbox" value="Mini Panini"> Mini Panini</label></div>
+          <div><label><input type="checkbox" value="Sausage Rolls"> Sausage Rolls</label></div>
+          <div><label><input type="checkbox" value="Pizza Slices"> Pizza Slices</label></div>
+          <div><label><input type="checkbox" value="Pasta Cups"> Pasta Cups</label></div>
+          <div><label><input type="checkbox" value="Hot Chips"> Hot Chips</label></div>
+          <div><label><input type="checkbox" value="Mini Burgers"> Mini Burgers</label></div>
+        </div>
+        <div class="count" id="count-Supper">0/6 selected</div>
+        <div class="warn" id="warn-Supper">Maximum 6 selections for Supper.</div>
+      </div>
+    </section>
+
+    <section class="card span2">
+      <h2>Summary</h2>
+      <div id="summary" class="muted">Start selecting items to see your summary.</div>
+      <div id="chips" style="margin-top:10px"></div>
+    </section>
+  </main>
+
+  <footer>
+    Members Lounge | Reggio Calabria Club, Parkville
+  </footer>
+
+  <script>
+    const LIMIT = 6;
+
+    const coupleEl   = document.getElementById('couple');
+    const dateEl     = document.getElementById('date');
+    const adultsEl   = document.getElementById('adults');
+    const childrenEl = document.getElementById('children');
+    const drinksEl   = document.getElementById('drinks');
+
+    function selectedByCourse(){
+      const out = {};
+      document.querySelectorAll('.course').forEach(courseEl => {
+        const course = courseEl.dataset.course;
+        const checked = [...courseEl.querySelectorAll('input[type="checkbox"]:checked')].map(x => x.value);
+        out[course] = checked;
+      });
+      return out;
+    }
+
+    function enforceLimit(courseEl){
+      const course = courseEl.dataset.course;
+      const checked = courseEl.querySelectorAll('input[type="checkbox"]:checked');
+      const warn = document.getElementById(`warn-${course}`);
+      const count = document.getElementById(`count-${course}`);
+      count.textContent = `${checked.length}/${LIMIT} selected`;
+
+      if (checked.length > LIMIT){
+        // Uncheck the last changed box (best-effort)
+        // If the user somehow exceeds (rare), just block by unchecking the newest.
+        // This works because event handler runs after a change.
+        const last = checked[checked.length - 1];
+        last.checked = false;
+      }
+
+      const checked2 = courseEl.querySelectorAll('input[type="checkbox"]:checked');
+      count.textContent = `${checked2.length}/${LIMIT} selected`;
+      warn.style.display = (checked2.length >= LIMIT) ? 'block' : 'none';
+    }
+
+    function render(){
+      const selections = selectedByCourse();
+
+      const couple = coupleEl.value.trim() || "—";
+      const date = dateEl.value.trim() || "—";
+      const adults = adultsEl.value || 0;
+      const children = childrenEl.value || 0;
+      const drinks = drinksEl.value;
+
+      const summaryLines = [];
+      summaryLines.push(`<b>Couple:</b> ${couple}`);
+      summaryLines.push(`<b>Date:</b> ${date}`);
+      summaryLines.push(`<b>Adults:</b> ${adults}`);
+      summaryLines.push(`<b>Children:</b> ${children}`);
+      summaryLines.push(`<b>Drinks Package:</b> ${drinks}`);
+
+      Object.keys(selections).forEach(course => {
+        const items = selections[course];
+        summaryLines.push(`<b>${course}:</b> ${items.length ? items.join(', ') : 'None selected'}`);
+      });
+
+      document.getElementById('summary').innerHTML = summaryLines.join('<br>');
+
+      // Chips
+      const chips = [];
+      Object.entries(selections).forEach(([course, items]) => {
+        items.forEach(item => {
+          chips.push(`<span class="pill">${course}: ${item}</span>`);
+        });
+      });
+      document.getElementById('chips').innerHTML = chips.join(' ');
+    }
+
+    // Bind events
+    document.querySelectorAll('.course').forEach(courseEl => {
+      courseEl.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', () => {
+          enforceLimit(courseEl);
+          render();
+        });
+      });
+      // initialize counts
+      enforceLimit(courseEl);
+    });
+
+    [coupleEl, dateEl, adultsEl, childrenEl, drinksEl].forEach(el => {
+      el.addEventListener('input', render);
+      el.addEventListener('change', render);
+    });
+
+    render();
+  </script>
+</body>
+</html>
