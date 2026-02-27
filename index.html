@@ -1,392 +1,629 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Event Spend Calculator</title>
-  <style>
-    :root{
-      --bg:#ffffff;
-      --fg:#000000;
-      --muted:#333333;
-      --card:#ffffff;
-      --border:#d9d9d9;
-      --soft:#f6f6f6;
-      --focus:#000000;
-      --shadow: 0 10px 25px rgba(0,0,0,.08);
-      --radius: 14px;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>The Members Lounge • Comprehensive Event Planner (5–6 Pages)</title>
 
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background:var(--bg);
-      color:var(--fg);
-      line-height:1.35;
-    }
+<style>
+  :root{
+    --bg:#ffffff;
+    --fg:#000000;
+    --muted:#333333;
+    --border:#000000;
+    --soft:#f2f2f2;
+  }
 
-    header{
-      position:sticky;
-      top:0;
-      background:var(--bg);
-      border-bottom:1px solid var(--border);
-      z-index:10;
-    }
-    .wrap{ max-width:1100px; margin:0 auto; padding:18px 16px; }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    font-family: Arial, Helvetica, sans-serif;
+    background:var(--bg);
+    color:var(--fg);
+    line-height:1.25;
+  }
 
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-    }
+  /* Page container */
+  .page{
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 22px 22px 26px;
+  }
 
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      min-width:0;
-    }
+  /* Header */
+  .masthead{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    border-bottom:2px solid var(--border);
+    padding-bottom:14px;
+    margin-bottom:16px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    min-width:0;
+  }
+  .brand img{
+    height:78px;
+    width:auto;
+    object-fit:contain;
+  }
+  .brandTitle{
+    min-width:0;
+  }
+  .brandTitle h1{
+    margin:0;
+    font-size:20px;
+    letter-spacing:.5px;
+  }
+  .brandTitle p{
+    margin:4px 0 0;
+    color:var(--muted);
+    font-size:12px;
+  }
+  .docMeta{
+    text-align:right;
+    font-size:12px;
+    color:var(--muted);
+    min-width:220px;
+  }
+  .docMeta strong{ color:var(--fg); }
 
-    .logo{
-      width:44px;
-      height:44px;
-      border:2px solid var(--fg);
-      border-radius:10px;
-      display:grid;
-      place-items:center;
-      font-weight:800;
-      letter-spacing:.5px;
-      flex:0 0 auto;
-    }
-    .brand h1{
-      font-size:16px;
-      margin:0;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .brand p{
-      margin:2px 0 0;
-      font-size:12px;
-      color:var(--muted);
-    }
+  /* Section headings */
+  h2{
+    margin:16px 0 10px;
+    font-size:16px;
+    border-bottom:1px solid var(--border);
+    padding-bottom:6px;
+    letter-spacing:.2px;
+  }
+  h3{
+    margin:14px 0 8px;
+    font-size:14px;
+  }
 
-    .menuBtn{
-      width:44px;
-      height:44px;
-      border:1px solid var(--border);
-      background:var(--bg);
-      border-radius:12px;
-      display:grid;
-      place-items:center;
-      cursor:pointer;
-    }
-    .burger{
-      width:18px;
-      height:12px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-    }
-    .burger span{
-      display:block;
-      height:2px;
-      background:var(--fg);
-      border-radius:999px;
-    }
+  /* Tables (Tabula-friendly) */
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin: 8px 0 14px;
+    font-size:12px;
+  }
+  th, td{
+    border:1px solid var(--border);
+    padding:7px 8px;
+    vertical-align:top;
+  }
+  th{
+    background:var(--soft);
+    text-align:left;
+  }
+  .small{ font-size:11px; color:var(--muted); }
+  .right{ text-align:right; }
+  .center{ text-align:center; }
 
-    main .grid{
-      display:grid;
-      grid-template-columns: 1.05fr .95fr;
-      gap:18px;
-      align-items:start;
-      padding:18px 0 24px;
-    }
-    @media (max-width: 980px){
-      main .grid{ grid-template-columns:1fr; }
-    }
+  /* Inputs */
+  input, textarea, select{
+    width:100%;
+    border:1px solid var(--border);
+    padding:7px 8px;
+    font-size:12px;
+    background:#fff;
+    color:#000;
+  }
+  textarea{ min-height:54px; resize:vertical; }
 
-    .card{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:16px;
-    }
+  /* Two-column blocks */
+  .grid2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  @media (max-width: 820px){
+    .grid2{ grid-template-columns:1fr; }
+    .docMeta{ min-width:auto; }
+    .masthead{ flex-direction:column; align-items:flex-start; }
+    .docMeta{ text-align:left; }
+  }
 
-    .card h2{
-      margin:0 0 12px;
-      font-size:15px;
-      letter-spacing:.2px;
-    }
+  /* Result blocks */
+  .totals{
+    border:2px solid var(--border);
+    padding:10px 12px;
+    margin: 10px 0 14px;
+  }
+  .totalsRow{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    font-weight:700;
+    font-size:14px;
+    padding:4px 0;
+  }
+  .totalsRow.sub{
+    font-weight:600;
+    font-size:12px;
+    color:var(--muted);
+  }
+  .pill{
+    border:1px solid var(--border);
+    padding:8px 10px;
+    background:var(--soft);
+    font-size:11px;
+    color:var(--muted);
+    margin: 10px 0 0;
+  }
 
-    .row{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-    }
-    @media (max-width: 520px){
-      .row{ grid-template-columns:1fr; }
-    }
+  /* Page breaks */
+  .pageBreak{
+    page-break-after: always;
+    break-after: page;
+  }
 
-    .field{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      margin-bottom:12px;
-    }
-    label{
-      font-size:12px;
-      color:var(--muted);
-    }
-    input{
-      width:100%;
-      padding:12px 12px;
-      border:1px solid var(--border);
-      border-radius:12px;
-      background:var(--bg);
-      color:var(--fg);
-      outline:none;
-      font-size:14px;
-    }
-    input:focus{
-      border-color:var(--focus);
-      box-shadow: 0 0 0 3px rgba(0,0,0,.10);
-    }
+  /* Print: force page breaks and hide buttons */
+  @media print{
+    body{ background:#fff; }
+    .page{ padding:18mm 14mm 18mm; }
+    .noPrint{ display:none !important; }
+    .pageBreak{ page-break-after: always; }
+  }
 
-    .pillNote{
-      background:var(--soft);
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:10px 12px;
-      font-size:12px;
-      color:var(--muted);
-      margin-top:6px;
-    }
-
-    .btnRow{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:10px;
-    }
-    button{
-      border-radius:12px;
-      padding:12px 14px;
-      border:1px solid var(--fg);
-      background:var(--fg);
-      color:var(--bg);
-      font-weight:700;
-      cursor:pointer;
-      font-size:14px;
-    }
-    button.secondary{
-      background:var(--bg);
-      color:var(--fg);
-      border-color:var(--border);
-      font-weight:600;
-    }
-
-    .results .big{
-      font-size:22px;
-      font-weight:900;
-      margin:4px 0 0;
-    }
-    .results .sub{
-      color:var(--muted);
-      font-size:12px;
-      margin:0;
-    }
-
-    .divider{ height:1px; background:var(--border); margin:14px 0; }
-
-    .kv{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      padding:8px 0;
-      border-bottom:1px dashed var(--border);
-      font-size:13px;
-    }
-    .kv:last-child{ border-bottom:none; }
-    .kv .k{ color:var(--muted); }
-    .kv .v{ font-weight:800; text-align:right; }
-
-    .badge{
-      display:inline-block;
-      font-size:11px;
-      padding:6px 10px;
-      border:1px solid var(--border);
-      border-radius:999px;
-      background:var(--soft);
-      color:var(--muted);
-      margin-top:8px;
-    }
-
-    footer{
-      border-top:1px solid var(--border);
-      color:var(--muted);
-      font-size:12px;
-    }
-  </style>
+  /* Tiny toolbar */
+  .toolbar{
+    max-width:960px;
+    margin:10px auto 0;
+    padding:0 22px;
+    display:flex;
+    gap:10px;
+    justify-content:flex-end;
+  }
+  button{
+    border:1px solid #000;
+    background:#000;
+    color:#fff;
+    padding:10px 12px;
+    border-radius:10px;
+    font-weight:700;
+    cursor:pointer;
+    font-size:12px;
+  }
+  button.secondary{
+    background:#fff;
+    color:#000;
+  }
+</style>
 </head>
 
 <body>
-<header>
-  <div class="wrap">
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo">ML</div>
-        <div style="min-width:0">
-          <h1>Event Spend Calculator</h1>
-          <p>White background • Black text • Includes Room Hire + Dry Hire + Security in totals</p>
-        </div>
+
+<!-- SIMPLE CONTROLS (won't print) -->
+<div class="toolbar noPrint">
+  <button class="secondary" type="button" id="resetBtn">Reset</button>
+  <button type="button" onclick="window.print()">Print / Save as PDF</button>
+</div>
+
+<!-- ===================== PAGE 1 ===================== -->
+<section class="page">
+  <div class="masthead">
+    <div class="brand">
+      <!-- Put your logo file in the same folder and name it exactly like this -->
+      <img src="members-lounge-logo.png" alt="Members Lounge Logo" />
+      <div class="brandTitle">
+        <h1>The Members Lounge • Comprehensive Event Planner</h1>
+        <p>White background • Black text • Tables designed for Tabula extraction</p>
       </div>
-
-      <button class="menuBtn" type="button" aria-label="Menu">
-        <div class="burger" aria-hidden="true">
-          <span></span><span></span><span></span>
-        </div>
-      </button>
+    </div>
+    <div class="docMeta">
+      <div><strong>Document:</strong> Client Planning Pack</div>
+      <div><strong>Version:</strong> v1.0</div>
+      <div><strong>Date:</strong> <span id="today"></span></div>
+      <div class="small">Reggio Calabria Club, Parkville</div>
     </div>
   </div>
-</header>
 
-<main>
-  <div class="wrap">
-    <div class="grid">
-      <!-- INPUTS -->
-      <section class="card">
-        <h2>Inputs</h2>
+  <h2>1) Event Details</h2>
+  <div class="grid2">
+    <table>
+      <tr><th style="width:40%">Field</th><th>Details</th></tr>
+      <tr><td>Client Name(s)</td><td><input id="clientName" placeholder="e.g., Sarah & Michael" /></td></tr>
+      <tr><td>Event Type</td><td><input id="eventType" placeholder="e.g., Wedding / Engagement / 50th / Corporate" /></td></tr>
+      <tr><td>Event Date</td><td><input id="eventDate" placeholder="dd/mm/yyyy" /></td></tr>
+      <tr><td>Start Time / Finish Time</td><td><input id="eventTimes" placeholder="e.g., 6:00pm – 11:30pm" /></td></tr>
+      <tr><td>Room</td><td><input id="room" placeholder="e.g., Members Lounge / Sala Reggio / Bistroteca" /></td></tr>
+      <tr><td>Contact Phone</td><td><input id="phone" placeholder="04xx xxx xxx" /></td></tr>
+      <tr><td>Email</td><td><input id="email" placeholder="name@email.com" /></td></tr>
+    </table>
 
-        <div class="row">
-          <div class="field">
-            <label for="adults">Adults (primary denominator)</label>
-            <input id="adults" type="number" min="0" step="1" value="80" />
-          </div>
-          <div class="field">
-            <label for="children">Children</label>
-            <input id="children" type="number" min="0" step="1" value="20" />
-          </div>
-        </div>
+    <table>
+      <tr><th style="width:40%">Field</th><th>Details</th></tr>
+      <tr><td>Estimated Guests</td><td><input id="estGuests" placeholder="e.g., 120" /></td></tr>
+      <tr><td>Final Numbers Due</td><td><input id="finalNumsDue" placeholder="e.g., 7 days prior" /></td></tr>
+      <tr><td>Style / Theme Notes</td><td><textarea id="styleNotes" placeholder="e.g., Tuscan, candlelight, live band, speeches..."></textarea></td></tr>
+      <tr><td>Audio / Visual Requirements</td><td><textarea id="avNotes" placeholder="Mic x2, screen, projector, playlist, etc."></textarea></td></tr>
+      <tr><td>Special Requests</td><td><textarea id="specialRequests" placeholder="e.g., surprise cake, cultural items, special entrance..."></textarea></td></tr>
+    </table>
+  </div>
 
-        <div class="row">
-          <div class="field">
-            <label for="adultSpend">Average spend per Adult ($)</label>
-            <input id="adultSpend" type="number" min="0" step="0.01" value="95" />
-          </div>
-          <div class="field">
-            <label for="childSpend">Average spend per Child ($)</label>
-            <input id="childSpend" type="number" min="0" step="0.01" value="55" />
-          </div>
-        </div>
+  <h2>2) Financial Calculator</h2>
+  <table>
+    <tr><th>Description</th><th style="width:220px">Amount</th></tr>
+    <tr><td>Number of Adults (primary denominator)</td><td><input type="number" id="adults" value="80" min="0" step="1"></td></tr>
+    <tr><td>Number of Children</td><td><input type="number" id="children" value="20" min="0" step="1"></td></tr>
+    <tr><td>Average Adult Spend ($)</td><td><input type="number" id="adultSpend" value="95" min="0" step="0.01"></td></tr>
+    <tr><td>Average Child Spend ($)</td><td><input type="number" id="childSpend" value="55" min="0" step="0.01"></td></tr>
+    <tr><td><strong>Room Hire ($)</strong></td><td><input type="number" id="roomHire" value="0" min="0" step="0.01"></td></tr>
+    <tr><td><strong>Dry Hire ($)</strong></td><td><input type="number" id="dryHire" value="0" min="0" step="0.01"></td></tr>
+    <tr><td><strong>Security ($)</strong></td><td><input type="number" id="security" value="0" min="0" step="0.01"></td></tr>
+  </table>
 
-        <div class="divider"></div>
-
-        <!-- IMPORTANT: These are included within the pool of sums, in order -->
-        <div class="row">
-          <div class="field">
-            <label for="roomHire">Room Hire ($)</label>
-            <input id="roomHire" type="number" min="0" step="0.01" value="0" />
-          </div>
-          <div class="field">
-            <label for="dryHire">Dry Hire ($)</label>
-            <input id="dryHire" type="number" min="0" step="0.01" value="0" />
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="field">
-            <label for="security">Security ($)</label>
-            <input id="security" type="number" min="0" step="0.01" value="0" />
-          </div>
-          <div class="field">
-            <label for="notes">Notes (optional)</label>
-            <input id="notes" type="text" placeholder="e.g., Saturday night wedding" />
-          </div>
-        </div>
-
-        <div class="pillNote">
-          <strong>Calculation order:</strong>
-          (1) Food/Spend totals → (2) + Room Hire → (3) + Dry Hire → (4) + Security → (5) Grand Total & per-person indicators.
-        </div>
-
-        <div class="btnRow">
-          <button id="calcBtn" type="button">Calculate</button>
-          <button id="resetBtn" class="secondary" type="button">Reset</button>
-        </div>
-
-        <span class="badge">Tip: Change any number—results auto-update too.</span>
-      </section>
-
-      <!-- RESULTS -->
-      <aside class="card results" aria-live="polite">
-        <h2>Results</h2>
-        <p class="sub">Grand Total (includes Room Hire + Dry Hire + Security)</p>
-        <div class="big" id="grandTotal">$0.00</div>
-
-        <div class="divider"></div>
-
-        <div class="kv">
-          <div class="k">Total guests</div>
-          <div class="v" id="totalGuests">0</div>
-        </div>
-
-        <div class="kv">
-          <div class="k">Food/Spend total (Adults + Children)</div>
-          <div class="v" id="spendTotal">$0.00</div>
-        </div>
-
-        <div class="kv">
-          <div class="k">Room Hire</div>
-          <div class="v" id="roomHireOut">$0.00</div>
-        </div>
-
-        <div class="kv">
-          <div class="k">Dry Hire</div>
-          <div class="v" id="dryHireOut">$0.00</div>
-        </div>
-
-        <div class="kv">
-          <div class="k">Security</div>
-          <div class="v" id="securityOut">$0.00</div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="kv">
-          <div class="k"><strong>Indicative cost per Adult (primary)</strong></div>
-          <div class="v" id="perAdult">$0.00</div>
-        </div>
-
-        <div class="kv">
-          <div class="k">Weighted average per Guest (Adults+Children)</div>
-          <div class="v" id="perGuest">$0.00</div>
-        </div>
-
-        <div class="kv">
-          <div class="k">Adults-only baseline (for reference)</div>
-          <div class="v" id="adultBaseline">$0.00</div>
-        </div>
-
-        <div class="pillNote" id="summaryLine">
-          Summary will appear here.
-        </div>
-      </aside>
+  <div class="totals">
+    <div class="totalsRow">
+      <div>Total Spent (incl. Room Hire + Dry Hire + Security)</div>
+      <div id="grandTotal">$0.00</div>
+    </div>
+    <!-- IMPORTANT: Average spend is displayed UNDER total spent -->
+    <div class="totalsRow sub">
+      <div>Average Spend per Adult (Grand Total ÷ Adults)</div>
+      <div id="perAdult">$0.00</div>
+    </div>
+    <div class="totalsRow sub">
+      <div>Weighted Average per Guest (Grand Total ÷ Total Guests)</div>
+      <div id="perGuest">$0.00</div>
+    </div>
+    <div class="totalsRow sub">
+      <div>Food/Spend Total (Adults+Children only)</div>
+      <div id="spendTotal">$0.00</div>
+    </div>
+    <div class="pill">
+      Calculation order: (1) Food/Spend → (2) + Room Hire → (3) + Dry Hire → (4) + Security → (5) Grand Total.
+      Adults is the major denominator for “per adult”.
     </div>
   </div>
-</main>
 
-<footer>
-  <div class="wrap">
-    © <span id="year"></span> The Members Lounge • Simple calculator (edit as needed)
+  <h2>3) Deposit, Payment & Notes</h2>
+  <table>
+    <tr><th style="width:26%">Field</th><th>Details</th></tr>
+    <tr><td>Deposit Paid</td><td><input id="deposit" placeholder="$" /></td></tr>
+    <tr><td>Deposit Date</td><td><input id="depositDate" placeholder="dd/mm/yyyy" /></td></tr>
+    <tr><td>Balance Due Date</td><td><input id="balanceDue" placeholder="dd/mm/yyyy" /></td></tr>
+    <tr><td>Payment Notes</td><td><textarea id="paymentNotes" placeholder="e.g., invoice details, staged payments, etc."></textarea></td></tr>
+  </table>
+</section>
+
+<div class="pageBreak"></div>
+
+<!-- ===================== PAGE 2 ===================== -->
+<section class="page">
+  <div class="masthead">
+    <div class="brand">
+      <img src="members-lounge-logo.png" alt="Members Lounge Logo" />
+      <div class="brandTitle">
+        <h1>Food Selection • Page 2</h1>
+        <p>Tick/mark selections inside the tables (print-friendly)</p>
+      </div>
+    </div>
+    <div class="docMeta">
+      <div><strong>Client:</strong> <span id="clientNameOut1">________</span></div>
+      <div><strong>Event Date:</strong> <span id="eventDateOut1">________</span></div>
+    </div>
   </div>
-</footer>
+
+  <h2>4) Canapés (Choose 4)</h2>
+  <table>
+    <tr>
+      <th style="width:44%">Canapé Item</th>
+      <th style="width:18%">Dietary Tags</th>
+      <th style="width:14%">Selected (✓)</th>
+      <th>Notes</th>
+    </tr>
+    <tr><td>Arancini (mushroom / cheese)</td><td>V</td><td></td><td></td></tr>
+    <tr><td>Mini Calamari fritti (lemon)</td><td>DF</td><td></td><td></td></tr>
+    <tr><td>Bruschetta trio (tomato / olive / capsicum)</td><td>V</td><td></td><td></td></tr>
+    <tr><td>Polpette (Italian meatballs, sugo)</td><td>DF</td><td></td><td></td></tr>
+    <tr><td>Caprese skewers (basil, cherry tomato, mozzarella)</td><td>V,GF*</td><td></td><td></td></tr>
+    <tr><td>Stuffed mushrooms (herb crumb)</td><td>V</td><td></td><td></td></tr>
+    <tr><td>Prosciutto & melon cups</td><td>GF,DF</td><td></td><td></td></tr>
+    <tr><td>Prawn cocktail spoon (classic Marie style)</td><td>GF</td><td></td><td></td></tr>
+    <tr><td>Mini sausage rolls (Italian pork)</td><td></td><td></td><td></td></tr>
+    <tr><td>Mini spanakopita triangles</td><td>V</td><td></td><td></td></tr>
+  </table>
+  <div class="small">*GF may require minor adjustments. Tags are guidance only—final dietary confirmations on Page 4.</div>
+
+  <h2>5) Entrée / Starter (Choose 1–2)</h2>
+  <table>
+    <tr>
+      <th style="width:44%">Entrée Item</th>
+      <th style="width:18%">Dietary Tags</th>
+      <th style="width:14%">Selected (✓)</th>
+      <th>Notes</th>
+    </tr>
+    <tr><td>Antipasto Italiano (cured meats, olives, pickles)</td><td>GF*</td><td></td><td></td></tr>
+    <tr><td>Vegetarian antipasto (grilled veg, dips, olives)</td><td>V,GF*</td><td></td><td></td></tr>
+    <tr><td>Seafood entrée plate (calamari, prawns, marinara)</td><td>DF*</td><td></td><td></td></tr>
+    <tr><td>Eggplant Parmigiana (baked)</td><td>V</td><td></td><td></td></tr>
+    <tr><td>Prosciutto & burrata (seasonal)</td><td>GF</td><td></td><td></td></tr>
+    <tr><td>Greek mezze (tarama, tzatziki, eggplant dip, pita)</td><td>V</td><td></td><td></td></tr>
+  </table>
+</section>
+
+<div class="pageBreak"></div>
+
+<!-- ===================== PAGE 3 ===================== -->
+<section class="page">
+  <div class="masthead">
+    <div class="brand">
+      <img src="members-lounge-logo.png" alt="Members Lounge Logo" />
+      <div class="brandTitle">
+        <h1>Main Menu • Page 3</h1>
+        <p>Family-style pastas + alternate drop mains</p>
+      </div>
+    </div>
+    <div class="docMeta">
+      <div><strong>Client:</strong> <span id="clientNameOut2">________</span></div>
+      <div><strong>Event Date:</strong> <span id="eventDateOut2">________</span></div>
+    </div>
+  </div>
+
+  <h2>6) Pasta Course (Shared / Family Style) – Choose 2</h2>
+  <table>
+    <tr>
+      <th style="width:44%">Pasta Option</th>
+      <th style="width:18%">Dietary Tags</th>
+      <th style="width:14%">Selected (✓)</th>
+      <th>Notes</th>
+    </tr>
+    <tr><td>Penne alla Vodka</td><td>V*</td><td></td><td></td></tr>
+    <tr><td>Gnocchi Sorrentina (napoli, basil, mozzarella)</td><td>V</td><td></td><td></td></tr>
+    <tr><td>Seafood linguine (marinara style)</td><td>DF*</td><td></td><td></td></tr>
+    <tr><td>Lasagna tradizionale</td><td></td><td></td><td></td></tr>
+    <tr><td>Rigatoni bolognese</td><td>DF</td><td></td><td></td></tr>
+    <tr><td>Pasta primavera (seasonal veg)</td><td>V,DF*</td><td></td><td></td></tr>
+  </table>
+
+  <h2>7) Main Courses (Alternate Drop) – Choose 2</h2>
+  <table>
+    <tr>
+      <th style="width:44%">Main Option</th>
+      <th style="width:18%">Dietary Tags</th>
+      <th style="width:14%">Selected (✓)</th>
+      <th>Notes (sides/sauces)</th>
+    </tr>
+    <tr><td>Lamb shanks (slow braised)</td><td>GF*</td><td></td><td>e.g., Greek potatoes, seasonal veg</td></tr>
+    <tr><td>Barramundi (lemon butter oil, capers)</td><td>GF</td><td></td><td>e.g., Greek potatoes, greens</td></tr>
+    <tr><td>Char-grilled chicken breast</td><td>GF,DF*</td><td></td><td>e.g., jus / mushroom sauce</td></tr>
+    <tr><td>Scotch fillet (medium, jus)</td><td>GF,DF*</td><td></td><td>e.g., roasted potatoes</td></tr>
+    <tr><td>Vegetarian main (seasonal chef selection)</td><td>V</td><td></td><td></td></tr>
+  </table>
+
+  <h2>8) Kids Meals</h2>
+  <table>
+    <tr><th style="width:44%">Kids Option</th><th style="width:18%">Dietary Tags</th><th style="width:14%">Selected (✓)</th><th>Notes</th></tr>
+    <tr><td>Chicken schnitzel (oven baked) + chips</td><td></td><td></td><td></td></tr>
+    <tr><td>Pasta napoli</td><td>V,DF*</td><td></td><td></td></tr>
+    <tr><td>Fish & chips (oven baked)</td><td>DF*</td><td></td><td></td></tr>
+  </table>
+  <div class="small">*Dietary tags are guidance. Confirm all dietary requirements on Page 4.</div>
+</section>
+
+<div class="pageBreak"></div>
+
+<!-- ===================== PAGE 4 ===================== -->
+<section class="page">
+  <div class="masthead">
+    <div class="brand">
+      <img src="members-lounge-logo.png" alt="Members Lounge Logo" />
+      <div class="brandTitle">
+        <h1>Dessert, Supper & Dietary Requirements • Page 4</h1>
+        <p>Use these tables for final numbers and kitchen briefing</p>
+      </div>
+    </div>
+    <div class="docMeta">
+      <div><strong>Client:</strong> <span id="clientNameOut3">________</span></div>
+      <div><strong>Event Date:</strong> <span id="eventDateOut3">________</span></div>
+    </div>
+  </div>
+
+  <h2>9) Dessert (Choose 1–2) + Extras</h2>
+  <table>
+    <tr><th style="width:44%">Dessert Option</th><th style="width:18%">Dietary Tags</th><th style="width:14%">Selected (✓)</th><th>Notes</th></tr>
+    <tr><td>Mini cannoli</td><td>V</td><td></td><td></td></tr>
+    <tr><td>Tiramisu</td><td>V*</td><td></td><td></td></tr>
+    <tr><td>Baklava</td><td>V</td><td></td><td></td></tr>
+    <tr><td>Panna cotta (berry coulis)</td><td>GF</td><td></td><td></td></tr>
+    <tr><td>Fresh fruit platter (complimentary option)</td><td>V,GF,DF</td><td></td><td></td></tr>
+    <tr><td>Wedding cake served (client supplied)</td><td></td><td></td><td>Cutting time: _________</td></tr>
+  </table>
+
+  <h2>10) Supper / Late Night (Choose 1–2)</h2>
+  <table>
+    <tr><th style="width:44%">Supper Option</th><th style="width:18%">Dietary Tags</th><th style="width:14%">Selected (✓)</th><th>Notes</th></tr>
+    <tr><td>Woodfired pizza slices</td><td>V*</td><td></td><td></td></tr>
+    <tr><td>Italian sausage rolls</td><td></td><td></td><td></td></tr>
+    <tr><td>Cheese & antipasto platters</td><td>GF*</td><td></td><td></td></tr>
+    <tr><td>Gelato cups</td><td>V,GF*</td><td></td><td></td></tr>
+  </table>
+
+  <h2>11) Dietary Requirements Summary (Final Numbers)</h2>
+  <table>
+    <tr>
+      <th style="width:24%">Dietary Type</th>
+      <th style="width:14%">Qty</th>
+      <th style="width:18%">Strict / Allergy?</th>
+      <th>Notes (names, cross-contamination, etc.)</th>
+    </tr>
+    <tr><td>Vegetarian</td><td></td><td></td><td></td></tr>
+    <tr><td>Vegan</td><td></td><td></td><td></td></tr>
+    <tr><td>Gluten Free</td><td></td><td></td><td></td></tr>
+    <tr><td>Dairy Free</td><td></td><td></td><td></td></tr>
+    <tr><td>Nut Allergy</td><td></td><td></td><td></td></tr>
+    <tr><td>Egg Allergy</td><td></td><td></td><td></td></tr>
+    <tr><td>Seafood Allergy</td><td></td><td></td><td></td></tr>
+    <tr><td>Shellfish Allergy</td><td></td><td></td><td></td></tr>
+    <tr><td>Halal</td><td></td><td></td><td></td></tr>
+    <tr><td>Kosher Style</td><td></td><td></td><td></td></tr>
+    <tr><td>No Pork</td><td></td><td></td><td></td></tr>
+    <tr><td>Other (specify)</td><td></td><td></td><td></td></tr>
+  </table>
+
+  <h2>12) Individual Dietary Guest List</h2>
+  <table>
+    <tr>
+      <th style="width:30%">Guest Name</th>
+      <th style="width:20%">Dietary Type</th>
+      <th style="width:18%">Course(s) Affected</th>
+      <th>Notes</th>
+    </tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+  </table>
+
+  <div class="small">
+    Kitchen note: Please ensure strict allergy items are confirmed in writing and communicated to service captains.
+  </div>
+</section>
+
+<div class="pageBreak"></div>
+
+<!-- ===================== PAGE 5 ===================== -->
+<section class="page">
+  <div class="masthead">
+    <div class="brand">
+      <img src="members-lounge-logo.png" alt="Members Lounge Logo" />
+      <div class="brandTitle">
+        <h1>Beverage, Staffing & Run Sheet • Page 5</h1>
+        <p>Operations planning + timing</p>
+      </div>
+    </div>
+    <div class="docMeta">
+      <div><strong>Client:</strong> <span id="clientNameOut4">________</span></div>
+      <div><strong>Event Date:</strong> <span id="eventDateOut4">________</span></div>
+    </div>
+  </div>
+
+  <h2>13) Beverage Package / Bar Notes</h2>
+  <table>
+    <tr><th style="width:26%">Item</th><th>Details</th></tr>
+    <tr><td>Package Type</td><td><input id="bevPackage" placeholder="e.g., Standard / Premium / Bar tab / Consumption" /></td></tr>
+    <tr><td>Bar Tab Amount</td><td><input id="barTab" placeholder="$" /></td></tr>
+    <tr><td>Wine / Beer Preferences</td><td><textarea id="wineBeer" placeholder="e.g., Prosecco, Pinot Grigio, Peroni, etc."></textarea></td></tr>
+    <tr><td>Spirits Allowed?</td><td><input id="spirits" placeholder="e.g., Yes/No + list" /></td></tr>
+    <tr><td>Non-alcoholic Requirements</td><td><textarea id="na" placeholder="e.g., mocktails, juice station, coffee service"></textarea></td></tr>
+  </table>
+
+  <h2>14) Staffing / Security / Bump In-Out</h2>
+  <table>
+    <tr>
+      <th style="width:24%">Item</th>
+      <th style="width:20%">Qty / Time</th>
+      <th>Notes</th>
+    </tr>
+    <tr><td>Wait Staff</td><td></td><td></td></tr>
+    <tr><td>Bar Staff</td><td></td><td></td></tr>
+    <tr><td>Kitchen Crew</td><td></td><td></td></tr>
+    <tr><td>Security</td><td></td><td>Included in calculator above if charged</td></tr>
+    <tr><td>Bump In Time</td><td></td><td></td></tr>
+    <tr><td>Bump Out Time</td><td></td><td></td></tr>
+  </table>
+
+  <h2>15) Event Run Sheet (Timing)</h2>
+  <table>
+    <tr>
+      <th style="width:18%">Time</th>
+      <th style="width:32%">Moment</th>
+      <th style="width:20%">Responsible</th>
+      <th>Notes</th>
+    </tr>
+    <tr><td></td><td>Guests arrive / welcome</td><td></td><td></td></tr>
+    <tr><td></td><td>Canapés service</td><td></td><td></td></tr>
+    <tr><td></td><td>Entrée / antipasto</td><td></td><td></td></tr>
+    <tr><td></td><td>Speeches</td><td></td><td></td></tr>
+    <tr><td></td><td>Pasta course</td><td></td><td></td></tr>
+    <tr><td></td><td>Main course alternate drop</td><td></td><td></td></tr>
+    <tr><td></td><td>Cake cutting</td><td></td><td></td></tr>
+    <tr><td></td><td>Dessert / coffee</td><td></td><td></td></tr>
+    <tr><td></td><td>Dancing / entertainment</td><td></td><td></td></tr>
+    <tr><td></td><td>Supper</td><td></td><td></td></tr>
+    <tr><td></td><td>Last drinks / close</td><td></td><td></td></tr>
+  </table>
+</section>
+
+<div class="pageBreak"></div>
+
+<!-- ===================== PAGE 6 ===================== -->
+<section class="page">
+  <div class="masthead">
+    <div class="brand">
+      <img src="members-lounge-logo.png" alt="Members Lounge Logo" />
+      <div class="brandTitle">
+        <h1>Final Notes, Checklist & Sign-off • Page 6</h1>
+        <p>Client confirmation + venue checklist</p>
+      </div>
+    </div>
+    <div class="docMeta">
+      <div><strong>Client:</strong> <span id="clientNameOut5">________</span></div>
+      <div><strong>Event Date:</strong> <span id="eventDateOut5">________</span></div>
+    </div>
+  </div>
+
+  <h2>16) Venue Checklist</h2>
+  <table>
+    <tr><th style="width:52%">Item</th><th style="width:18%">Confirmed (✓)</th><th>Notes</th></tr>
+    <tr><td>Table layout / seating plan received</td><td></td><td></td></tr>
+    <tr><td>Dietary list finalised and supplied to kitchen</td><td></td><td></td></tr>
+    <tr><td>Entertainment / DJ / band details confirmed</td><td></td><td></td></tr>
+    <tr><td>Microphones / AV tested</td><td></td><td></td></tr>
+    <tr><td>Cake delivery time confirmed</td><td></td><td></td></tr>
+    <tr><td>Decor / styling bump-in arranged</td><td></td><td></td></tr>
+    <tr><td>Bar arrangements (tab / package) confirmed</td><td></td><td></td></tr>
+    <tr><td>Security requirement confirmed</td><td></td><td></td></tr>
+  </table>
+
+  <h2>17) Terms (Short Operational Summary)</h2>
+  <table>
+    <tr><th>Item</th><th>Summary</th></tr>
+    <tr><td>Final Numbers</td><td>Final guest numbers and dietary requirements must be confirmed by the due date above.</td></tr>
+    <tr><td>Dietaries</td><td>All allergies must be declared in writing. While care is taken, cross-contamination risk exists in any kitchen.</td></tr>
+    <tr><td>Damage / Overtime</td><td>Any additional time, damage or extraordinary cleaning may be charged where applicable.</td></tr>
+    <tr><td>Payments</td><td>Deposit secures the booking. Balance is due by the agreed due date unless otherwise arranged.</td></tr>
+  </table>
+
+  <h2>18) Sign-off</h2>
+  <table>
+    <tr><th style="width:28%">Party</th><th style="width:36%">Name</th><th style="width:18%">Signature</th><th>Date</th></tr>
+    <tr><td>Client</td><td></td><td></td><td></td></tr>
+    <tr><td>Venue Representative</td><td></td><td></td><td></td></tr>
+  </table>
+
+  <div class="small">
+    The Members Lounge | Reggio Calabria Club, Parkville
+  </div>
+</section>
 
 <script>
+  // Date display
+  (function(){
+    const d = new Date();
+    const dd = String(d.getDate()).padStart(2,'0');
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const yyyy = d.getFullYear();
+    document.getElementById('today').textContent = `${dd}/${mm}/${yyyy}`;
+  })();
+
   const $ = (id) => document.getElementById(id);
+
+  function moneyAUD(x){
+    const n = Number.isFinite(x) ? x : 0;
+    return n.toLocaleString(undefined,{ style:"currency", currency:"AUD" });
+  }
 
   function num(id){
     const v = parseFloat($(id).value);
@@ -394,19 +631,22 @@
   }
 
   function intNum(id){
-    const v = parseInt($(id).value, 10);
+    const v = parseInt($(id).value,10);
     return Number.isFinite(v) ? v : 0;
   }
 
-  function money(x){
-    const n = Number.isFinite(x) ? x : 0;
-    return n.toLocaleString(undefined, { style:"currency", currency:"AUD" });
+  function updateClientOut(){
+    const name = ($("clientName").value || "").trim() || "________";
+    const date = ($("eventDate").value || "").trim() || "________";
+    const idsN = ["clientNameOut1","clientNameOut2","clientNameOut3","clientNameOut4","clientNameOut5"];
+    const idsD = ["eventDateOut1","eventDateOut2","eventDateOut3","eventDateOut4","eventDateOut5"];
+    idsN.forEach(id => { const el = $(id); if(el) el.textContent = name; });
+    idsD.forEach(id => { const el = $(id); if(el) el.textContent = date; });
   }
 
   function calculate(){
     const adults = Math.max(0, intNum("adults"));
     const children = Math.max(0, intNum("children"));
-
     const adultSpend = Math.max(0, num("adultSpend"));
     const childSpend = Math.max(0, num("childSpend"));
 
@@ -414,50 +654,55 @@
     const dryHire  = Math.max(0, num("dryHire"));
     const security = Math.max(0, num("security"));
 
-    const totalGuests = adults + children;
-
-    // (1) Food/Spend totals
     const spendTotal = (adults * adultSpend) + (children * childSpend);
-
-    // (2) + Room Hire  (3) + Dry Hire  (4) + Security  -> Grand Total
     const grandTotal = spendTotal + roomHire + dryHire + security;
 
-    // Per-person indicators
-    const perAdult = adults > 0 ? (grandTotal / adults) : 0; // primary denominator
-    const perGuest = totalGuests > 0 ? (grandTotal / totalGuests) : 0; // weighted by headcount
-    const adultBaseline = adults * adultSpend; // just a reference line
+    const totalGuests = adults + children;
+    const perAdult = adults > 0 ? (grandTotal / adults) : NaN;  // primary denominator
+    const perGuest = totalGuests > 0 ? (grandTotal / totalGuests) : NaN;
 
-    // Output
-    $("grandTotal").textContent = money(grandTotal);
-    $("totalGuests").textContent = totalGuests.toLocaleString();
+    $("spendTotal").textContent = moneyAUD(spendTotal);
+    $("grandTotal").textContent = moneyAUD(grandTotal);
 
-    $("spendTotal").textContent = money(spendTotal);
-    $("roomHireOut").textContent = money(roomHire);
-    $("dryHireOut").textContent = money(dryHire);
-    $("securityOut").textContent = money(security);
+    // Average spend MUST be under total spent (already in layout)
+    $("perAdult").textContent = Number.isFinite(perAdult) ? moneyAUD(perAdult) : "—";
+    $("perGuest").textContent = Number.isFinite(perGuest) ? moneyAUD(perGuest) : "—";
+  }
 
-    $("perAdult").textContent = money(perAdult);
-    $("perGuest").textContent = money(perGuest);
-    $("adultBaseline").textContent = money(adultBaseline);
-
-    const notes = $("notes").value?.trim();
-    const notePart = notes ? ` Notes: ${notes}.` : "";
-    $("summaryLine").textContent =
-      `For ${totalGuests} guests (${adults} adults, ${children} children), the grand total is ${money(grandTotal)}.` +
-      ` Indicative cost per adult (primary) is ${money(perAdult)}; weighted average per guest is ${money(perGuest)}.` +
-      notePart;
-
-    // gentle guard rails
-    if (adults === 0){
-      $("perAdult").textContent = "—";
-      $("summaryLine").textContent =
-        `Adults is set to 0, so “per adult” can’t be calculated. Grand total is ${money(grandTotal)}.` +
-        ` Weighted average per guest is ${money(perGuest)}.` +
-        notePart;
-    }
+  function bind(){
+    const ids = [
+      "clientName","eventDate",
+      "adults","children","adultSpend","childSpend","roomHire","dryHire","security"
+    ];
+    ids.forEach(id => $(id).addEventListener("input", () => {
+      updateClientOut();
+      calculate();
+    }));
   }
 
   function resetAll(){
+    $("clientName").value = "";
+    $("eventType").value = "";
+    $("eventDate").value = "";
+    $("eventTimes").value = "";
+    $("room").value = "";
+    $("phone").value = "";
+    $("email").value = "";
+    $("estGuests").value = "";
+    $("finalNumsDue").value = "";
+    $("styleNotes").value = "";
+    $("avNotes").value = "";
+    $("specialRequests").value = "";
+    $("deposit").value = "";
+    $("depositDate").value = "";
+    $("balanceDue").value = "";
+    $("paymentNotes").value = "";
+    $("bevPackage").value = "";
+    $("barTab").value = "";
+    $("wineBeer").value = "";
+    $("spirits").value = "";
+    $("na").value = "";
+
     $("adults").value = 80;
     $("children").value = 20;
     $("adultSpend").value = 95;
@@ -465,21 +710,18 @@
     $("roomHire").value = 0;
     $("dryHire").value = 0;
     $("security").value = 0;
-    $("notes").value = "";
+
+    updateClientOut();
     calculate();
   }
 
-  // Auto-update on input changes
-  const ids = ["adults","children","adultSpend","childSpend","roomHire","dryHire","security","notes"];
-  ids.forEach(id => $(id).addEventListener("input", calculate));
+  document.getElementById("resetBtn").addEventListener("click", resetAll);
 
-  $("calcBtn").addEventListener("click", calculate);
-  $("resetBtn").addEventListener("click", resetAll);
-
-  $("year").textContent = new Date().getFullYear();
-
-  // Initial calc
+  // Init
+  bind();
+  updateClientOut();
   calculate();
 </script>
+
 </body>
 </html>
