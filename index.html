@@ -1,455 +1,1059 @@
----
+"use client";
 
-## ✅ 4) `app.py` (FULL WORKING CODE)
+import React, { useEffect, useMemo, useState } from "react";
+import jsPDF from "jspdf";
+// @ts-ignore
+import autoTable from "jspdf-autotable";
 
-```python
-import streamlit as st
-import pandas as pd
-from datetime import datetime
-from fpdf import FPDF
+/* =========================
+   Signature Weddings Hub
+   The Members Lounge – Parkville, Melbourne
+   Vercel-ready Next.js App
+   ========================= */
 
-# ==========================
-# PAGE CONFIG + BRAND STYLE
-# ==========================
-st.set_page_config(
-    page_title="Signature Weddings Hub | The Members Lounge",
-    page_icon="💍",
-    layout="wide"
-)
+type RunSheetRow = { time: string; item: string; owner: string; notes: string };
+type Tab =
+  | "Dashboard"
+  | "Seating"
+  | "Diary"
+  | "Menu"
+  | "Predictor"
+  | "Budget"
+  | "Upsells"
+  | "Exports"
+  | "Admin";
 
-st.markdown(
-    """
-    <style>
-      .block-container { padding-top: 1.2rem; padding-bottom: 2rem; }
-      .ml-title { font-size: 2.2rem; font-weight: 800; color: #C6A75E; margin-bottom: 0.2rem; }
-      .ml-sub { font-size: 1.05rem; opacity: 0.85; margin-top: 0; }
-      .ml-card { border: 1px solid rgba(198,167,94,0.35); border-radius: 14px; padding: 14px 16px; background: rgba(255,255,255,0.55); }
-      .ml-muted { opacity: 0.75; }
-      .ml-badge { display:inline-block; padding: 2px 10px; border-radius: 999px; background: rgba(198,167,94,0.12); border: 1px solid rgba(198,167,94,0.35); }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+type AppState = {
+  userName: string;
+  eventName: string;
+  eventDate: string; // YYYY-MM-DD
+  guestCount: number;
+  tableSize: number;
+  runSheet: RunSheetRow[];
+  selectedMenu: Record<string, string[]>;
+  upsellSelected: Record<string, boolean>;
+  budget: {
+    roomHire: number;
+    dryHire: number;
+    security: number;
+    foodPP: number;
+    bevPP: number;
+    photography: number;
+    dj: number;
+    florals: number;
+    celebrant: number;
+    misc: number;
+  };
+};
 
-# ==========================
-# HELPERS
-# ==========================
-def aud(n: float) -> str:
-    """Format number as AUD with $ symbol."""
-    try:
-        return f"${n:,.2f}"
-    except Exception:
-        return "$0.00"
+const STORAGE_KEY = "ml_signature_weddings_hub_vercel_v1";
 
-def init_state():
-    if "user_name" not in st.session_state:
-        st.session_state.user_name = "Carlo"
-    if "event_name" not in st.session_state:
-        st.session_state.event_name = "Signature Wedding"
-    if "event_date" not in st.session_state:
-        st.session_state.event_date = datetime.now().date()
-    if "guest_count" not in st.session_state:
-        st.session_state.guest_count = 120
-    if "avg_table_size" not in st.session_state:
-        st.session_state.avg_table_size = 10
-    if "run_sheet" not in st.session_state:
-        st.session_state.run_sheet = pd.DataFrame(
-            {
-                "Time": ["4:30 PM", "5:00 PM", "6:30 PM"],
-                "Item (what happens)": ["Guest Arrival", "Ceremony", "Entrées Served"],
-                "Owner (who runs it)": ["Venue", "Celebrant", "Kitchen"],
-                "Notes": ["Welcome drinks ready", "Microphone check", "Dietaries flagged"],
-            }
-        )
+const MENU_CHOICES: Record<string, string[]> = {
+  "Canapés (choose up to 6)": [
+    "Arancini (oven baked)",
+    "Polpette al sugo (mini meatballs)",
+    "Crostini (ricotta + honey + walnuts)",
+    "Bruschetta (tomato + basil)",
+    "Calamari (oven style / grilled)",
+    "Mini parmigiana bites",
+    "Prosciutto + melon",
+    "Caprese skewers",
+    "Salsiccia bites",
+    "Focaccia + dips trio",
+    "Stuffed mushrooms",
+    "Grilled prawns",
+  ],
+  "Entrées (choose up to 6)": [
+    "Antipasto misto platter",
+    "Burrata + heirloom tomato",
+    "Carpaccio di manzo",
+    "Octopus salad (insalata di polpo)",
+    "Calabrian chilli prawns (light)",
+    "Eggplant involtini",
+    "Prosciutto + buffalo mozzarella",
+    "Grilled zucchini + mint + feta",
+  ],
+  "Mains (choose up to 6)": [
+    "Lamb shoulder (slow roasted)",
+    "Chicken breast (char-grilled)",
+    "Barramundi (lemon butter + capers)",
+    "Beef scotch fillet (rosemary jus)",
+    "Pork belly (crackling, apple salsa)",
+    "Veal scaloppine (marsala)",
+    "Vegetarian parmigiana",
+  ],
+  "Desserts (choose up to 6)": [
+    "Mini cannoli",
+    "Tiramisu cups",
+    "Panna cotta",
+    "Baklava",
+    "Gelato station",
+    "Wedding cake served with berries",
+    "Affogato bar",
+  ],
+  "Supper (choose up to 6)": [
+    "Gourmet pies",
+    "Panini station",
+    "Pasta late-night cups",
+    "Arrosticini skewers",
+    "Mini burgers",
+    "Pizza slices",
+    "Fruit platters",
+  ],
+};
 
-    # Menu selections (6 each)
-    if "menu_choices" not in st.session_state:
-        st.session_state.menu_choices = {
-            "Canapés (choose up to 6)": [
-                "Arancini (oven baked)",
-                "Polpette al sugo (mini meatballs)",
-                "Crostini (ricotta + honey + walnuts)",
-                "Bruschetta (tomato + basil)",
-                "Calamari (oven style / grilled)",
-                "Mini parmigiana bites",
-                "Prosciutto + melon",
-                "Caprese skewers",
-                "Salsiccia bites",
-                "Focaccia + dips trio",
-                "Stuffed mushrooms",
-                "Grilled prawns",
-            ],
-            "Entrées (choose up to 6)": [
-                "Antipasto misto platter",
-                "Burrata + heirloom tomato",
-                "Carpaccio di manzo",
-                "Octopus salad (insalata di polpo)",
-                "Calabrian chilli prawns (light)",
-                "Eggplant involtini",
-                "Prosciutto + buffalo mozzarella",
-                "Grilled zucchini + mint + feta",
-            ],
-            "Mains (choose up to 6)": [
-                "Lamb shoulder (slow roasted)",
-                "Chicken breast (char-grilled)",
-                "Barramundi (lemon butter + capers)",
-                "Beef scotch fillet (rosemary jus)",
-                "Pork belly (crackling, apple salsa)",
-                "Veal scaloppine (marsala)",
-                "Vegetarian parmigiana",
-            ],
-            "Desserts (choose up to 6)": [
-                "Mini cannoli",
-                "Tiramisu cups",
-                "Panna cotta",
-                "Baklava",
-                "Gelato station",
-                "Wedding cake served with berries",
-                "Affogato bar",
-            ],
-            "Supper (choose up to 6)": [
-                "Gourmet pies",
-                "Panini station",
-                "Pasta late-night cups",
-                "Arrosticini skewers",
-                "Mini burgers",
-                "Pizza slices",
-                "Fruit platters",
-            ],
-        }
+const DEFAULT_STATE: AppState = {
+  userName: "Carlo",
+  eventName: "Signature Wedding",
+  eventDate: new Date().toISOString().slice(0, 10),
+  guestCount: 120,
+  tableSize: 10,
+  runSheet: [
+    { time: "4:30 PM", item: "Guest Arrival", owner: "Venue", notes: "Welcome drinks ready" },
+    { time: "5:00 PM", item: "Ceremony", owner: "Celebrant", notes: "Microphone check" },
+    { time: "6:30 PM", item: "Entrées Served", owner: "Kitchen", notes: "Dietaries flagged" },
+  ],
+  selectedMenu: Object.fromEntries(Object.keys(MENU_CHOICES).map((k) => [k, []])),
+  upsellSelected: {
+    "Premium Champagne Tower": false,
+    "Live Italian Band": false,
+    "Luxury Floral Upgrade": false,
+    "Premium Wedding Cake Upgrade": false,
+    "Signature Late Night Supper": false,
+    "Extended Spirit Package": false,
+  },
+  budget: {
+    roomHire: 8000,
+    dryHire: 0,
+    security: 1500,
+    foodPP: 110,
+    bevPP: 75,
+    photography: 0,
+    dj: 0,
+    florals: 0,
+    celebrant: 0,
+    misc: 0,
+  },
+};
 
-    if "selected_menu" not in st.session_state:
-        st.session_state.selected_menu = {k: [] for k in st.session_state.menu_choices.keys()}
+// ---------- helpers ----------
+function aud(n: number) {
+  if (!Number.isFinite(n)) return "$0.00";
+  return new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(n);
+}
 
-init_state()
+function tablesRequired(guests: number, tableSize: number) {
+  if (tableSize <= 0) return 0;
+  return Math.ceil(guests / tableSize);
+}
 
-def tables_required(guests: int, table_size: int) -> int:
-    if table_size <= 0:
-        return 0
-    return int((guests + table_size - 1) // table_size)
-
-def build_budget(
-    guests: int,
-    room_hire: float,
-    dry_hire: float,
-    security: float,
-    food_pp: float,
-    bev_pp: float,
-    photo: float,
-    dj: float,
-    florals: float,
-    celebrant: float,
-    misc: float,
-    upsells: float,
-):
-    food_total = guests * food_pp
-    bev_total = guests * bev_pp
-    total = room_hire + dry_hire + security + food_total + bev_total + photo + dj + florals + celebrant + misc + upsells
-    per_guest = total / guests if guests else 0
+function loadState(): AppState {
+  if (typeof window === "undefined") return DEFAULT_STATE;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return DEFAULT_STATE;
+    const parsed = JSON.parse(raw) as AppState;
+    // Merge defaults for safety if structure changes
     return {
-        "guests": guests,
-        "room_hire": room_hire,
-        "dry_hire": dry_hire,
-        "security": security,
-        "food_pp": food_pp,
-        "bev_pp": bev_pp,
-        "food_total": food_total,
-        "bev_total": bev_total,
-        "photo": photo,
-        "dj": dj,
-        "florals": florals,
-        "celebrant": celebrant,
-        "misc": misc,
-        "upsells": upsells,
-        "total": total,
-        "per_guest": per_guest,
-    }
+      ...DEFAULT_STATE,
+      ...parsed,
+      budget: { ...DEFAULT_STATE.budget, ...(parsed.budget || {}) },
+      selectedMenu: { ...DEFAULT_STATE.selectedMenu, ...(parsed.selectedMenu || {}) },
+      upsellSelected: { ...DEFAULT_STATE.upsellSelected, ...(parsed.upsellSelected || {}) },
+      runSheet: Array.isArray(parsed.runSheet) ? parsed.runSheet : DEFAULT_STATE.runSheet,
+    };
+  } catch {
+    return DEFAULT_STATE;
+  }
+}
 
-def make_pdf(title: str, lines: list[str], out_path: str):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.set_font("Helvetica", size=14)
-    pdf.cell(0, 10, title, ln=True)
-    pdf.ln(2)
-    pdf.set_font("Helvetica", size=11)
-    for line in lines:
-        pdf.multi_cell(0, 6, line)
-    pdf.output(out_path)
+function saveState(state: AppState) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
 
-# ==========================
-# HEADER
-# ==========================
-left, right = st.columns([0.78, 0.22], vertical_alignment="center")
-with left:
-    st.markdown("<div class='ml-title'>Signature Weddings Hub</div>", unsafe_allow_html=True)
-    st.markdown("<div class='ml-sub'>The Members Lounge • Parkville, Melbourne</div>", unsafe_allow_html=True)
-with right:
-    st.markdown(f"<div class='ml-badge'>Logged in as <b>{st.session_state.user_name}</b></div>", unsafe_allow_html=True)
+function toCSV(rows: Record<string, any>[]) {
+  if (!rows.length) return "";
+  const headers = Object.keys(rows[0]);
+  const esc = (v: any) => `"${String(v ?? "").replaceAll('"', '""')}"`;
+  const out = [headers.join(",")];
+  for (const r of rows) out.push(headers.map((h) => esc(r[h])).join(","));
+  return out.join("\n");
+}
 
-st.divider()
+function downloadText(filename: string, text: string, mime = "text/plain") {
+  const blob = new Blob([text], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 
-# ==========================
-# SIDEBAR NAV
-# ==========================
-st.sidebar.header("Navigation")
-module = st.sidebar.radio(
-    "Go to",
-    [
-        "Dashboard",
-        "Seating",
-        "Diary (Run Sheet)",
-        "Menu Selection (6 each)",
-        "Guestlist Predictor",
-        "Budget Calculator",
-        "Upsell Engine",
-        "Export Center",
-        "Admin Settings",
-    ],
-)
+function calcBudget(state: AppState) {
+  const g = state.guestCount;
+  const b = state.budget;
+  const foodTotal = g * b.foodPP;
+  const bevTotal = g * b.bevPP;
 
-# ==========================
-# DASHBOARD
-# ==========================
-if module == "Dashboard":
-    st.subheader("Real-Time Dashboard")
+  const upsellTotal = Object.entries(state.upsellSelected).reduce((sum, [name, on]) => {
+    if (!on) return sum;
+    return sum + UPSALES[name];
+  }, 0);
 
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Event", st.session_state.event_name)
-    col2.metric("Event Date", str(st.session_state.event_date))
-    col3.metric("Guests (current)", st.session_state.guest_count)
-    col4.metric("Tables (auto)", tables_required(st.session_state.guest_count, st.session_state.avg_table_size))
+  const total =
+    b.roomHire +
+    b.dryHire +
+    b.security +
+    foodTotal +
+    bevTotal +
+    b.photography +
+    b.dj +
+    b.florals +
+    b.celebrant +
+    b.misc +
+    upsellTotal;
 
-    st.markdown("<div class='ml-card'>", unsafe_allow_html=True)
-    st.write("**Status**: On Track ✅")
-    st.write("**Melbourne Weather**: Placeholder (API can be connected later)")
-    st.write("**Notes**: This dashboard updates live as you change guests, seating, and budget.")
-    st.markdown("</div>", unsafe_allow_html=True)
+  const perGuest = g > 0 ? total / g : 0;
+  return { foodTotal, bevTotal, upsellTotal, total, perGuest };
+}
 
-    st.caption("Tip: Use the left sidebar like tabs — couples can jump between modules instantly on mobile.")
+const UPSALES: Record<string, number> = {
+  "Premium Champagne Tower": 2500,
+  "Live Italian Band": 4500,
+  "Luxury Floral Upgrade": 6000,
+  "Premium Wedding Cake Upgrade": 1800,
+  "Signature Late Night Supper": 2200,
+  "Extended Spirit Package": 3200,
+};
 
-# ==========================
-# SEATING
-# ==========================
-elif module == "Seating":
-    st.subheader("Seating Management (Dynamic Scaling)")
+// ---------- UI components ----------
+function TabButton({ label, active, onClick }: { label: Tab; active: boolean; onClick: () => void }) {
+  return (
+    <button className={`tab ${active ? "tabActive" : ""}`} onClick={onClick} type="button">
+      {label}
+    </button>
+  );
+}
 
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        st.session_state.guest_count = st.number_input("Total Guests", 20, 600, int(st.session_state.guest_count))
-    with c2:
-        st.session_state.avg_table_size = st.number_input("Seats per Table", 6, 14, int(st.session_state.avg_table_size))
-    with c3:
-        st.metric("Tables Required", tables_required(st.session_state.guest_count, st.session_state.avg_table_size))
+function Field({
+  label,
+  value,
+  onChange,
+  type = "text",
+  min,
+  max,
+  step,
+}: {
+  label: string;
+  value: any;
+  onChange: (v: any) => void;
+  type?: string;
+  min?: number;
+  max?: number;
+  step?: number;
+}) {
+  return (
+    <div className="card" style={{ padding: 12 }}>
+      <div className="small muted" style={{ fontWeight: 900, marginBottom: 6 }}>
+        {label}
+      </div>
+      <input
+        className="input"
+        value={value}
+        type={type}
+        min={min}
+        max={max}
+        step={step}
+        onChange={(e) => onChange(type === "number" ? Number(e.target.value) : e.target.value)}
+      />
+    </div>
+  );
+}
 
-    st.text_area(
-        "Floor Plan Notes (VIP, stage, aisle, parents tables, etc.)",
-        value="VIP table near stage. Parents at Table 1. Dancefloor clear line of sight.",
-        height=120,
-    )
+// ---------- main ----------
+export default function Page() {
+  const [tab, setTab] = useState<Tab>("Dashboard");
+  const [state, setState] = useState<AppState>(DEFAULT_STATE);
 
-# ==========================
-# DIARY / RUN SHEET
-# ==========================
-elif module == "Diary (Run Sheet)":
-    st.subheader("Diary (Run Sheet) – Item-First Structure")
+  // load once
+  useEffect(() => {
+    setState(loadState());
+  }, []);
 
-    st.write("Edit live. Add rows for speeches, cake, first dance, bouquet, supper, send-off, etc.")
-    st.session_state.run_sheet = st.data_editor(st.session_state.run_sheet, num_rows="dynamic", use_container_width=True)
+  // autosave
+  useEffect(() => {
+    saveState(state);
+  }, [state]);
 
-    st.info("Upsell prompt idea: before saving final run sheet → suggest late-night supper, band, or champagne tower.")
+  const budget = useMemo(() => calcBudget(state), [state]);
 
-# ==========================
-# MENU SELECTIONS (6 each)
-# ==========================
-elif module == "Menu Selection (6 each)":
-    st.subheader("Menu Selection – Choose up to 6 in each category")
+  const todayLabel = useMemo(() => {
+    const d = new Date();
+    return d.toLocaleDateString("en-AU", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
+  }, []);
 
-    st.caption("These are placeholder menu options. You can paste the exact list from reggiocalabriaclub.com.au anytime.")
+  const tableCount = useMemo(() => tablesRequired(state.guestCount, state.tableSize), [state.guestCount, state.tableSize]);
 
-    for section, options in st.session_state.menu_choices.items():
-        st.markdown(f"### {section}")
-        selected = st.multiselect(
-            f"Select up to 6 for: {section}",
-            options=options,
-            default=st.session_state.selected_menu.get(section, []),
-            max_selections=6,
-            key=f"menu_{section}",
-        )
-        st.session_state.selected_menu[section] = selected
+  const headerRight = (
+    <div className="row" style={{ justifyContent: "flex-end" }}>
+      <span className="badge">Logged in as <b>{state.userName}</b></span>
+    </div>
+  );
 
-    st.success("Selections saved in-session. For multi-user, connect SQLite/Firebase.")
+  return (
+    <div className="container">
+      <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+        <div>
+          <h1 className="headerTitle">Signature Weddings Hub</h1>
+          <p className="headerSub">The Members Lounge • Parkville, Melbourne • {todayLabel}</p>
+        </div>
+        {headerRight}
+      </div>
 
-# ==========================
-# GUESTLIST PREDICTOR
-# ==========================
-elif module == "Guestlist Predictor":
-    st.subheader("Guestlist Predictor (AI-like Forecast)")
+      <div className="tabs" style={{ marginTop: 14 }}>
+        {(
+          ["Dashboard", "Seating", "Diary", "Menu", "Predictor", "Budget", "Upsells", "Exports", "Admin"] as Tab[]
+        ).map((t) => (
+          <TabButton key={t} label={t} active={tab === t} onClick={() => setTab(t)} />
+        ))}
+      </div>
 
-    invited = st.number_input("Invited Guests", 50, 800, 160)
-    response_rate = st.slider("Expected RSVP Rate (%)", 40, 100, 85)
-    seasonal_factor = st.selectbox("Seasonal Factor (Melbourne)", ["Standard", "Peak Season (+3%)", "Low Season (-5%)"])
+      <hr className="hr" />
 
-    adj = 0
-    if seasonal_factor == "Peak Season (+3%)":
-        adj = 3
-    elif seasonal_factor == "Low Season (-5%)":
-        adj = -5
+      {/* DASHBOARD */}
+      {tab === "Dashboard" && (
+        <>
+          <div className="grid4">
+            <div className="card">
+              <div className="h2">Event</div>
+              <div style={{ fontWeight: 900 }}>{state.eventName}</div>
+              <div className="muted small">Date: {state.eventDate}</div>
+            </div>
 
-    predicted = int(invited * ((response_rate + adj) / 100))
-    st.metric("Predicted Final Guests", predicted)
+            <div className="card">
+              <div className="h2">Guests</div>
+              <div style={{ fontWeight: 900, fontSize: 26 }}>{state.guestCount}</div>
+              <div className="muted small">Live from Predictor / Seating</div>
+            </div>
 
-    if st.button("Apply Prediction to Seating/Budget"):
-        st.session_state.guest_count = predicted
-        st.success(f"Applied: guest count is now {predicted}")
+            <div className="card">
+              <div className="h2">Tables</div>
+              <div style={{ fontWeight: 900, fontSize: 26 }}>{tableCount}</div>
+              <div className="muted small">{state.tableSize} seats per table</div>
+            </div>
 
-# ==========================
-# BUDGET
-# ==========================
-elif module == "Budget Calculator":
-    st.subheader("Budget Calculator (AUD $)")
+            <div className="card">
+              <div className="h2">Avg / Guest</div>
+              <div style={{ fontWeight: 900, fontSize: 26 }}>{aud(budget.perGuest)}</div>
+              <div className="muted small">Includes upsells if selected</div>
+            </div>
+          </div>
 
-    guests = int(st.session_state.guest_count)
+          <div className="grid2" style={{ marginTop: 12 }}>
+            <div className="card">
+              <div className="h2">Status</div>
+              <div style={{ fontWeight: 900 }}>On Track ✅</div>
+              <div className="muted small" style={{ marginTop: 6 }}>
+                Melbourne Weather: Placeholder (API integration point)
+              </div>
+              <div className="muted small">VR Tour: Placeholder link (Admin tab)</div>
+            </div>
 
-    st.markdown("#### Core Venue Costs")
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        room_hire = st.number_input("Room Hire ($)", 0, 100000, 8000)
-    with c2:
-        dry_hire = st.number_input("Dry Hire ($)", 0, 100000, 0)
-    with c3:
-        security = st.number_input("Security ($)", 0, 50000, 1500)
+            <div className="card">
+              <div className="h2">Quick Actions</div>
+              <div className="row">
+                <button className="btn btnGold" onClick={() => setTab("Budget")} type="button">
+                  Open Budget
+                </button>
+                <button className="btn btnGold" onClick={() => setTab("Diary")} type="button">
+                  Open Run Sheet
+                </button>
+                <button className="btn btnGold" onClick={() => setTab("Menu")} type="button">
+                  Menu Selections
+                </button>
+              </div>
+              <div className="muted small" style={{ marginTop: 10 }}>
+                This app saves automatically on your phone/browser.
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
-    st.markdown("#### Per Person Packages")
-    c4, c5 = st.columns(2)
-    with c4:
-        food_pp = st.number_input("Food Per Person ($)", 0, 1000, 110)
-    with c5:
-        bev_pp = st.number_input("Beverage Per Person ($)", 0, 1000, 75)
+      {/* SEATING */}
+      {tab === "Seating" && (
+        <>
+          <div className="grid3">
+            <Field
+              label="Total Guests"
+              type="number"
+              min={20}
+              max={800}
+              value={state.guestCount}
+              onChange={(v) => setState((s) => ({ ...s, guestCount: v }))}
+            />
+            <Field
+              label="Seats Per Table"
+              type="number"
+              min={6}
+              max={14}
+              value={state.tableSize}
+              onChange={(v) => setState((s) => ({ ...s, tableSize: v }))}
+            />
+            <div className="card">
+              <div className="h2">Auto Result</div>
+              <div style={{ fontWeight: 900, fontSize: 26 }}>{tableCount} tables</div>
+              <div className="muted small">Dynamic scaling based on guest count</div>
+            </div>
+          </div>
 
-    st.markdown("#### Expanded Options (Optional Vendors)")
-    c6, c7, c8 = st.columns(3)
-    with c6:
-        photo = st.number_input("Photography ($)", 0, 100000, 0)
-        celebrant = st.number_input("Celebrant ($)", 0, 20000, 0)
-    with c7:
-        dj = st.number_input("DJ / Entertainment ($)", 0, 100000, 0)
-        florals = st.number_input("Florals ($)", 0, 150000, 0)
-    with c8:
-        misc = st.number_input("Misc / Contingency ($)", 0, 100000, 0)
+          <div className="card" style={{ marginTop: 12 }}>
+            <div className="h2">Floor Plan Notes (text for now)</div>
+            <textarea
+              className="textarea"
+              value={(state as any).floorNotes || "VIP near stage. Parents Table 1. Dancefloor clear line of sight."}
+              onChange={(e) => setState((s: any) => ({ ...s, floorNotes: e.target.value }))}
+            />
+            <div className="muted small" style={{ marginTop: 8 }}>
+              Upgrade path: interactive floor plan image/SVG editor.
+            </div>
+          </div>
+        </>
+      )}
 
-    st.divider()
+      {/* DIARY */}
+      {tab === "Diary" && (
+        <>
+          <div className="card">
+            <div className="h2">Diary (Run Sheet) – Item-first</div>
+            <div className="muted small">
+              Add / edit rows live. This becomes your wedding-day command centre.
+            </div>
 
-    # Upsells pass-through (from Upsell module) stored in session, default 0
-    upsells = float(st.session_state.get("upsell_total", 0.0))
+            <div style={{ marginTop: 10 }}>
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th style={{ width: 120 }}>Time</th>
+                    <th>Item (what happens)</th>
+                    <th style={{ width: 170 }}>Owner</th>
+                    <th>Notes</th>
+                    <th style={{ width: 90 }}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {state.runSheet.map((r, idx) => (
+                    <tr key={idx}>
+                      <td>
+                        <input
+                          className="input"
+                          value={r.time}
+                          onChange={(e) => {
+                            const next = [...state.runSheet];
+                            next[idx] = { ...next[idx], time: e.target.value };
+                            setState((s) => ({ ...s, runSheet: next }));
+                          }}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          className="input"
+                          value={r.item}
+                          onChange={(e) => {
+                            const next = [...state.runSheet];
+                            next[idx] = { ...next[idx], item: e.target.value };
+                            setState((s) => ({ ...s, runSheet: next }));
+                          }}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          className="input"
+                          value={r.owner}
+                          onChange={(e) => {
+                            const next = [...state.runSheet];
+                            next[idx] = { ...next[idx], owner: e.target.value };
+                            setState((s) => ({ ...s, runSheet: next }));
+                          }}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          className="input"
+                          value={r.notes}
+                          onChange={(e) => {
+                            const next = [...state.runSheet];
+                            next[idx] = { ...next[idx], notes: e.target.value };
+                            setState((s) => ({ ...s, runSheet: next }));
+                          }}
+                        />
+                      </td>
+                      <td>
+                        <button
+                          className="btn"
+                          onClick={() => {
+                            const next = state.runSheet.filter((_, i) => i !== idx);
+                            setState((s) => ({ ...s, runSheet: next }));
+                          }}
+                          type="button"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
 
-    budget = build_budget(
-        guests=guests,
-        room_hire=float(room_hire),
-        dry_hire=float(dry_hire),
-        security=float(security),
-        food_pp=float(food_pp),
-        bev_pp=float(bev_pp),
-        photo=float(photo),
-        dj=float(dj),
-        florals=float(florals),
-        celebrant=float(celebrant),
-        misc=float(misc),
-        upsells=float(upsells),
-    )
+              <div className="row" style={{ marginTop: 10 }}>
+                <button
+                  className="btn btnGold"
+                  onClick={() =>
+                    setState((s) => ({
+                      ...s,
+                      runSheet: [...s.runSheet, { time: "—", item: "New Item", owner: "Venue", notes: "" }],
+                    }))
+                  }
+                  type="button"
+                >
+                  + Add Row
+                </button>
+                <span className="muted small" style={{ alignSelf: "center" }}>
+                  Upsell prompt idea: when finalising run sheet → offer late-night supper / band / spirits extension.
+                </span>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
-    st.markdown("<div class='ml-card'>", unsafe_allow_html=True)
-    colA, colB, colC = st.columns(3)
-    colA.metric("Total Budget", aud(budget["total"]))
-    colB.metric("Average Spend / Guest", aud(budget["per_guest"]))
-    colC.metric("Guests Used", budget["guests"])
-    st.markdown("</div>", unsafe_allow_html=True)
+      {/* MENU */}
+      {tab === "Menu" && (
+        <>
+          <div className="card">
+            <div className="h2">Menu Selections (Choose up to 6 each)</div>
+            <div className="muted small">
+              These are placeholders — paste your exact Members Lounge menu lists later and we’ll replace.
+            </div>
+          </div>
 
-    st.caption("Weighted-average is based on adult spend denominator (guest count). Children can be handled later as a separate pricing rule.")
+          {Object.entries(MENU_CHOICES).map(([section, options]) => {
+            const picked = state.selectedMenu[section] || [];
+            return (
+              <div className="card" key={section} style={{ marginTop: 12 }}>
+                <div className="h2">{section}</div>
+                <div className="muted small">Selected: {picked.length} / 6</div>
 
-# ==========================
-# UPSELL ENGINE
-# ==========================
-elif module == "Upsell Engine":
-    st.subheader("Upsell Engine (AI-like Prompts)")
+                <div className="row" style={{ marginTop: 8 }}>
+                  {options.map((opt) => {
+                    const isOn = picked.includes(opt);
+                    return (
+                      <button
+                        key={opt}
+                        className={`chip ${isOn ? "tabActive" : ""}`}
+                        type="button"
+                        onClick={() => {
+                          setState((s) => {
+                            const curr = s.selectedMenu[section] || [];
+                            if (curr.includes(opt)) {
+                              return {
+                                ...s,
+                                selectedMenu: { ...s.selectedMenu, [section]: curr.filter((x) => x !== opt) },
+                              };
+                            }
+                            if (curr.length >= 6) return s; // cap at 6
+                            return { ...s, selectedMenu: { ...s.selectedMenu, [section]: [...curr, opt] } };
+                          });
+                        }}
+                        title="Tap to toggle"
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
 
-    upsell_options = {
-        "Premium Champagne Tower": 2500,
-        "Live Italian Band": 4500,
-        "Luxury Floral Upgrade": 6000,
-        "Premium Wedding Cake Upgrade": 1800,
-        "Signature Late Night Supper": 2200,
-        "Extended Spirit Package": 3200,
-    }
+                {picked.length >= 6 && (
+                  <div className="muted small" style={{ marginTop: 10 }}>
+                    Limit reached (6). Unselect one to add another.
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </>
+      )}
 
-    total = 0
-    selected = []
-    for name, price in upsell_options.items():
-        if st.checkbox(f"{name} (+{aud(price)})", key=f"upsell_{name}"):
-            total += price
-            selected.append(name)
+      {/* PREDICTOR */}
+      {tab === "Predictor" && (
+        <>
+          <div className="grid3">
+            <Field
+              label="Guests Invited"
+              type="number"
+              min={50}
+              max={1000}
+              value={(state as any).invited || 160}
+              onChange={(v) => setState((s: any) => ({ ...s, invited: v }))}
+            />
+            <div className="card">
+              <div className="small muted" style={{ fontWeight: 900, marginBottom: 6 }}>
+                Expected RSVP Rate (%)
+              </div>
+              <input
+                className="input"
+                type="number"
+                min={40}
+                max={100}
+                value={(state as any).rsvpRate || 85}
+                onChange={(e) => setState((s: any) => ({ ...s, rsvpRate: Number(e.target.value) }))}
+              />
+              <div className="muted small" style={{ marginTop: 8 }}>
+                (Simple predictor — upgrade path to vendor + trend model.)
+              </div>
+            </div>
+            <div className="card">
+              <div className="small muted" style={{ fontWeight: 900, marginBottom: 6 }}>
+                Seasonal Factor (Melbourne)
+              </div>
+              <select
+                className="select"
+                value={(state as any).season || "Standard"}
+                onChange={(e) => setState((s: any) => ({ ...s, season: e.target.value }))}
+              >
+                <option>Standard</option>
+                <option>Peak Season (+3%)</option>
+                <option>Low Season (-5%)</option>
+              </select>
+            </div>
+          </div>
 
-    st.session_state.upsell_total = float(total)
+          <div className="card" style={{ marginTop: 12 }}>
+            <div className="h2">Prediction</div>
+            {(() => {
+              const invited = Number((state as any).invited || 160);
+              const rsvp = Number((state as any).rsvpRate || 85);
+              const season = (state as any).season || "Standard";
+              const adj = season === "Peak Season (+3%)" ? 3 : season === "Low Season (-5%)" ? -5 : 0;
+              const predicted = Math.max(0, Math.floor(invited * ((rsvp + adj) / 100)));
+              return (
+                <>
+                  <div style={{ fontWeight: 900, fontSize: 26 }}>{predicted} guests predicted</div>
+                  <div className="muted small">Tap apply to push guest count into Seating + Budget.</div>
+                  <div className="row" style={{ marginTop: 10 }}>
+                    <button
+                      className="btn btnGold"
+                      type="button"
+                      onClick={() => setState((s) => ({ ...s, guestCount: predicted }))}
+                    >
+                      Apply Prediction
+                    </button>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        </>
+      )}
 
-    st.metric("Upsell Total", aud(total))
+      {/* BUDGET */}
+      {tab === "Budget" && (
+        <>
+          <div className="card">
+            <div className="h2">Budget Calculator (AUD $)</div>
+            <div className="muted small">
+              Includes Room Hire, Dry Hire, Security, Food/Bev per person, optional vendors, and selected upsells.
+            </div>
+          </div>
 
-    if total > 0:
-        st.success("Experience Level: Platinum Signature ✅")
-        st.write("Selected upgrades:", ", ".join(selected))
+          <div className="grid3" style={{ marginTop: 12 }}>
+            <Field
+              label="Room Hire ($)"
+              type="number"
+              min={0}
+              max={200000}
+              value={state.budget.roomHire}
+              onChange={(v) => setState((s) => ({ ...s, budget: { ...s.budget, roomHire: v } }))}
+            />
+            <Field
+              label="Dry Hire ($)"
+              type="number"
+              min={0}
+              max={200000}
+              value={state.budget.dryHire}
+              onChange={(v) => setState((s) => ({ ...s, budget: { ...s.budget, dryHire: v } }))}
+            />
+            <Field
+              label="Security ($)"
+              type="number"
+              min={0}
+              max={100000}
+              value={state.budget.security}
+              onChange={(v) => setState((s) => ({ ...s, budget: { ...s.budget, security: v } }))}
+            />
+          </div>
 
-# ==========================
-# EXPORTS
-# ==========================
-elif module == "Export Center":
-    st.subheader("Export Center")
+          <div className="grid2" style={{ marginTop: 12 }}>
+            <Field
+              label="Food Per Person ($)"
+              type="number"
+              min={0}
+              max={2000}
+              value={state.budget.foodPP}
+              onChange={(v) => setState((s) => ({ ...s, budget: { ...s.budget, foodPP: v } }))}
+            />
+            <Field
+              label="Beverage Per Person ($)"
+              type="number"
+              min={0}
+              max={2000}
+              value={state.budget.bevPP}
+              onChange={(v) => setState((s) => ({ ...s, budget: { ...s.budget, bevPP: v } }))}
+            />
+          </div>
 
-    st.markdown("### Run Sheet Exports")
-    run_csv = st.session_state.run_sheet.to_csv(index=False).encode("utf-8")
-    st.download_button("Download Run Sheet (CSV)", run_csv, file_name="run_sheet.csv", mime="text/csv")
+          <div className="grid3" style={{ marginTop: 12 }}>
+            <Field
+              label="Photography ($)"
+              type="number"
+              min={0}
+              max={200000}
+              value={state.budget.photography}
+              onChange={(v) => setState((s) => ({ ...s, budget: { ...s.budget, photography: v } }))}
+            />
+            <Field
+              label="DJ / Entertainment ($)"
+              type="number"
+              min={0}
+              max={200000}
+              value={state.budget.dj}
+              onChange={(v) => setState((s) => ({ ...s, budget: { ...s.budget, dj: v } }))}
+            />
+            <Field
+              label="Florals ($)"
+              type="number"
+              min={0}
+              max={200000}
+              value={state.budget.florals}
+              onChange={(v) => setState((s) => ({ ...s, budget: { ...s.budget, florals: v } }))}
+            />
+          </div>
 
-    if st.button("Generate Run Sheet PDF"):
-        lines = [f"{row['Time']} — {row['Item (what happens)']} — Owner: {row['Owner (who runs it)']} — Notes: {row.get('Notes','')}"
-                 for _, row in st.session_state.run_sheet.iterrows()]
-        make_pdf("Signature Weddings Run Sheet | The Members Lounge", lines, "run_sheet.pdf")
-        with open("run_sheet.pdf", "rb") as f:
-            st.download_button("Download Run Sheet (PDF)", f, file_name="run_sheet.pdf", mime="application/pdf")
+          <div className="grid2" style={{ marginTop: 12 }}>
+            <Field
+              label="Celebrant ($)"
+              type="number"
+              min={0}
+              max={20000}
+              value={state.budget.celebrant}
+              onChange={(v) => setState((s) => ({ ...s, budget: { ...s.budget, celebrant: v } }))}
+            />
+            <Field
+              label="Misc / Contingency ($)"
+              type="number"
+              min={0}
+              max={200000}
+              value={state.budget.misc}
+              onChange={(v) => setState((s) => ({ ...s, budget: { ...s.budget, misc: v } }))}
+            />
+          </div>
 
-    st.divider()
+          <div className="grid4" style={{ marginTop: 12 }}>
+            <div className="card">
+              <div className="h2">Food Total</div>
+              <div style={{ fontWeight: 900, fontSize: 24 }}>{aud(budget.foodTotal)}</div>
+              <div className="muted small">{state.guestCount} × {aud(state.budget.foodPP)}</div>
+            </div>
+            <div className="card">
+              <div className="h2">Beverage Total</div>
+              <div style={{ fontWeight: 900, fontSize: 24 }}>{aud(budget.bevTotal)}</div>
+              <div className="muted small">{state.guestCount} × {aud(state.budget.bevPP)}</div>
+            </div>
+            <div className="card">
+              <div className="h2">Upsells Total</div>
+              <div style={{ fontWeight: 900, fontSize: 24 }}>{aud(budget.upsellTotal)}</div>
+              <div className="muted small">From Upsells tab</div>
+            </div>
+            <div className="card">
+              <div className="h2">Total / Guest</div>
+              <div style={{ fontWeight: 900, fontSize: 24 }}>{aud(budget.perGuest)}</div>
+              <div className="muted small">Weighted on guest count</div>
+            </div>
+          </div>
 
-    st.markdown("### Menu Selections Export")
-    menu_rows = []
-    for section, picked in st.session_state.selected_menu.items():
-        for item in picked:
-            menu_rows.append({"Section": section, "Selection": item})
-    menu_df = pd.DataFrame(menu_rows) if menu_rows else pd.DataFrame([{"Section": "None", "Selection": "No items selected yet"}])
+          <div className="card" style={{ marginTop: 12 }}>
+            <div className="h2">Total Estimated Investment</div>
+            <div style={{ fontWeight: 900, fontSize: 30 }}>{aud(budget.total)}</div>
+          </div>
+        </>
+      )}
 
-    menu_csv = menu_df.to_csv(index=False).encode("utf-8")
-    st.download_button("Download Menu Selections (CSV)", menu_csv, file_name="menu_selections.csv", mime="text/csv")
+      {/* UPSELLS */}
+      {tab === "Upsells" && (
+        <>
+          <div className="card">
+            <div className="h2">Upsell Engine</div>
+            <div className="muted small">Tap to toggle upgrades. These feed into Budget automatically.</div>
+          </div>
 
-    st.divider()
+          <div className="grid2" style={{ marginTop: 12 }}>
+            {Object.entries(UPSALES).map(([name, price]) => {
+              const on = !!state.upsellSelected[name];
+              return (
+                <div className="card" key={name}>
+                  <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <div style={{ fontWeight: 900 }}>{name}</div>
+                      <div className="muted small">+ {aud(price)}</div>
+                    </div>
+                    <button
+                      className={`btn ${on ? "btnGold" : ""}`}
+                      type="button"
+                      onClick={() =>
+                        setState((s) => ({
+                          ...s,
+                          upsellSelected: { ...s.upsellSelected, [name]: !s.upsellSelected[name] },
+                        }))
+                      }
+                    >
+                      {on ? "Selected" : "Select"}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
-    st.markdown("### iCal Placeholder")
-    st.code(
-        "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Members Lounge//Signature Weddings Hub//EN\nBEGIN:VEVENT\nSUMMARY:Wedding Day\nDTSTART:20260101T170000\nDTEND:20260101T235900\nLOCATION:The Members Lounge, Parkville\nEND:VEVENT\nEND:VCALENDAR",
-        language="text",
-    )
-    st.caption("Replace DTSTART/DTEND with the real event date/time when ready.")
+          <div className="card" style={{ marginTop: 12 }}>
+            <div className="h2">Experience Level</div>
+            <div style={{ fontWeight: 900 }}>
+              {budget.upsellTotal > 0 ? "Platinum Signature ✅" : "Signature ✅"}
+            </div>
+          </div>
+        </>
+      )}
 
-# ==========================
-# ADMIN
-# ==========================
-elif module == "Admin Settings":
-    st.subheader("Admin Settings (Simulated Login + Production Notes)")
+      {/* EXPORTS */}
+      {tab === "Exports" && (
+        <>
+          <div className="card">
+            <div className="h2">Export Center</div>
+            <div className="muted small">Downloads are generated on your device (CSV / iCal / PDF).</div>
+          </div>
 
-    st.session_state.user_name = st.text_input("Display Name", value=st.session_state.user_name)
-    st.session_state.event_name = st.text_input("Default Event Name", value=st.session_state.event_name)
-    st.session_state.event_date = st.date_input("Event Date", value=st.session_state.event_date)
+          <div className="grid2" style={{ marginTop: 12 }}>
+            <div className="card">
+              <div className="h2">Run Sheet (CSV / PDF)</div>
+              <div className="row" style={{ marginTop: 8 }}>
+                <button
+                  className="btn btnGold"
+                  type="button"
+                  onClick={() => {
+                    const rows = state.runSheet.map((r) => ({
+                      Time: r.time,
+                      Item: r.item,
+                      Owner: r.owner,
+                      Notes: r.notes,
+                    }));
+                    downloadText("run_sheet.csv", toCSV(rows), "text/csv");
+                  }}
+                >
+                  Download CSV
+                </button>
 
-    st.divider()
-    st.markdown("### Integrations (Placeholders)")
-    st.write("- Weather API (Melbourne): **placeholder**")
-    st.write("- Payments (Stripe): **placeholder**")
-    st.write("- Database (SQLite/Firebase): **recommended for multi-user**")
-    st.write("- VR Tours: embed a 360° link (YouTube/Kuula/Google)")
+                <button
+                  className="btn btnGold"
+                  type="button"
+                  onClick={() => {
+                    const doc = new jsPDF();
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(14);
+                    doc.text("Signature Weddings Run Sheet", 14, 16);
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(10);
+                    doc.text(`The Members Lounge • Parkville • ${state.eventDate}`, 14, 22);
 
-    st.warning("Privacy note: Production version should have authentication, role-based permissions, and secure storage.")
+                    autoTable(doc, {
+                      startY: 28,
+                      head: [["Time", "Item", "Owner", "Notes"]],
+                      body: state.runSheet.map((r) => [r.time, r.item, r.owner, r.notes]),
+                      styles: { font: "helvetica", fontSize: 9 },
+                    });
+
+                    doc.save("run_sheet.pdf");
+                  }}
+                >
+                  Download PDF
+                </button>
+              </div>
+            </div>
+
+            <div className="card">
+              <div className="h2">Menu Selections (CSV)</div>
+              <button
+                className="btn btnGold"
+                type="button"
+                onClick={() => {
+                  const rows: any[] = [];
+                  Object.entries(state.selectedMenu).forEach(([section, items]) => {
+                    items.forEach((it) => rows.push({ Section: section, Selection: it }));
+                  });
+                  if (!rows.length) rows.push({ Section: "None", Selection: "No items selected" });
+                  downloadText("menu_selections.csv", toCSV(rows), "text/csv");
+                }}
+                style={{ marginTop: 8 }}
+              >
+                Download CSV
+              </button>
+            </div>
+          </div>
+
+          <div className="card" style={{ marginTop: 12 }}>
+            <div className="h2">Budget Report (PDF)</div>
+            <button
+              className="btn btnGold"
+              type="button"
+              onClick={() => {
+                const doc = new jsPDF();
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(14);
+                doc.text("Signature Weddings Budget Report", 14, 16);
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(10);
+                doc.text(`The Members Lounge • Parkville • ${state.eventDate}`, 14, 22);
+
+                const rows = [
+                  ["Guests", String(state.guestCount)],
+                  ["Room Hire", aud(state.budget.roomHire)],
+                  ["Dry Hire", aud(state.budget.dryHire)],
+                  ["Security", aud(state.budget.security)],
+                  ["Food Total", aud(budget.foodTotal)],
+                  ["Beverage Total", aud(budget.bevTotal)],
+                  ["Photography", aud(state.budget.photography)],
+                  ["DJ/Entertainment", aud(state.budget.dj)],
+                  ["Florals", aud(state.budget.florals)],
+                  ["Celebrant", aud(state.budget.celebrant)],
+                  ["Misc", aud(state.budget.misc)],
+                  ["Upsells", aud(budget.upsellTotal)],
+                  ["TOTAL", aud(budget.total)],
+                  ["Average / Guest", aud(budget.perGuest)],
+                ];
+
+                autoTable(doc, {
+                  startY: 28,
+                  head: [["Line Item", "Amount"]],
+                  body: rows,
+                  styles: { font: "helvetica", fontSize: 9 },
+                });
+
+                doc.save("budget_report.pdf");
+              }}
+              style={{ marginTop: 8 }}
+            >
+              Download Budget PDF
+            </button>
+          </div>
+
+          <div className="card" style={{ marginTop: 12 }}>
+            <div className="h2">iCal Placeholder</div>
+            <div className="muted small">This exports a simple wedding-day calendar event.</div>
+            <button
+              className="btn btnGold"
+              type="button"
+              onClick={() => {
+                // DTSTART/DTEND in basic format (local time placeholder)
+                const date = state.eventDate.replaceAll("-", "");
+                const ics =
+                  "BEGIN:VCALENDAR\n" +
+                  "VERSION:2.0\n" +
+                  "PRODID:-//Members Lounge//Signature Weddings Hub//EN\n" +
+                  "BEGIN:VEVENT\n" +
+                  `SUMMARY:${state.eventName}\n` +
+                  `DTSTART:${date}T170000\n` +
+                  `DTEND:${date}T235900\n` +
+                  "LOCATION:The Members Lounge, Parkville, Melbourne\n" +
+                  "END:VEVENT\n" +
+                  "END:VCALENDAR\n";
+                downloadText("wedding_event.ics", ics, "text/calendar");
+              }}
+              style={{ marginTop: 8 }}
+            >
+              Download iCal (.ics)
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* ADMIN */}
+      {tab === "Admin" && (
+        <>
+          <div className="grid3">
+            <Field
+              label="Display Name"
+              value={state.userName}
+              onChange={(v) => setState((s) => ({ ...s, userName: v }))}
+            />
+            <Field
+              label="Event Name"
+              value={state.eventName}
+              onChange={(v) => setState((s) => ({ ...s, eventName: v }))}
+            />
+            <Field
+              label="Event Date (YYYY-MM-DD)"
+              value={state.eventDate}
+              onChange={(v) => setState((s) => ({ ...s, eventDate: v }))}
+              type="date"
+            />
+          </div>
+
+          <div className="card" style={{ marginTop: 12 }}>
+            <div className="h2">Integrations (Placeholders)</div>
+            <div className="muted small">• Weather alerts (Melbourne) – placeholder API point</div>
+            <div className="muted small">• Payments (Stripe) – placeholder</div>
+            <div className="muted small">• Vendor portal – placeholder</div>
+            <div className="muted small">• VR Tours – paste a 360° link here:</div>
+
+            <input
+              className="input"
+              value={(state as any).vrTourLink || ""}
+              placeholder="https://..."
+              onChange={(e) => setState((s: any) => ({ ...s, vrTourLink: e.target.value }))}
+              style={{ marginTop: 8 }}
+            />
+
+            {!!(state as any).vrTourLink && (
+              <div style={{ marginTop: 10 }}>
+                <a className="btn btnGold" href={(state as any).vrTourLink} target="_blank" rel="noreferrer">
+                  Open VR Tour Link
+                </a>
+              </div>
+            )}
+
+            <hr className="hr" />
+
+            <div className="row">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  localStorage.removeItem(STORAGE_KEY);
+                  setState(DEFAULT_STATE);
+                }}
+              >
+                Reset App Data
+              </button>
+            </div>
+
+            <div className="muted small" style={{ marginTop: 10 }}>
+              Production upgrade path: real login + database (Postgres/Firebase) + role permissions.
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
