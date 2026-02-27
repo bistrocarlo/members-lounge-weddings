@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Members Lounge – Wedding Planning Suite | Parkville</title>
+<title>The Members Lounge – Comprehensive Wedding Planning Suite | Parkville</title>
 
 <style>
 body{
@@ -83,7 +83,7 @@ th{
 }
 
 /* INPUTS */
-input[type="number"], input[type="text"], select{
+input[type="number"], input[type="text"], input[type="date"], select{
   width:100%;
   padding:8px;
   border:1px solid #000;
@@ -118,7 +118,7 @@ input[type="number"], input[type="text"], select{
   </div>
   <div>
     <h1>The Members Lounge</h1>
-    <div class="sub">Luxury Wedding Planning Suite – Parkville</div>
+    <div class="sub">Luxury Wedding Planning Suite – Parkville (Reggio Calabria Club)</div>
   </div>
 </header>
 
@@ -133,12 +133,16 @@ input[type="number"], input[type="text"], select{
 
 <!-- DASHBOARD -->
 <div class="section active">
-<h2>Welcome</h2>
+<h2>Welcome to Your Wedding Planning Dashboard</h2>
 <table>
-<tr><th>Bride & Groom</th><td><input type="text" id="names"></td></tr>
-<tr><th>Wedding Date</th><td><input type="text" id="date"></td></tr>
+<tr><th>Bride & Groom Names</th><td><input type="text" id="names" placeholder="e.g., Jane Doe & John Smith"></td></tr>
+<tr><th>Wedding Date</th><td><input type="date" id="date"></td></tr>
 <tr><th>Guest Estimate</th><td><input type="number" id="guests" value="120"></td></tr>
-<tr><th>Room</th><td><input type="text" placeholder="Members Lounge / Sala Reggio"></td></tr>
+<tr><th>Adult Guests</th><td><input type="number" id="adults" value="100"></td></tr>
+<tr><th>Child Guests (Under 12)</th><td><input type="number" id="children" value="20"></td></tr>
+<tr><th>Room/Venue</th><td><select id="room"><option value="Members Lounge">Members Lounge (up to 180)</option><option value="Sala Reggio Ballroom">Sala Reggio Ballroom (up to 360)</option><option value="FIOR">FIOR (up to 500)</option></select></td></tr>
+<tr><th>Contact Email</th><td><input type="text" id="email" placeholder="your@email.com"></td></tr>
+<tr><th>Contact Phone</th><td><input type="text" id="phone" placeholder="+61 ..."></td></tr>
 </table>
 </div>
 
@@ -146,9 +150,9 @@ input[type="number"], input[type="text"], select{
 <div class="section">
 <h2>Select Your Service Level</h2>
 <select id="tier" onchange="updateTier()">
-<option value="classic">Classic Collection</option>
-<option value="signature">Signature Collection</option>
-<option value="grand">Grand Collection</option>
+<option value="classic">Classic Collection ($99 pp - 5 Courses)</option>
+<option value="signature">Signature Collection ($124 pp - 5 Courses + Premium)</option>
+<option value="grand">Grand Collection ($144 pp - 5 Courses + Extended)</option>
 </select>
 
 <div id="tierDetails" style="margin-top:20px;"></div>
@@ -159,53 +163,116 @@ input[type="number"], input[type="text"], select{
 <h2>Financial Structure</h2>
 <table>
 <tr><th>Description</th><th>Amount</th></tr>
-<tr><td>Adults</td><td><input type="number" id="adults" value="100"></td></tr>
-<tr><td>Adult Package ($)</td><td><input type="number" id="adultSpend" value="120"></td></tr>
-<tr><td>Drinks Package ($)</td><td><input type="number" id="drinks" value="40"></td></tr>
+<tr><td>Adult Guests</td><td><input type="number" id="adultsFin" value="100"></td></tr>
+<tr><td>Adult Package ($ pp)</td><td><input type="number" id="adultSpend" value="99"></td></tr>
+<tr><td>Child Guests</td><td><input type="number" id="childrenFin" value="20"></td></tr>
+<tr><td>Child Package ($ pp)</td><td><input type="number" id="childSpend" value="30"></td></tr>
+<tr><td>Drinks Package ($ pp)</td><td><input type="number" id="drinks" value="20"></td></tr>
 <tr><td>Room Hire ($)</td><td><input type="number" id="roomHire" value="0"></td></tr>
 <tr><td>Security ($)</td><td><input type="number" id="security" value="0"></td></tr>
+<tr><td>Additional Services ($)</td><td><input type="number" id="additional" value="0" placeholder="e.g., DJ, Styling"></td></tr>
+<tr><td>Deposit Required ($)</td><td><input type="number" id="deposit" value="2000"></td></tr>
 </table>
 
 <div class="summary-box">
 Total Investment: $<span id="total">0.00</span>
 <div class="small">Average Per Adult: $<span id="perAdult">0.00</span></div>
+<div class="small">Average Per Child: $<span id="perChild">0.00</span></div>
 </div>
 </div>
 
-<!-- MENU -->
+<!-- MENU SELECTION -->
 <div class="section">
-<h2>Signature Menu Selection</h2>
-<h3>Select 6 Canapés</h3>
-<div class="checkbox-list">
-<label><input type="checkbox"> Arancini</label>
-<label><input type="checkbox"> Polpette</label>
-<label><input type="checkbox"> Calamari</label>
-<label><input type="checkbox"> Bruschetta Trio</label>
-<label><input type="checkbox"> Caprese</label>
-<label><input type="checkbox"> Prawn Cocktail</label>
+<h2>Comprehensive Menu Selection</h2>
+<p>Based on Reggio Calabria Club wedding packages. Select options for each course. For Signature/Grand, select up to 6 canapés, 4 entrees, etc.</p>
+
+<h3>Select Canapés (4 Options Available - Select up to 6 for Signature/Grand)</h3>
+<div class="checkbox-list" id="canapes">
+<label><input type="checkbox"> Arancini (Rice Balls)</label>
+<label><input type="checkbox"> Polpette (Meatballs)</label>
+<label><input type="checkbox"> Calamari Fritti (Fried Calamari)</label>
+<label><input type="checkbox"> Bruschetta Trio (Tomato, Mushroom, Prosciutto)</label>
+<label><input type="checkbox"> Caprese Skewers (Tomato, Mozzarella, Basil)</label>
+<label><input type="checkbox"> Prawn Cocktail Shots</label>
+<label><input type="checkbox"> Prosciutto Wrapped Asparagus</label>
+<label><input type="checkbox"> Mini Caponata Crostini</label>
 </div>
 
-<h3>Select 2 Mains</h3>
-<div class="checkbox-list">
-<label><input type="checkbox"> Lamb Shanks</label>
-<label><input type="checkbox"> Barramundi</label>
-<label><input type="checkbox"> Scotch Fillet</label>
-<label><input type="checkbox"> Chargrilled Chicken</label>
+<h3>Select Cold Antipasto (4 Options Available - Select 2 Alternating)</h3>
+<div class="checkbox-list" id="coldAntipasto">
+<label><input type="checkbox"> Prosciutto e Melone (Prosciutto and Melon)</label>
+<label><input type="checkbox"> Insalata Caprese (Caprese Salad)</label>
+<label><input type="checkbox"> Antipasto Misto (Mixed Cured Meats and Cheeses)</label>
+<label><input type="checkbox"> Marinated Olives and Artichokes</label>
 </div>
+
+<h3>Select Hot Antipasto (4 Options Available - Select 2 Alternating)</h3>
+<div class="checkbox-list" id="hotAntipasto">
+<label><input type="checkbox"> Arancini Siciliani</label>
+<label><input type="checkbox"> Polpette in Sugo (Meatballs in Sauce)</label>
+<label><input type="checkbox"> Calamari alla Griglia (Grilled Calamari)</label>
+<label><input type="checkbox"> Funghi Ripieni (Stuffed Mushrooms)</label>
+</div>
+
+<h3>Select Pasta/Entree Course (4 Options Available - Select 2 Alternating)</h3>
+<div class="checkbox-list" id="pasta">
+<label><input type="checkbox"> Pasta alla Norma (Eggplant and Tomato Pasta)</label>
+<label><input type="checkbox"> Lasagne Bolognese</label>
+<label><input type="checkbox"> Ravioli al Burro e Salvia (Ravioli with Butter and Sage)</label>
+<label><input type="checkbox"> Gnocchi al Pesto</label>
+</div>
+
+<h3>Select Mains (4 Options Available - Select 2 Alternating)</h3>
+<div class="checkbox-list" id="mains">
+<label><input type="checkbox"> Lamb Shanks Braised in Red Wine</label>
+<label><input type="checkbox"> Barramundi with Lemon Herb Sauce</label>
+<label><input type="checkbox"> Scotch Fillet Steak with Peppercorn Sauce</label>
+<label><input type="checkbox"> Chargrilled Chicken with Rosemary</label>
+<label><input type="checkbox"> Veal Scaloppine</label>
+<label><input type="checkbox"> Eggplant Parmigiana (Vegetarian)</label>
+</div>
+
+<h3>Select Sides (4 Options Available - Included)</h3>
+<div class="checkbox-list" id="sides">
+<label><input type="checkbox"> Roasted Vegetables</label>
+<label><input type="checkbox"> Garden Salad</label>
+<label><input type="checkbox"> Potato Wedges</label>
+<label><input type="checkbox"> Steamed Greens</label>
+</div>
+
+<h3>Select Desserts (4 Options Available - Select 2 Alternating)</h3>
+<div class="checkbox-list" id="desserts">
+<label><input type="checkbox"> Tiramisu</label>
+<label><input type="checkbox"> Cannoli Siciliani</label>
+<label><input type="checkbox"> Panna Cotta with Berry Compote</label>
+<label><input type="checkbox"> Gelato Assortito</label>
+</div>
+
+<h3>Beverage Package</h3>
+<select id="beverages">
+<option value="basic">Basic (Soft Drinks & Espresso Included)</option>
+<option value="premium">Premium (+$20 pp: Beer - Peroni, Corona, Cascade Light; Wine - Red, Moscato, Sauvignon Blanc)</option>
+</select>
 </div>
 
 <!-- TIMELINE -->
 <div class="section">
 <h2>Wedding Timeline</h2>
-<table>
-<tr><th>Time</th><th>Moment</th></tr>
-<tr><td></td><td>Guest Arrival</td></tr>
-<tr><td></td><td>Canapés</td></tr>
-<tr><td></td><td>Speeches</td></tr>
-<tr><td></td><td>Main Course</td></tr>
-<tr><td></td><td>Cake Cutting</td></tr>
-<tr><td></td><td>Dancing</td></tr>
+<table id="timeline">
+<tr><th>Time</th><th>Moment</th><th>Details</th></tr>
+<tr><td><input type="time" value="17:00"></td><td>Guest Arrival</td><td><input type="text" placeholder="Welcome drinks"></td></tr>
+<tr><td><input type="time" value="17:30"></td><td>Canapés Service</td><td><input type="text" placeholder="Circulating canapés"></td></tr>
+<tr><td><input type="time" value="18:00"></td><td>Ceremony (if on-site)</td><td><input type="text" placeholder="Vows and exchange"></td></tr>
+<tr><td><input type="time" value="18:30"></td><td>Speeches</td><td><input type="text" placeholder="Toasts from family"></td></tr>
+<tr><td><input type="time" value="19:00"></td><td>Entree Service</td><td><input type="text" placeholder="Antipasto platters"></td></tr>
+<tr><td><input type="time" value="19:45"></td><td>Main Course</td><td><input type="text" placeholder="Alternating mains"></td></tr>
+<tr><td><input type="time" value="20:45"></td><td>Dessert Service</td><td><input type="text" placeholder="Sweet treats"></td></tr>
+<tr><td><input type="time" value="21:15"></td><td>Cake Cutting</td><td><input type="text" placeholder="Symbolic cut"></td></tr>
+<tr><td><input type="time" value="21:30"></td><td>First Dance</td><td><input type="text" placeholder="Couple's dance"></td></tr>
+<tr><td><input type="time" value="21:45"></td><td>Dancing & Party</td><td><input type="text" placeholder="DJ music"></td></tr>
+<tr><td><input type="time" value="23:00"></td><td>Event End</td><td><input type="text" placeholder="Farewells"></td></tr>
 </table>
+<button onclick="addTimelineRow()">Add Custom Moment</button>
 </div>
 
 <!-- LIVE QUOTE -->
@@ -213,8 +280,14 @@ Total Investment: $<span id="total">0.00</span>
 <h2>Live Quote Overview</h2>
 <p><strong>Couple:</strong> <span id="qNames"></span></p>
 <p><strong>Date:</strong> <span id="qDate"></span></p>
+<p><strong>Venue:</strong> <span id="qRoom"></span></p>
+<p><strong>Service Level:</strong> <span id="qTier"></span></p>
+<p><strong>Total Guests:</strong> <span id="qGuests"></span> (<span id="qAdults"></span> Adults, <span id="qChildren"></span> Children)</p>
 <p><strong>Total Investment:</strong> $<span id="qTotal"></span></p>
-<p><strong>Per Adult:</strong> $<span id="qPer"></span></p>
+<p><strong>Per Adult:</strong> $<span id="qPerAdult"></span></p>
+<p><strong>Per Child:</strong> $<span id="qPerChild"></span></p>
+<p><strong>Selected Menu Summary:</strong></p>
+<ul id="qMenu"></ul>
 </div>
 
 <script>
@@ -225,44 +298,96 @@ function showTab(i){
     t.classList.toggle('active', index===i);
     sections[index].classList.toggle('active', index===i);
   });
+  if(i===5) updateQuote();
 }
 
 function updateTier(){
   const tier=document.getElementById('tier').value;
   const box=document.getElementById('tierDetails');
+  const adultSpend = document.getElementById('adultSpend');
 
   if(tier==='classic'){
-    box.innerHTML="<strong>Classic Collection:</strong><br>3 Canapés • 2 Courses • Standard Drinks";
+    box.innerHTML="<strong>Classic Collection:</strong><br>5 Courses (incl. Hot & Cold Antipasto) • Canapés & Champagne • Standard Drinks • Up to 5 Hours";
+    adultSpend.value = 99;
   }
   if(tier==='signature'){
-    box.innerHTML="<strong>Signature Collection:</strong><br>6 Canapés • 3 Courses • Premium Drinks • Styling Support";
+    box.innerHTML="<strong>Signature Collection:</strong><br>5 Courses • 6 Canapés • Premium Drinks • Styling Support • Gluten-Free/Vegan Options";
+    adultSpend.value = 124;
   }
   if(tier==='grand'){
-    box.innerHTML="<strong>Grand Collection:</strong><br>6 Canapés • 4 Courses • Premium Bar • Extended Reception • Dedicated Event Manager";
+    box.innerHTML="<strong>Grand Collection:</strong><br>5 Courses • 6 Canapés • 4 Courses Alternating • Premium Bar • Extended Reception (6 Hours) • Dedicated Event Manager";
+    adultSpend.value = 144;
   }
+  calculate();
 }
 
 function calculate(){
-  const adults=parseFloat(document.getElementById('adults').value)||0;
-  const food=parseFloat(document.getElementById('adultSpend').value)||0;
+  const adults=parseFloat(document.getElementById('adultsFin').value)||0;
+  const children=parseFloat(document.getElementById('childrenFin').value)||0;
+  const foodAdult=parseFloat(document.getElementById('adultSpend').value)||0;
+  const foodChild=parseFloat(document.getElementById('childSpend').value)||0;
   const drinks=parseFloat(document.getElementById('drinks').value)||0;
   const room=parseFloat(document.getElementById('roomHire').value)||0;
   const security=parseFloat(document.getElementById('security').value)||0;
+  const additional=parseFloat(document.getElementById('additional').value)||0;
 
-  const total=(adults*(food+drinks))+room+security;
-  const per=adults>0?total/adults:0;
+  const total=(adults * (foodAdult + drinks)) + (children * foodChild) + room + security + additional;
+  const perAdult=adults>0 ? (total - (children * foodChild)) / adults : 0;
+  const perChild=children>0 ? foodChild : 0;
 
   document.getElementById('total').innerText=total.toFixed(2);
-  document.getElementById('perAdult').innerText=per.toFixed(2);
+  document.getElementById('perAdult').innerText=perAdult.toFixed(2);
+  document.getElementById('perChild') ? document.getElementById('perChild').innerText=perChild.toFixed(2) : '';
 
-  document.getElementById('qNames').innerText=document.getElementById('names').value;
-  document.getElementById('qDate').innerText=document.getElementById('date').value;
-  document.getElementById('qTotal').innerText=total.toFixed(2);
-  document.getElementById('qPer').innerText=per.toFixed(2);
+  syncDashboard();
 }
 
-document.querySelectorAll('input').forEach(i=>{
-  i.addEventListener('input',calculate);
+function syncDashboard(){
+  document.getElementById('adultsFin').value = document.getElementById('adults').value;
+  document.getElementById('childrenFin').value = document.getElementById('children').value;
+}
+
+function updateQuote(){
+  document.getElementById('qNames').innerText=document.getElementById('names').value;
+  document.getElementById('qDate').innerText=document.getElementById('date').value;
+  document.getElementById('qRoom').innerText=document.getElementById('room').value;
+  document.getElementById('qTier').innerText=document.getElementById('tier').options[document.getElementById('tier').selectedIndex].text;
+  document.getElementById('qGuests').innerText=parseInt(document.getElementById('guests').value)||0;
+  document.getElementById('qAdults').innerText=document.getElementById('adults').value;
+  document.getElementById('qChildren').innerText=document.getElementById('children').value;
+  document.getElementById('qTotal').innerText=document.getElementById('total').innerText;
+  document.getElementById('qPerAdult').innerText=document.getElementById('perAdult').innerText;
+  document.getElementById('qPerChild') ? document.getElementById('qPerChild').innerText=document.getElementById('perChild').innerText : '';
+
+  const menuList = document.getElementById('qMenu');
+  menuList.innerHTML = '';
+  ['canapes', 'coldAntipasto', 'hotAntipasto', 'pasta', 'mains', 'sides', 'desserts'].forEach(course => {
+    const selected = Array.from(document.getElementById(course).querySelectorAll('input:checked')).map(cb => cb.parentNode.textContent);
+    if(selected.length > 0){
+      const li = document.createElement('li');
+      li.textContent = `${course.charAt(0).toUpperCase() + course.slice(1)}: ${selected.join(', ')}`;
+      menuList.appendChild(li);
+    }
+  });
+  const bev = document.getElementById('beverages').options[document.getElementById('beverages').selectedIndex].text;
+  const liBev = document.createElement('li');
+  liBev.textContent = `Beverages: ${bev}`;
+  menuList.appendChild(liBev);
+}
+
+function addTimelineRow(){
+  const table = document.getElementById('timeline');
+  const row = table.insertRow();
+  row.innerHTML = '<td><input type="time"></td><td><input type="text" placeholder="Custom Moment"></td><td><input type="text" placeholder="Details"></td>';
+}
+
+document.querySelectorAll('input, select').forEach(el => {
+  el.addEventListener('input', () => {
+    calculate();
+    if(el.id === 'adults' || el.id === 'children') document.getElementById('guests').value = parseInt(document.getElementById('adults').value) + parseInt(document.getElementById('children').value);
+    if(el.id === 'tier') updateTier();
+    if(el.closest('.checkbox-list') || el.id === 'beverages') updateQuote();
+  });
 });
 
 updateTier();
