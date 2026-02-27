@@ -605,15 +605,12 @@
 <script>
   const MENU = {
     "Canapés": [
-      "Potato Croquettes",
       "Arancini",
-      "Pizza",
       "Meatballs",
-      "Calamari Fritti",
-      "Cocktail Sausages"
+      "Prawn Wontons",
     ],
     "Antipasto": [
-      "Italian dinner rolls",
+      "Sausages",
       "Bocconcini & Ricotta",
       "Salumi",
       "Eggplant parmigiana",
@@ -624,38 +621,28 @@
     "Pasta": [
       "Elicoidali al Ragú (four meat sauce)",
       "Gnocchi Pesto (vegetarian)",
-      "Pasta Napoli (tomato & herbs)"
     ],
     "Mains": [
-      "Pollo alla Rosmarino (roasted chicken breast + rosemary butter pangrattato)",
-      "Pesce con Salmoriglio (barramundi + southern Italian olive oil herb dressing)",
-      "Chicken Scallopini (white wine & butter sauce)"
+      "Pollo Provinciale (roasted chicken breast + Chimmichurri base)",
+      "Cotoletta de Pesce (barramundi + southern Italian herb crumbed coating)",
+      "Lamb Shank (white wine & tomato sauce)"
     ],
     "Dessert": [
       "Roaming assorted desserts (mini cannoli + mini cheesecakes + lemon tarts)",
-      "Marks Quality Cakes (select two individual desserts)",
-      "Gelato station"
+      "Continental selection (select two individual desserts)",
+      "Gelato dessert classic"
     ],
     "Supper": [
-      "Assorted Rolls",
       "Pizza",
-      "Arancini Balls",
-      "Meatballs",
-      "Fried Calamari",
-      "Prawns",
-      "Popcorn Chicken",
-      "Eggplant Patties",
-      "Pasta",
-      "Potato Croquettes"
     ]
   };
 
   const RULES = {
-    "Canapés": { exact: 4, max: 4 },
+    "Canapés": { exact: 3, max: 3 },
     "Pasta":   { exact: 2, max: 2 },
     "Mains":   { exact: 2, max: 2 },
     "Dessert": { exact: 1, max: 1 },
-    "Supper":  { exact: 0, max: 6 }
+    "Supper":  { exact: 1, max: 1 }
   };
 
   const TAB_ORDER = ["quote","couple","food","drinks","summary"];
