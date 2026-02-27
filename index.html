@@ -44,9 +44,7 @@
       box-shadow:0 6px 18px rgba(0,0,0,.03);
       gap:10px;
     }
-    .logoImg{
-      height:34px; width:auto; display:block;
-    }
+    .logoImg{height:34px; width:auto; display:block;}
     .logoFallback{
       display:inline-flex; align-items:center; gap:10px;
       font-weight:800; letter-spacing:.14em; font-size:12px;
@@ -54,10 +52,8 @@
     h1{margin:12px 0 6px; font-size:28px}
     .sub{color:var(--muted); font-size:14px}
     .gold{color:var(--gold)}
-
     main{max-width:1180px; margin:0 auto; padding:10px 18px 70px;}
 
-    /* Sticky tabs */
     .tabs-wrap{
       position:sticky; top:0; z-index:10;
       padding:10px 0 12px;
@@ -83,7 +79,7 @@
     .page.active{display:block}
 
     .grid{display:grid; grid-template-columns:1fr; gap:14px; margin-top:8px;}
-    @media(min-width:920px){ .grid{grid-template-columns:1fr 1fr;} .span2{grid-column:1/-1;} }
+    @media(min-width:920px){ .grid{grid-template-columns:1fr 1fr;} }
 
     .card{
       background:#fff;
@@ -131,7 +127,6 @@
     .btn.primary{border-color: rgba(176,141,42,.75); background:var(--goldSoft); font-weight:900;}
     .btn.ghost{border-color: rgba(176,141,42,.75); background:var(--goldSoft); font-weight:900;}
 
-    /* Quote table */
     .table{width:100%; border-collapse:collapse; font-size:13px;}
     .table td{padding:10px 8px; border-bottom:1px solid var(--line); vertical-align:top;}
     .table td:last-child{text-align:right; font-weight:900;}
@@ -145,7 +140,6 @@
       font-weight:900;
     }
 
-    /* Menu builder */
     .course{margin-top:12px; border-top:1px solid var(--line); padding-top:12px;}
     .course h3{margin:0 0 8px; font-size:14px;}
     .count{color:var(--muted); font-size:12px; margin-top:8px;}
@@ -210,8 +204,6 @@
   <header>
     <div class="brandline">
       <div class="logoWrap">
-        <!-- LOGO: Put a file called "logo.png" in the SAME repo folder as index.html -->
-        <!-- It will auto-load. If missing, the fallback text shows. -->
         <img class="logoImg" id="logoImg" src="logo.png" alt="The Members Lounge Logo"
              onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='inline-flex';">
         <span class="logoFallback" id="logoFallback" style="display:none;">✨ <span>THE MEMBERS LOUNGE</span></span>
@@ -221,7 +213,7 @@
     <h1><span class="gold">Wedding Signature Series</span></h1>
     <div class="sub">Reggio Calabria Club, Parkville</div>
     <div class="small" style="margin-top:6px;">
-      GitHub Pages ready • White / Black / Gold • Multi-page tabs (no long scroll)
+      Tap the tabs or use 👻 Next to move through each step.
     </div>
   </header>
 
@@ -237,12 +229,12 @@
   </div>
 
   <main>
-    <!-- PAGE 1: QUOTE FIRST -->
+    <!-- QUOTE -->
     <section class="page active" id="page-quote">
       <div class="grid">
         <div class="card">
           <h2>Indicative Quote (Live)</h2>
-          <div class="hint">Room hire + dry hire + security + food + drinks = estimate.</div>
+          <div class="hint">Your selections update the estimate instantly.</div>
 
           <div class="divider"></div>
 
@@ -276,7 +268,7 @@
           <table class="table" aria-label="Quote breakdown">
             <tbody>
               <tr><td>Room hire</td><td id="qRoom">$0.00</td></tr>
-              <tr><td>Food (menu-driven)</td><td id="qFood">$0.00</td></tr>
+              <tr><td>Food</td><td id="qFood">$0.00</td></tr>
               <tr><td>Drinks</td><td id="qDrinks">$0.00</td></tr>
               <tr><td>Dry hire</td><td id="qDry">$0.00</td></tr>
               <tr><td>Security</td><td id="qSec">$0.00</td></tr>
@@ -289,8 +281,8 @@
           </div>
 
           <div class="actions">
-            <button class="btn" id="saveDraft">💾 Save Draft</button>
-            <button class="btn" id="loadDraft">📥 Load Draft</button>
+            <button class="btn" id="saveDraft">💾 Save</button>
+            <button class="btn" id="loadDraft">📥 Load</button>
             <button class="btn" id="resetAll">🧹 Reset</button>
             <button class="btn" id="printQuote">🖨️ Print</button>
             <button class="btn primary" id="nextQ">👻 Next</button>
@@ -298,47 +290,29 @@
         </div>
 
         <div class="card">
-          <h2>Quick Snapshot</h2>
+          <h2>Snapshot</h2>
 
           <div class="statusRow">
-            <span class="badge" id="menuBadge">Menu: Draft</span>
-            <span class="badge" id="drinksBadge">Drinks: Draft</span>
+            <span class="badge" id="menuBadge">Menu: In progress</span>
+            <span class="badge" id="drinksBadge">Drinks: In progress</span>
           </div>
 
           <div class="kpi">
             <div class="box"><div class="label">Adults</div><div class="value" id="kpiAdults">120</div></div>
             <div class="box"><div class="label">Children</div><div class="value" id="kpiChildren">20</div></div>
             <div class="box"><div class="label">Food subtotal</div><div class="value mono" id="kpiFood">$0.00</div></div>
-            <div class="box"><div class="label">Avg per guest</div><div class="value mono" id="kpiAvg">$0.00</div></div>
-          </div>
-
-          <div class="divider"></div>
-
-          <h2>Admin Pricing (Editable)</h2>
-          <div class="hint">These defaults are safe. Adjust anytime. Quote updates live.</div>
-
-          <div class="row">
-            <div>
-              <label for="adultFactor">Adult pricing factor</label>
-              <input id="adultFactor" type="number" min="0" step="0.05" value="1.00">
-              <div class="small">Scales all adult food course pricing (1.00 = normal).</div>
-            </div>
-            <div>
-              <label for="childFactor">Child pricing factor</label>
-              <input id="childFactor" type="number" min="0" step="0.05" value="0.30">
-              <div class="small">Kids cost as a fraction of adult food (default 0.30).</div>
-            </div>
+            <div class="box"><div class="label">Per adult (weighted)</div><div class="value mono" id="kpiPerAdult">$0.00</div></div>
           </div>
 
           <div class="divider"></div>
           <div class="small">
-            Tip: If you want kids to be exactly “$30”, we can swap this factor model to a fixed child price later.
+            Your quote becomes “complete” when the Food selections meet the exact pick rules.
           </div>
         </div>
       </div>
     </section>
 
-    <!-- PAGE 2: COUPLE -->
+    <!-- COUPLE -->
     <section class="page" id="page-couple">
       <div class="grid">
         <div class="card">
@@ -349,7 +323,7 @@
 
           <div class="row">
             <div>
-              <label for="weddingDate">Date of Choice</label>
+              <label for="weddingDate">Preferred Date</label>
               <input id="weddingDate" type="date">
             </div>
             <div>
@@ -380,65 +354,60 @@
         </div>
 
         <div class="card">
-          <h2>What couples do next</h2>
+          <h2>How it works</h2>
           <div class="small">
-            1) Build the food menu (exact selection rules) <br>
-            2) Choose drinks <br>
+            1) Choose your Food selections (exact rules)<br>
+            2) Choose Drinks<br>
             3) Summary shows a clean breakdown & total estimate.
-          </div>
-          <div class="divider"></div>
-          <div class="small">
-            The Quote tab is always live, so couples can see the cost impact instantly.
           </div>
         </div>
       </div>
     </section>
 
-    <!-- PAGE 3: FOOD -->
+    <!-- FOOD -->
     <section class="page" id="page-food">
       <div class="card">
-        <h2>Food Builder (Menu-Driven)</h2>
-        <div class="hint">
-          Selection rules are enforced (no over-selecting). “Complete menu” requires meeting all exact counts.
-        </div>
+        <h2>Food Selections</h2>
+        <div class="hint">Selections are guided so your menu stays clean and complete.</div>
 
         <div class="statusRow">
-          <span class="badge" id="foodCompleteBadge">Menu: Draft</span>
-          <span class="badge" id="foodRuleBadge">Rules: Incomplete</span>
+          <span class="badge" id="foodCompleteBadge">Menu: In progress</span>
+          <span class="badge" id="foodRuleBadge">Selections: Not complete</span>
         </div>
 
         <div class="divider"></div>
 
+        <!-- Pricing (still editable, but phrased elegantly) -->
         <div class="grid">
           <div class="card">
-            <h2>Per-Adult Course Pricing (AUD)</h2>
-            <div class="hint">Defaults are a sensible starting point (edit anytime).</div>
+            <h2>Menu Investment (Per Adult)</h2>
+            <div class="hint">These values shape your estimate. Adjust if required.</div>
 
             <div class="row">
               <div>
-                <label for="pCanapes">Canapés (4 picks)</label>
+                <label for="pCanapes">Canapés</label>
                 <input id="pCanapes" type="number" min="0" step="0.5" value="12">
               </div>
               <div>
-                <label for="pAntipasto">Grande Antipasto (fixed)</label>
+                <label for="pAntipasto">Grande Antipasto</label>
                 <input id="pAntipasto" type="number" min="0" step="0.5" value="28">
               </div>
             </div>
 
             <div class="row">
               <div>
-                <label for="pPasta">Entrée / Pasta (2 picks)</label>
+                <label for="pPasta">Entrée / Pasta</label>
                 <input id="pPasta" type="number" min="0" step="0.5" value="15">
               </div>
               <div>
-                <label for="pMains">Mains (2 picks)</label>
+                <label for="pMains">Mains</label>
                 <input id="pMains" type="number" min="0" step="0.5" value="34">
               </div>
             </div>
 
             <div class="row">
               <div>
-                <label for="pDessert">Dessert (1 pick)</label>
+                <label for="pDessert">Dessert</label>
                 <input id="pDessert" type="number" min="0" step="0.5" value="10">
               </div>
               <div>
@@ -451,16 +420,22 @@
 
             <label style="margin-top:0;">
               <input id="enableSupperPricing" type="checkbox">
-              Add supper pricing to food total (only if supper is selected)
+              Include supper in the estimate (only when selected)
             </label>
-            <div class="small">If unchecked, supper remains “informational” and won’t affect the quote.</div>
+            <div class="small">If unchecked, supper remains informational only.</div>
+
+            <div style="display:none">
+              <!-- kept internally for your original maths; hidden from users -->
+              <input id="adultFactor" type="number" value="1.00">
+              <input id="childFactor" type="number" value="0.30">
+            </div>
           </div>
 
           <div class="card">
-            <h2>Exact Selection Rules</h2>
+            <h2>Selection Guide</h2>
             <ul class="small">
               <li><b>Canapés:</b> exactly 4</li>
-              <li><b>Grande Antipasto:</b> fixed inclusion (auto)</li>
+              <li><b>Grande Antipasto:</b> included</li>
               <li><b>Entrée / Pasta:</b> exactly 2</li>
               <li><b>Mains:</b> exactly 2</li>
               <li><b>Dessert:</b> exactly 1</li>
@@ -471,12 +446,12 @@
 
             <label>
               <input id="vegMain" type="checkbox">
-              Add Vegetarian Main option (Calzone / seasonal veg filling)
+              Add Vegetarian Main option
             </label>
 
             <label style="margin-top:12px;">
               <input id="fruitPlatter" type="checkbox">
-              Add Fruit Platter (optional add-on)
+              Add Fruit Platter (optional)
             </label>
 
             <div class="row">
@@ -502,11 +477,11 @@
           <h3>Canapés (choose exactly 4)</h3>
           <div class="row" id="list-Canapés"></div>
           <div class="count" id="count-Canapés">0/4 selected</div>
-          <div class="warn" id="warn-Canapés">You must select exactly 4 canapés.</div>
+          <div class="warn" id="warn-Canapés">Please select exactly 4 canapés.</div>
         </div>
 
         <div class="course" data-course="Antipasto">
-          <h3>Grande Antipasto (fixed inclusion)</h3>
+          <h3>Grande Antipasto (included)</h3>
           <div class="small" id="antipastoFixed"></div>
         </div>
 
@@ -514,21 +489,21 @@
           <h3>Entrée / Pasta (choose exactly 2)</h3>
           <div class="row" id="list-Pasta"></div>
           <div class="count" id="count-Pasta">0/2 selected</div>
-          <div class="warn" id="warn-Pasta">You must select exactly 2 pasta/entrée options.</div>
+          <div class="warn" id="warn-Pasta">Please select exactly 2 options.</div>
         </div>
 
         <div class="course" data-course="Mains" data-limit="2" data-exact="2">
           <h3>Mains (choose exactly 2)</h3>
           <div class="row" id="list-Mains"></div>
           <div class="count" id="count-Mains">0/2 selected</div>
-          <div class="warn" id="warn-Mains">You must select exactly 2 mains.</div>
+          <div class="warn" id="warn-Mains">Please select exactly 2 mains.</div>
         </div>
 
         <div class="course" data-course="Dessert" data-limit="1" data-exact="1">
           <h3>Dessert (choose exactly 1)</h3>
           <div class="row" id="list-Dessert"></div>
           <div class="count" id="count-Dessert">0/1 selected</div>
-          <div class="warn" id="warn-Dessert">You must select exactly 1 dessert option.</div>
+          <div class="warn" id="warn-Dessert">Please select exactly 1 dessert option.</div>
         </div>
 
         <div class="course" data-course="Supper" data-limit="6" data-exact="0">
@@ -545,16 +520,16 @@
       </div>
     </section>
 
-    <!-- PAGE 4: DRINKS -->
+    <!-- DRINKS -->
     <section class="page" id="page-drinks">
       <div class="grid">
         <div class="card">
           <h2>Drinks</h2>
-          <div class="hint">Choose drinks. Quote updates live.</div>
+          <div class="hint">Select your preferred option. Quote updates live.</div>
 
           <label for="drinkMode">Drinks Option</label>
           <select id="drinkMode">
-            <option value="bar">Bar Prices (no package)</option>
+            <option value="bar">Bar Prices (pay as you go)</option>
             <option value="pkg20">$20 per Adult Package (4 hrs)</option>
             <option value="custom">Custom per Adult (set price)</option>
           </select>
@@ -565,8 +540,8 @@
               <input id="customDrinkPrice" type="number" min="0" step="1" value="0">
             </div>
             <div>
-              <label for="customDrinkNote">Custom drink notes</label>
-              <input id="customDrinkNote" placeholder="e.g., Premium package details…">
+              <label for="customDrinkNote">Custom notes</label>
+              <input id="customDrinkNote" placeholder="e.g., Premium spirits included…">
             </div>
           </div>
 
@@ -582,21 +557,21 @@
         <div class="card">
           <h2>Status</h2>
           <div class="statusRow">
-            <span class="badge" id="drinksCompleteBadge">Drinks: Draft</span>
+            <span class="badge" id="drinksCompleteBadge">Drinks: In progress</span>
           </div>
           <div class="divider"></div>
           <div class="small">
-            “Bar prices” shows $0 for drinks (indicative). Package/custom adds into the quote.
+            Bar prices will show $0 for drinks (indicative). Packages add into the estimate.
           </div>
         </div>
       </div>
     </section>
 
-    <!-- PAGE 5: SUMMARY -->
+    <!-- SUMMARY -->
     <section class="page" id="page-summary">
       <div class="grid">
         <div class="card">
-          <h2>Final Summary</h2>
+          <h2>Summary</h2>
           <div id="finalSummary" class="small">Complete the steps to see your summary.</div>
 
           <div class="divider"></div>
@@ -616,7 +591,7 @@
           <div id="chips"></div>
           <div class="divider"></div>
           <div class="small">
-            Put <b>logo.png</b> next to <b>index.html</b> to display your Members Lounge logo in the header.
+            Add <b>logo.png</b> next to <b>index.html</b> in your repo to display the Members Lounge logo.
           </div>
         </div>
       </div>
@@ -628,9 +603,6 @@
   </footer>
 
 <script>
-  // -----------------------------
-  // MENU DATA (Edit anytime)
-  // -----------------------------
   const MENU = {
     "Canapés": [
       "Potato Croquettes",
@@ -678,20 +650,15 @@
     ]
   };
 
-  // Exact rules
   const RULES = {
     "Canapés": { exact: 4, max: 4 },
     "Pasta":   { exact: 2, max: 2 },
     "Mains":   { exact: 2, max: 2 },
     "Dessert": { exact: 1, max: 1 },
-    "Supper":  { exact: 0, max: 6 } // 0 means optional
+    "Supper":  { exact: 0, max: 6 }
   };
 
-  // -----------------------------
-  // NAV
-  // -----------------------------
   const TAB_ORDER = ["quote","couple","food","drinks","summary"];
-
   function setActivePage(page){
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     const target = document.getElementById("page-" + page);
@@ -722,7 +689,6 @@
   });
   document.getElementById("ghostNext").addEventListener("click", nextPage);
 
-  // Buttons
   document.getElementById("nextQ").addEventListener("click", nextPage);
   document.getElementById("backC").addEventListener("click", prevPage);
   document.getElementById("nextC").addEventListener("click", nextPage);
@@ -740,9 +706,6 @@
     if(e.key === "ArrowLeft") prevPage();
   });
 
-  // -----------------------------
-  // ELEMENTS
-  // -----------------------------
   const $ = (id) => document.getElementById(id);
 
   const adultsEl   = $("adults");
@@ -751,8 +714,8 @@
   const dryHireEl  = $("dryHire");
   const securityEl = $("security");
 
-  const adultFactorEl = $("adultFactor");
-  const childFactorEl = $("childFactor");
+  const adultFactorEl = $("adultFactor");   // hidden
+  const childFactorEl = $("childFactor");   // hidden
 
   const pCanapesEl  = $("pCanapes");
   const pAntipastoEl= $("pAntipasto");
@@ -791,7 +754,7 @@
   const kpiAdultsEl  = $("kpiAdults");
   const kpiChildrenEl= $("kpiChildren");
   const kpiFoodEl    = $("kpiFood");
-  const kpiAvgEl     = $("kpiAvg");
+  const kpiPerAdultEl= $("kpiPerAdult");
 
   const finalSummaryEl = $("finalSummary");
   const chipsEl = $("chips");
@@ -802,9 +765,6 @@
   const foodRuleBadgeEl = $("foodRuleBadge");
   const drinksCompleteBadgeEl = $("drinksCompleteBadge");
 
-  // -----------------------------
-  // HELPERS
-  // -----------------------------
   const STORAGE_KEY = "memberslounge_wedding_signature_series_v2";
 
   function aud(n){
@@ -827,9 +787,6 @@
     el.textContent = text;
   }
 
-  // -----------------------------
-  // MENU RENDER
-  // -----------------------------
   function addCheckboxList(course, listId){
     const wrap = document.getElementById(listId);
     wrap.innerHTML = "";
@@ -877,11 +834,9 @@
 
     if(countEl) countEl.textContent = `${checked2.length}/${rule.max} selected`;
 
-    // Exact rule warnings
     if(rule.exact > 0){
       warnEl.style.display = (checked2.length === rule.exact) ? "none" : "block";
     }else{
-      // Optional: only warn if at max
       warnEl.style.display = (checked2.length >= rule.max) ? "block" : "none";
     }
   }
@@ -896,9 +851,6 @@
     return ok;
   }
 
-  // -----------------------------
-  // CALCS (Menu-driven)
-  // -----------------------------
   function coursePricesAdult(){
     return {
       Canapés:  Number(pCanapesEl.value || 0),
@@ -920,29 +872,16 @@
     const sel = getSelections();
     const prices = coursePricesAdult();
 
-    // We only include course price when the course is "validly selected" (meets exact rule),
-    // except antipasto which is always included.
     let perAdult = 0;
 
-    // Canapés: only if exactly 4 chosen
     if(sel.Canapés.length === RULES["Canapés"].exact) perAdult += prices.Canapés;
-
-    // Antipasto always included
     perAdult += prices.Antipasto;
-
-    // Pasta: only if exactly 2 chosen
     if(sel.Pasta.length === RULES["Pasta"].exact) perAdult += prices.Pasta;
-
-    // Mains: only if exactly 2 chosen
     if(sel.Mains.length === RULES["Mains"].exact) perAdult += prices.Mains;
-
-    // Dessert: only if exactly 1 chosen
     if(sel.Dessert.length === RULES["Dessert"].exact) perAdult += prices.Dessert;
 
-    // Supper: optional; included only if enabled + any selected
     if(enableSupperPricingEl.checked && sel.Supper.length > 0) perAdult += prices.Supper;
 
-    // Add-ons (non per-person)
     let addOns = 0;
     if(fruitPlatterEl.checked){
       addOns += Number(tablesEl.value || 0) * Number(fruitPerTableEl.value || 0);
@@ -958,7 +897,7 @@
     const adults = Number(adultsEl.value || 0);
     const mode = drinkModeEl.value;
 
-    if(mode === "bar")   return { total: 0, note: "Bar prices (no package estimated)." };
+    if(mode === "bar")   return { total: 0, note: "Bar prices (pay as you go)." };
     if(mode === "pkg20") return { total: adults * 20, note: "$20 per adult (4 hrs)." };
     if(mode === "custom"){
       return {
@@ -985,15 +924,12 @@
     };
   }
 
-  // -----------------------------
-  // RENDER
-  // -----------------------------
   function renderDrinkInfo(){
     const mode = drinkModeEl.value;
     customDrinkRow.style.display = (mode === "custom") ? "grid" : "none";
 
     if(mode === "bar"){
-      drinkInfoEl.textContent = "Bar prices selected. Quote shows $0 for drinks (indicative only).";
+      drinkInfoEl.textContent = "Bar prices selected (pay as you go).";
       setBadge(drinksCompleteBadgeEl, "ok", "Drinks: Bar prices");
       setBadge(drinksBadgeEl, "ok", "Drinks: Bar prices");
     } else if(mode === "pkg20"){
@@ -1007,14 +943,13 @@
         setBadge(drinksCompleteBadgeEl, "ok", "Drinks: Custom set");
         setBadge(drinksBadgeEl, "ok", "Drinks: Custom set");
       }else{
-        setBadge(drinksCompleteBadgeEl, "warn", "Drinks: Custom (set price)");
-        setBadge(drinksBadgeEl, "warn", "Drinks: Custom (set price)");
+        setBadge(drinksCompleteBadgeEl, "warn", "Drinks: Set price");
+        setBadge(drinksBadgeEl, "warn", "Drinks: Set price");
       }
     }
   }
 
   function renderMenuStatus(){
-    // per-course exactness
     const sel = getSelections();
     let incomplete = [];
     ["Canapés","Pasta","Mains","Dessert"].forEach(c => {
@@ -1025,12 +960,12 @@
 
     if(incomplete.length === 0){
       setBadge(foodCompleteBadgeEl, "ok", "Menu: Complete");
-      setBadge(foodRuleBadgeEl, "ok", "Rules: Complete");
+      setBadge(foodRuleBadgeEl, "ok", "Selections: Complete");
       setBadge(menuBadgeEl, "ok", "Menu: Complete");
     }else{
-      setBadge(foodCompleteBadgeEl, "warn", "Menu: Draft");
-      setBadge(foodRuleBadgeEl, "warn", "Rules: Incomplete");
-      setBadge(menuBadgeEl, "warn", "Menu: Draft");
+      setBadge(foodCompleteBadgeEl, "warn", "Menu: In progress");
+      setBadge(foodRuleBadgeEl, "warn", "Selections: Not complete");
+      setBadge(menuBadgeEl, "warn", "Menu: In progress");
     }
   }
 
@@ -1049,8 +984,8 @@
     kpiChildrenEl.textContent = q.children;
     kpiFoodEl.textContent     = aud(q.food.total);
 
-    const guests = Math.max(1, q.adults + q.children);
-    kpiAvgEl.textContent = aud(q.total / guests);
+    const perAdultWeighted = q.adults > 0 ? (q.total / q.adults) : 0;
+    kpiPerAdultEl.textContent = aud(perAdultWeighted);
   }
 
   function renderSummary(){
@@ -1061,8 +996,8 @@
     Object.entries(sel).forEach(([course, items]) => {
       items.forEach(item => chips.push(`<span class="pill">${escapeHtml(course)}: ${escapeHtml(item)}</span>`));
     });
-    if(vegMainEl.checked) chips.push(`<span class="pill">Mains: Vegetarian main option</span>`);
-    if(fruitPlatterEl.checked) chips.push(`<span class="pill">Dessert: Fruit platter add-on</span>`);
+    if(vegMainEl.checked) chips.push(`<span class="pill">Mains: Vegetarian option</span>`);
+    if(fruitPlatterEl.checked) chips.push(`<span class="pill">Fruit platter add-on</span>`);
     chipsEl.innerHTML = chips.join(" ");
 
     const lines = [];
@@ -1077,24 +1012,19 @@
 
     lines.push(`<hr style="border:none;border-top:1px solid rgba(0,0,0,.10);margin:12px 0">`);
 
+    const perAdultWeighted = q.adults > 0 ? (q.total / q.adults) : 0;
     lines.push(`<b>Guests:</b> Adults ${q.adults}, Children ${q.children}`);
     lines.push(`<b>Room hire:</b> ${aud(roomHireEl.value)}`);
     lines.push(`<b>Dry hire:</b> ${aud(dryHireEl.value)}`);
     lines.push(`<b>Security:</b> ${aud(securityEl.value)}`);
-
-    lines.push(`<b>Food total:</b> ${aud(q.food.total)} <span class="small">(per-adult: ${aud(q.food.perAdult)})</span>`);
-    if(q.food.addOns > 0){
-      lines.push(`<b>Food add-ons:</b> ${aud(q.food.addOns)} <span class="small">(fruit platters)</span>`);
-    }
-
+    lines.push(`<b>Food total:</b> ${aud(q.food.total)}`);
     lines.push(`<b>Drinks total:</b> ${aud(q.drinks.total)} <span class="small">(${escapeHtml(q.drinks.note)})</span>`);
     lines.push(`<div class="total"><div>Total Estimated Cost</div><div class="mono">${aud(q.total)}</div></div>`);
+    lines.push(`<div class="small" style="margin-top:8px;"><b>Per adult (weighted):</b> ${aud(perAdultWeighted)}</div>`);
 
     lines.push(`<hr style="border:none;border-top:1px solid rgba(0,0,0,.10);margin:12px 0">`);
 
-    lines.push(`<b>Menu completion:</b> ${menuIsComplete() ? "✅ Complete" : "⚠️ Incomplete (finish required picks)"}<br>`);
-
-    lines.push(`<b>Selections:</b>`);
+    lines.push(`<b>Menu status:</b> ${menuIsComplete() ? "✅ Complete" : "⚠️ Please finish required picks"}<br>`);
     lines.push(`<b>Canapés:</b> ${sel.Canapés.length ? sel.Canapés.map(escapeHtml).join(", ") : "—"}`);
     lines.push(`<b>Grande Antipasto:</b> Included`);
     lines.push(`<b>Pasta:</b> ${sel.Pasta.length ? sel.Pasta.map(escapeHtml).join(", ") : "—"}`);
@@ -1112,9 +1042,6 @@
     renderSummary();
   }
 
-  // -----------------------------
-  // SAVE / LOAD
-  // -----------------------------
   function getState(){
     const selections = { Canapés:[], Pasta:[], Mains:[], Dessert:[], Supper:[] };
     document.querySelectorAll('input[type="checkbox"][data-course]:checked').forEach(cb => {
@@ -1125,7 +1052,6 @@
     return {
       adults: adultsEl.value, children: childrenEl.value,
       roomHire: roomHireEl.value, dryHire: dryHireEl.value, security: securityEl.value,
-      adultFactor: adultFactorEl.value, childFactor: childFactorEl.value,
       prices: {
         pCanapes: pCanapesEl.value, pAntipasto: pAntipastoEl.value, pPasta: pPastaEl.value,
         pMains: pMainsEl.value, pDessert: pDessertEl.value, pSupper: pSupperEl.value,
@@ -1151,9 +1077,6 @@
     roomHireEl.value = s.roomHire ?? 0;
     dryHireEl.value  = s.dryHire ?? 0;
     securityEl.value = s.security ?? 0;
-
-    adultFactorEl.value = s.adultFactor ?? 1;
-    childFactorEl.value = s.childFactor ?? 0.30;
 
     if(s.prices){
       pCanapesEl.value = s.prices.pCanapes ?? 12;
@@ -1185,10 +1108,8 @@
     tablesEl.value = (s.menu && s.menu.tables) ?? 10;
     fruitPerTableEl.value = (s.menu && s.menu.fruitPerTable) ?? 35;
 
-    // Clear all checks
     document.querySelectorAll('input[type="checkbox"][data-course]').forEach(cb => cb.checked = false);
 
-    // Restore checks
     if(s.menu && s.menu.selections){
       Object.entries(s.menu.selections).forEach(([course, items]) => {
         (items || []).forEach(item => {
@@ -1238,12 +1159,10 @@
     }
   });
 
-  // -----------------------------
-  // EVENTS
-  // -----------------------------
   function bindRecalc(ids){
     ids.forEach(id => {
       const el = document.getElementById(id);
+      if(!el) return;
       el.addEventListener("input", renderAll);
       el.addEventListener("change", renderAll);
     });
@@ -1251,7 +1170,6 @@
 
   bindRecalc([
     "adults","children","roomHire","dryHire","security",
-    "adultFactor","childFactor",
     "pCanapes","pAntipasto","pPasta","pMains","pDessert","pSupper","enableSupperPricing",
     "coupleName","weddingDate","venueSpace","email","phone","notes",
     "drinkMode","customDrinkPrice","customDrinkNote",
@@ -1270,9 +1188,6 @@
 
   drinkModeEl.addEventListener("change", renderAll);
 
-  // -----------------------------
-  // INIT
-  // -----------------------------
   addCheckboxList("Canapés","list-Canapés");
   addCheckboxList("Pasta","list-Pasta");
   addCheckboxList("Mains","list-Mains");
