@@ -1,544 +1,455 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Members Lounge – Comprehensive Wedding Planning Suite | Parkville</title>
+---
 
-<style>
-body{
-  margin:0;
-  font-family: Arial, Helvetica, sans-serif;
-  background:#ffffff;
-  color:#000000;
-}
+## ✅ 4) `app.py` (FULL WORKING CODE)
 
-/* HEADER */
-header{
-  padding:20px;
-  border-bottom:3px solid #000;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
+```python
+import streamlit as st
+import pandas as pd
+from datetime import datetime
+from fpdf import FPDF
 
-.logo img{
-  height:75px;
-}
+# ==========================
+# PAGE CONFIG + BRAND STYLE
+# ==========================
+st.set_page_config(
+    page_title="Signature Weddings Hub | The Members Lounge",
+    page_icon="💍",
+    layout="wide"
+)
 
-h1{
-  margin:0;
-  font-size:22px;
-  letter-spacing:1px;
-}
+st.markdown(
+    """
+    <style>
+      .block-container { padding-top: 1.2rem; padding-bottom: 2rem; }
+      .ml-title { font-size: 2.2rem; font-weight: 800; color: #C6A75E; margin-bottom: 0.2rem; }
+      .ml-sub { font-size: 1.05rem; opacity: 0.85; margin-top: 0; }
+      .ml-card { border: 1px solid rgba(198,167,94,0.35); border-radius: 14px; padding: 14px 16px; background: rgba(255,255,255,0.55); }
+      .ml-muted { opacity: 0.75; }
+      .ml-badge { display:inline-block; padding: 2px 10px; border-radius: 999px; background: rgba(198,167,94,0.12); border: 1px solid rgba(198,167,94,0.35); }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
-.sub{
-  font-size:13px;
-  color:#444;
-}
+# ==========================
+# HELPERS
+# ==========================
+def aud(n: float) -> str:
+    """Format number as AUD with $ symbol."""
+    try:
+        return f"${n:,.2f}"
+    except Exception:
+        return "$0.00"
 
-/* TABS */
-.tabs{
-  display:flex;
-  overflow-x:auto;
-  border-bottom:2px solid #000;
-}
+def init_state():
+    if "user_name" not in st.session_state:
+        st.session_state.user_name = "Carlo"
+    if "event_name" not in st.session_state:
+        st.session_state.event_name = "Signature Wedding"
+    if "event_date" not in st.session_state:
+        st.session_state.event_date = datetime.now().date()
+    if "guest_count" not in st.session_state:
+        st.session_state.guest_count = 120
+    if "avg_table_size" not in st.session_state:
+        st.session_state.avg_table_size = 10
+    if "run_sheet" not in st.session_state:
+        st.session_state.run_sheet = pd.DataFrame(
+            {
+                "Time": ["4:30 PM", "5:00 PM", "6:30 PM"],
+                "Item (what happens)": ["Guest Arrival", "Ceremony", "Entrées Served"],
+                "Owner (who runs it)": ["Venue", "Celebrant", "Kitchen"],
+                "Notes": ["Welcome drinks ready", "Microphone check", "Dietaries flagged"],
+            }
+        )
 
-.tab{
-  padding:14px 20px;
-  cursor:pointer;
-  border-right:1px solid #000;
-  font-weight:bold;
-}
+    # Menu selections (6 each)
+    if "menu_choices" not in st.session_state:
+        st.session_state.menu_choices = {
+            "Canapés (choose up to 6)": [
+                "Arancini (oven baked)",
+                "Polpette al sugo (mini meatballs)",
+                "Crostini (ricotta + honey + walnuts)",
+                "Bruschetta (tomato + basil)",
+                "Calamari (oven style / grilled)",
+                "Mini parmigiana bites",
+                "Prosciutto + melon",
+                "Caprese skewers",
+                "Salsiccia bites",
+                "Focaccia + dips trio",
+                "Stuffed mushrooms",
+                "Grilled prawns",
+            ],
+            "Entrées (choose up to 6)": [
+                "Antipasto misto platter",
+                "Burrata + heirloom tomato",
+                "Carpaccio di manzo",
+                "Octopus salad (insalata di polpo)",
+                "Calabrian chilli prawns (light)",
+                "Eggplant involtini",
+                "Prosciutto + buffalo mozzarella",
+                "Grilled zucchini + mint + feta",
+            ],
+            "Mains (choose up to 6)": [
+                "Lamb shoulder (slow roasted)",
+                "Chicken breast (char-grilled)",
+                "Barramundi (lemon butter + capers)",
+                "Beef scotch fillet (rosemary jus)",
+                "Pork belly (crackling, apple salsa)",
+                "Veal scaloppine (marsala)",
+                "Vegetarian parmigiana",
+            ],
+            "Desserts (choose up to 6)": [
+                "Mini cannoli",
+                "Tiramisu cups",
+                "Panna cotta",
+                "Baklava",
+                "Gelato station",
+                "Wedding cake served with berries",
+                "Affogato bar",
+            ],
+            "Supper (choose up to 6)": [
+                "Gourmet pies",
+                "Panini station",
+                "Pasta late-night cups",
+                "Arrosticini skewers",
+                "Mini burgers",
+                "Pizza slices",
+                "Fruit platters",
+            ],
+        }
 
-.tab.active{
-  background:#000;
-  color:#fff;
-}
+    if "selected_menu" not in st.session_state:
+        st.session_state.selected_menu = {k: [] for k in st.session_state.menu_choices.keys()}
 
-.section{
-  display:none;
-  padding:30px;
-}
+init_state()
 
-.section.active{
-  display:block;
-}
+def tables_required(guests: int, table_size: int) -> int:
+    if table_size <= 0:
+        return 0
+    return int((guests + table_size - 1) // table_size)
 
-/* TABLES */
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-bottom:20px;
-}
-
-th, td{
-  border:1px solid #000;
-  padding:10px;
-  font-size:14px;
-}
-
-th{
-  background:#f5f5f5;
-}
-
-/* INPUTS */
-input[type="number"], input[type="text"], input[type="date"], select, textarea{
-  width:100%;
-  padding:8px;
-  border:1px solid #000;
-}
-
-.checkbox-list label{
-  display:block;
-  margin-bottom:8px;
-}
-
-/* SUMMARY */
-.summary-box{
-  border:2px solid #000;
-  padding:15px;
-  font-size:18px;
-  font-weight:bold;
-  margin-top:20px;
-}
-
-.small{
-  font-size:14px;
-  font-weight:normal;
-}
-
-/* VENDORS */
-.vendors-list{
-  list-style:none;
-  padding:0;
-}
-
-.vendors-list li{
-  margin-bottom:15px;
-}
-
-.vendors-list a{
-  color:#000;
-  text-decoration:underline;
-}
-
-/* FOOTER */
-footer{
-  padding:20px;
-  border-top:3px solid #000;
-  text-align:center;
-  background:#f5f5f5;
-}
-
-footer img{
-  height:50px;
-  margin-bottom:10px;
-}
-
-footer p{
-  margin:0;
-  font-size:12px;
-  color:#444;
-}
-</style>
-</head>
-
-<body>
-
-<header>
-  <div class="logo">
-    <img src="members-lounge-logo.png" alt="The Members Lounge Parkville">
-  </div>
-  <div>
-    <h1>The Members Lounge</h1>
-    <div class="sub">Luxury Wedding Planning Suite – Parkville (Reggio Calabria Club)</div>
-  </div>
-</header>
-
-<div class="tabs">
-  <div class="tab active" onclick="showTab(0)">Bride Dashboard</div>
-  <div class="tab" onclick="showTab(1)">Preferences & Needs</div>
-  <div class="tab" onclick="showTab(2)">Service Level</div>
-  <div class="tab" onclick="showTab(3)">Financials</div>
-  <div class="tab" onclick="showTab(4)">Menu Selection</div>
-  <div class="tab" onclick="showTab(5)">Timeline</div>
-  <div class="tab" onclick="showTab(6)">Recommended Vendors</div>
-  <div class="tab" onclick="showTab(7)">Live Quote</div>
-</div>
-
-<!-- DASHBOARD -->
-<div class="section active">
-<h2>Welcome to Your Wedding Planning Dashboard</h2>
-<p>Experience excellence in every detail. Let us tailor your special day to perfection.</p>
-<table>
-<tr><th>Bride & Groom Names</th><td><input type="text" id="names" placeholder="e.g., Jane Doe & John Smith"></td></tr>
-<tr><th>Wedding Date</th><td><input type="date" id="date"></td></tr>
-<tr><th>Guest Estimate</th><td><input type="number" id="guests" value="120"></td></tr>
-<tr><th>Adult Guests</th><td><input type="number" id="adults" value="100"></td></tr>
-<tr><th>Child Guests (Under 12)</th><td><input type="number" id="children" value="20"></td></tr>
-<tr><th>Room/Venue</th><td><select id="room"><option value="Members Lounge">Members Lounge (up to 180)</option><option value="Sala Reggio Ballroom">Sala Reggio Ballroom (up to 360)</option><option value="FIOR">FIOR (up to 500)</option></select></td></tr>
-<tr><th>Contact Email</th><td><input type="text" id="email" placeholder="your@email.com"></td></tr>
-<tr><th>Contact Phone</th><td><input type="text" id="phone" placeholder="+61 ..."></td></tr>
-</table>
-</div>
-
-<!-- PREFERENCES & NEEDS -->
-<div class="section">
-<h2>Your Preferences, Needs & Wants</h2>
-<p>We strive for excellence in understanding your vision. Share your details below to help us create a bespoke experience.</p>
-<table>
-<tr><th>Wedding Theme/Ideas</th><td><textarea id="theme" placeholder="e.g., Rustic, Elegant, Cultural"></textarea></td></tr>
-<tr><th>Special Requests</th><td><textarea id="requests" placeholder="e.g., Cultural elements, specific decorations"></textarea></td></tr>
-<tr><th>Dietary Requirements/Allergies</th><td><textarea id="dietary" placeholder="e.g., Gluten-free options, Nut allergies"></textarea></td></tr>
-<tr><th>Preferred Music Style</th><td><input type="text" id="music" placeholder="e.g., Jazz, Pop, Traditional Italian"></td></tr>
-<tr><th>Color Scheme</th><td><input type="text" id="colors" placeholder="e.g., Ivory and Gold"></td></tr>
-<tr><th>Additional Notes</th><td><textarea id="notes" placeholder="Any other needs or wants?"></textarea></td></tr>
-</table>
-</div>
-
-<!-- SERVICE LEVEL -->
-<div class="section">
-<h2>Select Your Service Level</h2>
-<select id="tier" onchange="updateTier()">
-<option value="classic">Classic Collection ($99 pp - 5 Courses)</option>
-<option value="signature">Signature Collection ($124 pp - 5 Courses + Premium)</option>
-<option value="grand">Grand Collection ($144 pp - 5 Courses + Extended)</option>
-</select>
-
-<div id="tierDetails" style="margin-top:20px;"></div>
-</div>
-
-<!-- FINANCIALS -->
-<div class="section">
-<h2>Financial Structure</h2>
-<table>
-<tr><th>Description</th><th>Amount</th></tr>
-<tr><td>Adult Guests</td><td><input type="number" id="adultsFin" value="100"></td></tr>
-<tr><td>Adult Package ($ pp)</td><td><input type="number" id="adultSpend" value="99"></td></tr>
-<tr><td>Child Guests</td><td><input type="number" id="childrenFin" value="20"></td></tr>
-<tr><td>Child Package ($ pp)</td><td><input type="number" id="childSpend" value="30"></td></tr>
-<tr><td>Drinks Package ($ pp)</td><td><input type="number" id="drinks" value="20"></td></tr>
-<tr><td>Room Hire ($)</td><td><input type="number" id="roomHire" value="0"></td></tr>
-<tr><td>Security ($)</td><td><input type="number" id="security" value="0"></td></tr>
-<tr><td>Additional Services ($)</td><td><input type="number" id="additional" value="0" placeholder="e.g., DJ, Styling"></td></tr>
-<tr><td>Deposit Required ($)</td><td><input type="number" id="deposit" value="2000"></td></tr>
-</table>
-
-<div class="summary-box">
-Total Investment: $<span id="total">0.00</span>
-<div class="small">Average Per Adult: $<span id="perAdult">0.00</span></div>
-<div class="small">Average Per Child: $<span id="perChild">0.00</span></div>
-</div>
-</div>
-
-<!-- MENU SELECTION -->
-<div class="section">
-<h2>Comprehensive Menu Selection</h2>
-<p>Based on Reggio Calabria Club wedding packages. Select options for each course. For Signature/Grand, select up to 6 canapés, 4 entrees, etc.</p>
-
-<h3>Select Canapés (4 Options Available - Select up to 6 for Signature/Grand)</h3>
-<div class="checkbox-list" id="canapes">
-<label><input type="checkbox"> Arancini (Rice Balls)</label>
-<label><input type="checkbox"> Polpette (Meatballs)</label>
-<label><input type="checkbox"> Calamari Fritti (Fried Calamari)</label>
-<label><input type="checkbox"> Bruschetta Trio (Tomato, Mushroom, Prosciutto)</label>
-<label><input type="checkbox"> Caprese Skewers (Tomato, Mozzarella, Basil)</label>
-<label><input type="checkbox"> Prawn Cocktail Shots</label>
-<label><input type="checkbox"> Prosciutto Wrapped Asparagus</label>
-<label><input type="checkbox"> Mini Caponata Crostini</label>
-</div>
-
-<h3>Select Cold Antipasto (4 Options Available - Select 2 Alternating)</h3>
-<div class="checkbox-list" id="coldAntipasto">
-<label><input type="checkbox"> Prosciutto e Melone (Prosciutto and Melon)</label>
-<label><input type="checkbox"> Insalata Caprese (Caprese Salad)</label>
-<label><input type="checkbox"> Antipasto Misto (Mixed Cured Meats and Cheeses)</label>
-<label><input type="checkbox"> Marinated Olives and Artichokes</label>
-</div>
-
-<h3>Select Hot Antipasto (4 Options Available - Select 2 Alternating)</h3>
-<div class="checkbox-list" id="hotAntipasto">
-<label><input type="checkbox"> Arancini Siciliani</label>
-<label><input type="checkbox"> Polpette in Sugo (Meatballs in Sauce)</label>
-<label><input type="checkbox"> Calamari alla Griglia (Grilled Calamari)</label>
-<label><input type="checkbox"> Funghi Ripieni (Stuffed Mushrooms)</label>
-</div>
-
-<h3>Select Pasta/Entree Course (4 Options Available - Select 2 Alternating)</h3>
-<div class="checkbox-list" id="pasta">
-<label><input type="checkbox"> Pasta alla Norma (Eggplant and Tomato Pasta)</label>
-<label><input type="checkbox"> Lasagne Bolognese</label>
-<label><input type="checkbox"> Ravioli al Burro e Salvia (Ravioli with Butter and Sage)</label>
-<label><input type="checkbox"> Gnocchi al Pesto</label>
-</div>
-
-<h3>Select Mains (4 Options Available - Select 2 Alternating)</h3>
-<div class="checkbox-list" id="mains">
-<label><input type="checkbox"> Lamb Shanks Braised in Red Wine</label>
-<label><input type="checkbox"> Barramundi with Lemon Herb Sauce</label>
-<label><input type="checkbox"> Scotch Fillet Steak with Peppercorn Sauce</label>
-<label><input type="checkbox"> Chargrilled Chicken with Rosemary</label>
-<label><input type="checkbox"> Veal Scaloppine</label>
-<label><input type="checkbox"> Eggplant Parmigiana (Vegetarian)</label>
-</div>
-
-<h3>Select Sides (4 Options Available - Included)</h3>
-<div class="checkbox-list" id="sides">
-<label><input type="checkbox"> Roasted Vegetables</label>
-<label><input type="checkbox"> Garden Salad</label>
-<label><input type="checkbox"> Potato Wedges</label>
-<label><input type="checkbox"> Steamed Greens</label>
-</div>
-
-<h3>Select Desserts (4 Options Available - Select 2 Alternating)</h3>
-<div class="checkbox-list" id="desserts">
-<label><input type="checkbox"> Tiramisu</label>
-<label><input type="checkbox"> Cannoli Siciliani</label>
-<label><input type="checkbox"> Panna Cotta with Berry Compote</label>
-<label><input type="checkbox"> Gelato Assortito</label>
-</div>
-
-<h3>Beverage Package</h3>
-<select id="beverages">
-<option value="basic">Basic (Soft Drinks & Espresso Included)</option>
-<option value="premium">Premium (+$20 pp: Beer - Peroni, Corona, Cascade Light; Wine - Red, Moscato, Sauvignon Blanc)</option>
-</select>
-</div>
-
-<!-- TIMELINE -->
-<div class="section">
-<h2>Wedding Timeline</h2>
-<table id="timeline">
-<tr><th>Time</th><th>Moment</th><th>Details</th></tr>
-<tr><td><input type="time" value="17:00"></td><td>Guest Arrival</td><td><input type="text" placeholder="Welcome drinks"></td></tr>
-<tr><td><input type="time" value="17:30"></td><td>Canapés Service</td><td><input type="text" placeholder="Circulating canapés"></td></tr>
-<tr><td><input type="time" value="18:00"></td><td>Ceremony (if on-site)</td><td><input type="text" placeholder="Vows and exchange"></td></tr>
-<tr><td><input type="time" value="18:30"></td><td>Speeches</td><td><input type="text" placeholder="Toasts from family"></td></tr>
-<tr><td><input type="time" value="19:00"></td><td>Entree Service</td><td><input type="text" placeholder="Antipasto platters"></td></tr>
-<tr><td><input type="time" value="19:45"></td><td>Main Course</td><td><input type="text" placeholder="Alternating mains"></td></tr>
-<tr><td><input type="time" value="20:45"></td><td>Dessert Service</td><td><input type="text" placeholder="Sweet treats"></td></tr>
-<tr><td><input type="time" value="21:15"></td><td>Cake Cutting</td><td><input type="text" placeholder="Symbolic cut"></td></tr>
-<tr><td><input type="time" value="21:30"></td><td>First Dance</td><td><input type="text" placeholder="Couple's dance"></td></tr>
-<tr><td><input type="time" value="21:45"></td><td>Dancing & Party</td><td><input type="text" placeholder="DJ music"></td></tr>
-<tr><td><input type="time" value="23:00"></td><td>Event End</td><td><input type="text" placeholder="Farewells"></td></tr>
-</table>
-<button onclick="addTimelineRow()">Add Custom Moment</button>
-</div>
-
-<!-- RECOMMENDED VENDORS -->
-<div class="section">
-<h2>Recommended Vendors & Suppliers</h2>
-<p>Explore our curated list of top wedding professionals in Melbourne to complement your special day at The Members Lounge. We've selected these based on excellence and reliability. This section is modular and can be expanded over time.</p>
-
-<h3>Photographers</h3>
-<ul class="vendors-list">
-<li><a href="https://onefinedayweddingexpo.com.au/wedding-hub/wedding-tips/best-wedding-photographer-melbourne" target="_blank">Augmented Arts Weddings & More (One Fine Day Expo)</a></li>
-<li><a href="https://tamaralittlephotography.com.au/" target="_blank">Tamara Little Photography</a></li>
-<li><a href="https://www.thefunkycelebrant.com.au/blog/best-wedding-photographers-melbourne" target="_blank">The Funky Celebrant's Recommendations</a></li>
-<li><a href="https://www.reddit.com/r/AusWeddingPlanning/comments/1o5suhx/melbourne_wedding_photographers" target="_blank">Community Recommendations on Reddit</a></li>
-</ul>
-
-<h3>Videographers</h3>
-<ul class="vendors-list">
-<li><a href="https://onefinedayweddingexpo.com.au/wedding-hub/wedding-tips/best-wedding-videographers-in-melbourne" target="_blank">Dreamlife & Top Videographers (One Fine Day)</a></li>
-<li><a href="https://www.easyweddings.com.au/WeddingVideo/Melbourne" target="_blank">Easy Weddings Videographers Directory</a></li>
-<li><a href="https://thewed.com/magazine/7-best-wedding-videographers-in-australia" target="_blank">The Wed's Top Australian Videographers</a></li>
-<li><a href="https://lachlanchatfieldphotography.com/best-yarra-valley-wedding-videographers" target="_blank">Yarra Valley & Melbourne Videographers</a></li>
-</ul>
-
-<h3>DJs</h3>
-<ul class="vendors-list">
-<li><a href="https://www.rohitjhawar.com/melbourne-wedding-photography-resources/7-top-wedding-djs-in-melbourne" target="_blank">Melbourne Entertainment Co. & Top DJs</a></li>
-<li><a href="https://onemoresong.com.au/the-ultimate-guide-to-finding-the-best-wedding-dj-in-melbourne" target="_blank">One More Song DJs</a></li>
-<li><a href="https://www.easyweddings.com.au/WeddingMusic/Melbourne" target="_blank">Easy Weddings Music Suppliers</a></li>
-<li><a href="https://www.reddit.com/r/AusWeddingPlanning/comments/1kvdcbd/wedding_djmc_recommendations" target="_blank">Reddit DJ/MC Recommendations</a></li>
-</ul>
-
-<h3>Bands</h3>
-<ul class="vendors-list">
-<li><a href="https://www.findaband.co/wedding-bands-melbourne" target="_blank">Findaband's Top 20 Melbourne Wedding Bands</a></li>
-<li><a href="https://www.heyjack.com.au/our-journal/music/melbournes-best-wedding-bands" target="_blank">Hey Jack's Best Wedding Bands</a></li>
-<li><a href="https://www.easyweddings.com.au/WeddingMusic/Melbourne" target="_blank">Easy Weddings Bands Directory</a></li>
-<li><a href="https://melbourneentertainmentco.com.au/bands" target="_blank">Melbourne Entertainment Co. Live Bands</a></li>
-</ul>
-
-<h3>Drummers</h3>
-<ul class="vendors-list">
-<li><a href="https://zaffetroyale.com.au/" target="_blank">Zaffet Royale (Lebanese Drummers & DJs)</a></li>
-<li><a href="https://www.instagram.com/ykentertainmentmelbourne?hl=en" target="_blank">Yanni K Entertainment (Greek/Balkan/Arabic Drummers)</a></li>
-<li><a href="https://www.youtube.com/watch?v=7vzLmNMqLmM" target="_blank">Melbourne Films Lebanese Drummers</a></li>
-<li><a href="https://melbourneentertainmentco.com.au/lebanese-drums" target="_blank">Melbourne Entertainment Co. Lebanese Drums</a></li>
-</ul>
-
-<h3>Suppliers (Planners, Stylists, etc.)</h3>
-<ul class="vendors-list">
-<li><a href="https://www.easyweddings.com.au/wedding/Melbourne" target="_blank">Easy Weddings Melbourne Suppliers Directory</a></li>
-<li><a href="https://simplycelebrant.com.au/best-wedding-vendors" target="_blank">Simply Celebrant's Best Vendors</a></li>
-<li><a href="https://www.katemorgan.net.au/post/surprising-ways-to-find-melbourne-s-best-wedding-suppliers" target="_blank">Kate Morgan's Supplier Guide</a></li>
-<li><a href="https://onefinedayweddingexpo.com.au/wedding-hub/wedding-tips/best-wedding-event-hire-businesses-melbourne" target="_blank">One Fine Day Event Hire</a></li>
-</ul>
-</div>
-
-<!-- LIVE QUOTE -->
-<div class="section">
-<h2>Live Quote Overview</h2>
-<p><strong>Couple:</strong> <span id="qNames"></span></p>
-<p><strong>Date:</strong> <span id="qDate"></span></p>
-<p><strong>Venue:</strong> <span id="qRoom"></span></p>
-<p><strong>Service Level:</strong> <span id="qTier"></span></p>
-<p><strong>Total Guests:</strong> <span id="qGuests"></span> (<span id="qAdults"></span> Adults, <span id="qChildren"></span> Children)</p>
-<p><strong>Preferences Summary:</strong> <span id="qPrefs"></span></p>
-<p><strong>Total Investment:</strong> $<span id="qTotal"></span></p>
-<p><strong>Per Adult:</strong> $<span id="qPerAdult"></span></p>
-<p><strong>Per Child:</strong> $<span id="qPerChild"></span></p>
-<p><strong>Selected Menu Summary:</strong></p>
-<ul id="qMenu"></ul>
-<button onclick="exportQuote()">Export Quote to PDF</button>
-</div>
-
-<footer>
-  <img src="members-lounge-logo.png" alt="The Members Lounge Parkville">
-  <p>© 2026 The Members Lounge | Reggio Calabria Club | Parkville, Melbourne | Excellence in Every Celebration</p>
-</footer>
-
-<script>
-function showTab(i){
-  const tabs=document.querySelectorAll('.tab');
-  const sections=document.querySelectorAll('.section');
-  tabs.forEach((t,index)=>{
-    t.classList.toggle('active', index===i);
-    sections[index].classList.toggle('active', index===i);
-  });
-  if(i===7) updateQuote();
-}
-
-function updateTier(){
-  const tier=document.getElementById('tier').value;
-  const box=document.getElementById('tierDetails');
-  const adultSpend = document.getElementById('adultSpend');
-
-  if(tier==='classic'){
-    box.innerHTML="<strong>Classic Collection:</strong><br>5 Courses (incl. Hot & Cold Antipasto) • Canapés & Champagne • Standard Drinks • Up to 5 Hours";
-    adultSpend.value = 99;
-  }
-  if(tier==='signature'){
-    box.innerHTML="<strong>Signature Collection:</strong><br>5 Courses • 6 Canapés • Premium Drinks • Styling Support • Gluten-Free/Vegan Options";
-    adultSpend.value = 124;
-  }
-  if(tier==='grand'){
-    box.innerHTML="<strong>Grand Collection:</strong><br>5 Courses • 6 Canapés • 4 Courses Alternating • Premium Bar • Extended Reception (6 Hours) • Dedicated Event Manager";
-    adultSpend.value = 144;
-  }
-  calculate();
-}
-
-function calculate(){
-  const adults=parseFloat(document.getElementById('adultsFin').value)||0;
-  const children=parseFloat(document.getElementById('childrenFin').value)||0;
-  const foodAdult=parseFloat(document.getElementById('adultSpend').value)||0;
-  const foodChild=parseFloat(document.getElementById('childSpend').value)||0;
-  const drinks=parseFloat(document.getElementById('drinks').value)||0;
-  const room=parseFloat(document.getElementById('roomHire').value)||0;
-  const security=parseFloat(document.getElementById('security').value)||0;
-  const additional=parseFloat(document.getElementById('additional').value)||0;
-
-  const total=(adults * (foodAdult + drinks)) + (children * foodChild) + room + security + additional;
-  const perAdult=adults>0 ? (total - (children * foodChild)) / adults : 0;
-  const perChild=children>0 ? foodChild : 0;
-
-  document.getElementById('total').innerText=total.toFixed(2);
-  document.getElementById('perAdult').innerText=perAdult.toFixed(2);
-  document.getElementById('perChild').innerText=perChild.toFixed(2);
-
-  syncDashboard();
-}
-
-function syncDashboard(){
-  document.getElementById('adultsFin').value = document.getElementById('adults').value;
-  document.getElementById('childrenFin').value = document.getElementById('children').value;
-}
-
-function updateQuote(){
-  document.getElementById('qNames').innerText=document.getElementById('names').value;
-  document.getElementById('qDate').innerText=document.getElementById('date').value;
-  document.getElementById('qRoom').innerText=document.getElementById('room').value;
-  document.getElementById('qTier').innerText=document.getElementById('tier').options[document.getElementById('tier').selectedIndex].text;
-  document.getElementById('qGuests').innerText=parseInt(document.getElementById('guests').value)||0;
-  document.getElementById('qAdults').innerText=document.getElementById('adults').value;
-  document.getElementById('qChildren').innerText=document.getElementById('children').value;
-  document.getElementById('qTotal').innerText=document.getElementById('total').innerText;
-  document.getElementById('qPerAdult').innerText=document.getElementById('perAdult').innerText;
-  document.getElementById('qPerChild').innerText=document.getElementById('perChild').innerText;
-
-  const prefs = [];
-  if(document.getElementById('theme').value) prefs.push(`Theme: ${document.getElementById('theme').value}`);
-  if(document.getElementById('requests').value) prefs.push(`Requests: ${document.getElementById('requests').value}`);
-  if(document.getElementById('dietary').value) prefs.push(`Dietary: ${document.getElementById('dietary').value}`);
-  document.getElementById('qPrefs').innerText = prefs.join(' | ');
-
-  const menuList = document.getElementById('qMenu');
-  menuList.innerHTML = '';
-  ['canapes', 'coldAntipasto', 'hotAntipasto', 'pasta', 'mains', 'sides', 'desserts'].forEach(course => {
-    const selected = Array.from(document.getElementById(course).querySelectorAll('input:checked')).map(cb => cb.parentNode.textContent);
-    if(selected.length > 0){
-      const li = document.createElement('li');
-      li.textContent = `${course.charAt(0).toUpperCase() + course.slice(1)}: ${selected.join(', ')}`;
-      menuList.appendChild(li);
+def build_budget(
+    guests: int,
+    room_hire: float,
+    dry_hire: float,
+    security: float,
+    food_pp: float,
+    bev_pp: float,
+    photo: float,
+    dj: float,
+    florals: float,
+    celebrant: float,
+    misc: float,
+    upsells: float,
+):
+    food_total = guests * food_pp
+    bev_total = guests * bev_pp
+    total = room_hire + dry_hire + security + food_total + bev_total + photo + dj + florals + celebrant + misc + upsells
+    per_guest = total / guests if guests else 0
+    return {
+        "guests": guests,
+        "room_hire": room_hire,
+        "dry_hire": dry_hire,
+        "security": security,
+        "food_pp": food_pp,
+        "bev_pp": bev_pp,
+        "food_total": food_total,
+        "bev_total": bev_total,
+        "photo": photo,
+        "dj": dj,
+        "florals": florals,
+        "celebrant": celebrant,
+        "misc": misc,
+        "upsells": upsells,
+        "total": total,
+        "per_guest": per_guest,
     }
-  });
-  const bev = document.getElementById('beverages').options[document.getElementById('beverages').selectedIndex].text;
-  const liBev = document.createElement('li');
-  liBev.textContent = `Beverages: ${bev}`;
-  menuList.appendChild(liBev);
-}
 
-function addTimelineRow(){
-  const table = document.getElementById('timeline');
-  const row = table.insertRow();
-  row.innerHTML = '<td><input type="time"></td><td><input type="text" placeholder="Custom Moment"></td><td><input type="text" placeholder="Details"></td>';
-}
+def make_pdf(title: str, lines: list[str], out_path: str):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.set_font("Helvetica", size=14)
+    pdf.cell(0, 10, title, ln=True)
+    pdf.ln(2)
+    pdf.set_font("Helvetica", size=11)
+    for line in lines:
+        pdf.multi_cell(0, 6, line)
+    pdf.output(out_path)
 
-function exportQuote(){
-  // Placeholder for PDF export - can be expanded modularly
-  alert('Exporting quote to PDF... (Feature coming soon)');
-}
+# ==========================
+# HEADER
+# ==========================
+left, right = st.columns([0.78, 0.22], vertical_alignment="center")
+with left:
+    st.markdown("<div class='ml-title'>Signature Weddings Hub</div>", unsafe_allow_html=True)
+    st.markdown("<div class='ml-sub'>The Members Lounge • Parkville, Melbourne</div>", unsafe_allow_html=True)
+with right:
+    st.markdown(f"<div class='ml-badge'>Logged in as <b>{st.session_state.user_name}</b></div>", unsafe_allow_html=True)
 
-document.querySelectorAll('input, select, textarea').forEach(el => {
-  el.addEventListener('input', () => {
-    calculate();
-    if(el.id === 'adults' || el.id === 'children') document.getElementById('guests').value = parseInt(document.getElementById('adults').value || 0) + parseInt(document.getElementById('children').value || 0);
-    if(el.id === 'tier') updateTier();
-    if(el.closest('.checkbox-list') || el.id === 'beverages' || el.closest('#preferences')) updateQuote();
-  });
-});
+st.divider()
 
-// Auto-save feature for efficiency (using localStorage as example)
-window.addEventListener('beforeunload', () => {
-  const data = {
-    names: document.getElementById('names').value,
-    date: document.getElementById('date').value,
-    // Add more fields as needed
-  };
-  localStorage.setItem('weddingAppData', JSON.stringify(data));
-});
+# ==========================
+# SIDEBAR NAV
+# ==========================
+st.sidebar.header("Navigation")
+module = st.sidebar.radio(
+    "Go to",
+    [
+        "Dashboard",
+        "Seating",
+        "Diary (Run Sheet)",
+        "Menu Selection (6 each)",
+        "Guestlist Predictor",
+        "Budget Calculator",
+        "Upsell Engine",
+        "Export Center",
+        "Admin Settings",
+    ],
+)
 
-window.addEventListener('load', () => {
-  const saved = JSON.parse(localStorage.getItem('weddingAppData'));
-  if(saved){
-    document.getElementById('names').value = saved.names || '';
-    document.getElementById('date').value = saved.date || '';
-    // Restore more
-  }
-  updateTier();
-  calculate();
-  updateQuote();
-});
+# ==========================
+# DASHBOARD
+# ==========================
+if module == "Dashboard":
+    st.subheader("Real-Time Dashboard")
 
-updateTier();
-calculate();
-</script>
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Event", st.session_state.event_name)
+    col2.metric("Event Date", str(st.session_state.event_date))
+    col3.metric("Guests (current)", st.session_state.guest_count)
+    col4.metric("Tables (auto)", tables_required(st.session_state.guest_count, st.session_state.avg_table_size))
 
-</body>
-</html>
-```" id
+    st.markdown("<div class='ml-card'>", unsafe_allow_html=True)
+    st.write("**Status**: On Track ✅")
+    st.write("**Melbourne Weather**: Placeholder (API can be connected later)")
+    st.write("**Notes**: This dashboard updates live as you change guests, seating, and budget.")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    st.caption("Tip: Use the left sidebar like tabs — couples can jump between modules instantly on mobile.")
+
+# ==========================
+# SEATING
+# ==========================
+elif module == "Seating":
+    st.subheader("Seating Management (Dynamic Scaling)")
+
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        st.session_state.guest_count = st.number_input("Total Guests", 20, 600, int(st.session_state.guest_count))
+    with c2:
+        st.session_state.avg_table_size = st.number_input("Seats per Table", 6, 14, int(st.session_state.avg_table_size))
+    with c3:
+        st.metric("Tables Required", tables_required(st.session_state.guest_count, st.session_state.avg_table_size))
+
+    st.text_area(
+        "Floor Plan Notes (VIP, stage, aisle, parents tables, etc.)",
+        value="VIP table near stage. Parents at Table 1. Dancefloor clear line of sight.",
+        height=120,
+    )
+
+# ==========================
+# DIARY / RUN SHEET
+# ==========================
+elif module == "Diary (Run Sheet)":
+    st.subheader("Diary (Run Sheet) – Item-First Structure")
+
+    st.write("Edit live. Add rows for speeches, cake, first dance, bouquet, supper, send-off, etc.")
+    st.session_state.run_sheet = st.data_editor(st.session_state.run_sheet, num_rows="dynamic", use_container_width=True)
+
+    st.info("Upsell prompt idea: before saving final run sheet → suggest late-night supper, band, or champagne tower.")
+
+# ==========================
+# MENU SELECTIONS (6 each)
+# ==========================
+elif module == "Menu Selection (6 each)":
+    st.subheader("Menu Selection – Choose up to 6 in each category")
+
+    st.caption("These are placeholder menu options. You can paste the exact list from reggiocalabriaclub.com.au anytime.")
+
+    for section, options in st.session_state.menu_choices.items():
+        st.markdown(f"### {section}")
+        selected = st.multiselect(
+            f"Select up to 6 for: {section}",
+            options=options,
+            default=st.session_state.selected_menu.get(section, []),
+            max_selections=6,
+            key=f"menu_{section}",
+        )
+        st.session_state.selected_menu[section] = selected
+
+    st.success("Selections saved in-session. For multi-user, connect SQLite/Firebase.")
+
+# ==========================
+# GUESTLIST PREDICTOR
+# ==========================
+elif module == "Guestlist Predictor":
+    st.subheader("Guestlist Predictor (AI-like Forecast)")
+
+    invited = st.number_input("Invited Guests", 50, 800, 160)
+    response_rate = st.slider("Expected RSVP Rate (%)", 40, 100, 85)
+    seasonal_factor = st.selectbox("Seasonal Factor (Melbourne)", ["Standard", "Peak Season (+3%)", "Low Season (-5%)"])
+
+    adj = 0
+    if seasonal_factor == "Peak Season (+3%)":
+        adj = 3
+    elif seasonal_factor == "Low Season (-5%)":
+        adj = -5
+
+    predicted = int(invited * ((response_rate + adj) / 100))
+    st.metric("Predicted Final Guests", predicted)
+
+    if st.button("Apply Prediction to Seating/Budget"):
+        st.session_state.guest_count = predicted
+        st.success(f"Applied: guest count is now {predicted}")
+
+# ==========================
+# BUDGET
+# ==========================
+elif module == "Budget Calculator":
+    st.subheader("Budget Calculator (AUD $)")
+
+    guests = int(st.session_state.guest_count)
+
+    st.markdown("#### Core Venue Costs")
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        room_hire = st.number_input("Room Hire ($)", 0, 100000, 8000)
+    with c2:
+        dry_hire = st.number_input("Dry Hire ($)", 0, 100000, 0)
+    with c3:
+        security = st.number_input("Security ($)", 0, 50000, 1500)
+
+    st.markdown("#### Per Person Packages")
+    c4, c5 = st.columns(2)
+    with c4:
+        food_pp = st.number_input("Food Per Person ($)", 0, 1000, 110)
+    with c5:
+        bev_pp = st.number_input("Beverage Per Person ($)", 0, 1000, 75)
+
+    st.markdown("#### Expanded Options (Optional Vendors)")
+    c6, c7, c8 = st.columns(3)
+    with c6:
+        photo = st.number_input("Photography ($)", 0, 100000, 0)
+        celebrant = st.number_input("Celebrant ($)", 0, 20000, 0)
+    with c7:
+        dj = st.number_input("DJ / Entertainment ($)", 0, 100000, 0)
+        florals = st.number_input("Florals ($)", 0, 150000, 0)
+    with c8:
+        misc = st.number_input("Misc / Contingency ($)", 0, 100000, 0)
+
+    st.divider()
+
+    # Upsells pass-through (from Upsell module) stored in session, default 0
+    upsells = float(st.session_state.get("upsell_total", 0.0))
+
+    budget = build_budget(
+        guests=guests,
+        room_hire=float(room_hire),
+        dry_hire=float(dry_hire),
+        security=float(security),
+        food_pp=float(food_pp),
+        bev_pp=float(bev_pp),
+        photo=float(photo),
+        dj=float(dj),
+        florals=float(florals),
+        celebrant=float(celebrant),
+        misc=float(misc),
+        upsells=float(upsells),
+    )
+
+    st.markdown("<div class='ml-card'>", unsafe_allow_html=True)
+    colA, colB, colC = st.columns(3)
+    colA.metric("Total Budget", aud(budget["total"]))
+    colB.metric("Average Spend / Guest", aud(budget["per_guest"]))
+    colC.metric("Guests Used", budget["guests"])
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    st.caption("Weighted-average is based on adult spend denominator (guest count). Children can be handled later as a separate pricing rule.")
+
+# ==========================
+# UPSELL ENGINE
+# ==========================
+elif module == "Upsell Engine":
+    st.subheader("Upsell Engine (AI-like Prompts)")
+
+    upsell_options = {
+        "Premium Champagne Tower": 2500,
+        "Live Italian Band": 4500,
+        "Luxury Floral Upgrade": 6000,
+        "Premium Wedding Cake Upgrade": 1800,
+        "Signature Late Night Supper": 2200,
+        "Extended Spirit Package": 3200,
+    }
+
+    total = 0
+    selected = []
+    for name, price in upsell_options.items():
+        if st.checkbox(f"{name} (+{aud(price)})", key=f"upsell_{name}"):
+            total += price
+            selected.append(name)
+
+    st.session_state.upsell_total = float(total)
+
+    st.metric("Upsell Total", aud(total))
+
+    if total > 0:
+        st.success("Experience Level: Platinum Signature ✅")
+        st.write("Selected upgrades:", ", ".join(selected))
+
+# ==========================
+# EXPORTS
+# ==========================
+elif module == "Export Center":
+    st.subheader("Export Center")
+
+    st.markdown("### Run Sheet Exports")
+    run_csv = st.session_state.run_sheet.to_csv(index=False).encode("utf-8")
+    st.download_button("Download Run Sheet (CSV)", run_csv, file_name="run_sheet.csv", mime="text/csv")
+
+    if st.button("Generate Run Sheet PDF"):
+        lines = [f"{row['Time']} — {row['Item (what happens)']} — Owner: {row['Owner (who runs it)']} — Notes: {row.get('Notes','')}"
+                 for _, row in st.session_state.run_sheet.iterrows()]
+        make_pdf("Signature Weddings Run Sheet | The Members Lounge", lines, "run_sheet.pdf")
+        with open("run_sheet.pdf", "rb") as f:
+            st.download_button("Download Run Sheet (PDF)", f, file_name="run_sheet.pdf", mime="application/pdf")
+
+    st.divider()
+
+    st.markdown("### Menu Selections Export")
+    menu_rows = []
+    for section, picked in st.session_state.selected_menu.items():
+        for item in picked:
+            menu_rows.append({"Section": section, "Selection": item})
+    menu_df = pd.DataFrame(menu_rows) if menu_rows else pd.DataFrame([{"Section": "None", "Selection": "No items selected yet"}])
+
+    menu_csv = menu_df.to_csv(index=False).encode("utf-8")
+    st.download_button("Download Menu Selections (CSV)", menu_csv, file_name="menu_selections.csv", mime="text/csv")
+
+    st.divider()
+
+    st.markdown("### iCal Placeholder")
+    st.code(
+        "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Members Lounge//Signature Weddings Hub//EN\nBEGIN:VEVENT\nSUMMARY:Wedding Day\nDTSTART:20260101T170000\nDTEND:20260101T235900\nLOCATION:The Members Lounge, Parkville\nEND:VEVENT\nEND:VCALENDAR",
+        language="text",
+    )
+    st.caption("Replace DTSTART/DTEND with the real event date/time when ready.")
+
+# ==========================
+# ADMIN
+# ==========================
+elif module == "Admin Settings":
+    st.subheader("Admin Settings (Simulated Login + Production Notes)")
+
+    st.session_state.user_name = st.text_input("Display Name", value=st.session_state.user_name)
+    st.session_state.event_name = st.text_input("Default Event Name", value=st.session_state.event_name)
+    st.session_state.event_date = st.date_input("Event Date", value=st.session_state.event_date)
+
+    st.divider()
+    st.markdown("### Integrations (Placeholders)")
+    st.write("- Weather API (Melbourne): **placeholder**")
+    st.write("- Payments (Stripe): **placeholder**")
+    st.write("- Database (SQLite/Firebase): **recommended for multi-user**")
+    st.write("- VR Tours: embed a 360° link (YouTube/Kuula/Google)")
+
+    st.warning("Privacy note: Production version should have authentication, role-based permissions, and secure storage.")
