@@ -83,7 +83,7 @@ th{
 }
 
 /* INPUTS */
-input[type="number"], input[type="text"], input[type="date"], select{
+input[type="number"], input[type="text"], input[type="date"], select, textarea{
   width:100%;
   padding:8px;
   border:1px solid #000;
@@ -107,6 +107,40 @@ input[type="number"], input[type="text"], input[type="date"], select{
   font-size:14px;
   font-weight:normal;
 }
+
+/* VENDORS */
+.vendors-list{
+  list-style:none;
+  padding:0;
+}
+
+.vendors-list li{
+  margin-bottom:15px;
+}
+
+.vendors-list a{
+  color:#000;
+  text-decoration:underline;
+}
+
+/* FOOTER */
+footer{
+  padding:20px;
+  border-top:3px solid #000;
+  text-align:center;
+  background:#f5f5f5;
+}
+
+footer img{
+  height:50px;
+  margin-bottom:10px;
+}
+
+footer p{
+  margin:0;
+  font-size:12px;
+  color:#444;
+}
 </style>
 </head>
 
@@ -124,16 +158,19 @@ input[type="number"], input[type="text"], input[type="date"], select{
 
 <div class="tabs">
   <div class="tab active" onclick="showTab(0)">Bride Dashboard</div>
-  <div class="tab" onclick="showTab(1)">Service Level</div>
-  <div class="tab" onclick="showTab(2)">Financials</div>
-  <div class="tab" onclick="showTab(3)">Menu Selection</div>
-  <div class="tab" onclick="showTab(4)">Timeline</div>
-  <div class="tab" onclick="showTab(5)">Live Quote</div>
+  <div class="tab" onclick="showTab(1)">Preferences & Needs</div>
+  <div class="tab" onclick="showTab(2)">Service Level</div>
+  <div class="tab" onclick="showTab(3)">Financials</div>
+  <div class="tab" onclick="showTab(4)">Menu Selection</div>
+  <div class="tab" onclick="showTab(5)">Timeline</div>
+  <div class="tab" onclick="showTab(6)">Recommended Vendors</div>
+  <div class="tab" onclick="showTab(7)">Live Quote</div>
 </div>
 
 <!-- DASHBOARD -->
 <div class="section active">
 <h2>Welcome to Your Wedding Planning Dashboard</h2>
+<p>Experience excellence in every detail. Let us tailor your special day to perfection.</p>
 <table>
 <tr><th>Bride & Groom Names</th><td><input type="text" id="names" placeholder="e.g., Jane Doe & John Smith"></td></tr>
 <tr><th>Wedding Date</th><td><input type="date" id="date"></td></tr>
@@ -143,6 +180,20 @@ input[type="number"], input[type="text"], input[type="date"], select{
 <tr><th>Room/Venue</th><td><select id="room"><option value="Members Lounge">Members Lounge (up to 180)</option><option value="Sala Reggio Ballroom">Sala Reggio Ballroom (up to 360)</option><option value="FIOR">FIOR (up to 500)</option></select></td></tr>
 <tr><th>Contact Email</th><td><input type="text" id="email" placeholder="your@email.com"></td></tr>
 <tr><th>Contact Phone</th><td><input type="text" id="phone" placeholder="+61 ..."></td></tr>
+</table>
+</div>
+
+<!-- PREFERENCES & NEEDS -->
+<div class="section">
+<h2>Your Preferences, Needs & Wants</h2>
+<p>We strive for excellence in understanding your vision. Share your details below to help us create a bespoke experience.</p>
+<table>
+<tr><th>Wedding Theme/Ideas</th><td><textarea id="theme" placeholder="e.g., Rustic, Elegant, Cultural"></textarea></td></tr>
+<tr><th>Special Requests</th><td><textarea id="requests" placeholder="e.g., Cultural elements, specific decorations"></textarea></td></tr>
+<tr><th>Dietary Requirements/Allergies</th><td><textarea id="dietary" placeholder="e.g., Gluten-free options, Nut allergies"></textarea></td></tr>
+<tr><th>Preferred Music Style</th><td><input type="text" id="music" placeholder="e.g., Jazz, Pop, Traditional Italian"></td></tr>
+<tr><th>Color Scheme</th><td><input type="text" id="colors" placeholder="e.g., Ivory and Gold"></td></tr>
+<tr><th>Additional Notes</th><td><textarea id="notes" placeholder="Any other needs or wants?"></textarea></td></tr>
 </table>
 </div>
 
@@ -275,6 +326,60 @@ Total Investment: $<span id="total">0.00</span>
 <button onclick="addTimelineRow()">Add Custom Moment</button>
 </div>
 
+<!-- RECOMMENDED VENDORS -->
+<div class="section">
+<h2>Recommended Vendors & Suppliers</h2>
+<p>Explore our curated list of top wedding professionals in Melbourne to complement your special day at The Members Lounge. We've selected these based on excellence and reliability. This section is modular and can be expanded over time.</p>
+
+<h3>Photographers</h3>
+<ul class="vendors-list">
+<li><a href="https://onefinedayweddingexpo.com.au/wedding-hub/wedding-tips/best-wedding-photographer-melbourne" target="_blank">Augmented Arts Weddings & More (One Fine Day Expo)</a></li>
+<li><a href="https://tamaralittlephotography.com.au/" target="_blank">Tamara Little Photography</a></li>
+<li><a href="https://www.thefunkycelebrant.com.au/blog/best-wedding-photographers-melbourne" target="_blank">The Funky Celebrant's Recommendations</a></li>
+<li><a href="https://www.reddit.com/r/AusWeddingPlanning/comments/1o5suhx/melbourne_wedding_photographers" target="_blank">Community Recommendations on Reddit</a></li>
+</ul>
+
+<h3>Videographers</h3>
+<ul class="vendors-list">
+<li><a href="https://onefinedayweddingexpo.com.au/wedding-hub/wedding-tips/best-wedding-videographers-in-melbourne" target="_blank">Dreamlife & Top Videographers (One Fine Day)</a></li>
+<li><a href="https://www.easyweddings.com.au/WeddingVideo/Melbourne" target="_blank">Easy Weddings Videographers Directory</a></li>
+<li><a href="https://thewed.com/magazine/7-best-wedding-videographers-in-australia" target="_blank">The Wed's Top Australian Videographers</a></li>
+<li><a href="https://lachlanchatfieldphotography.com/best-yarra-valley-wedding-videographers" target="_blank">Yarra Valley & Melbourne Videographers</a></li>
+</ul>
+
+<h3>DJs</h3>
+<ul class="vendors-list">
+<li><a href="https://www.rohitjhawar.com/melbourne-wedding-photography-resources/7-top-wedding-djs-in-melbourne" target="_blank">Melbourne Entertainment Co. & Top DJs</a></li>
+<li><a href="https://onemoresong.com.au/the-ultimate-guide-to-finding-the-best-wedding-dj-in-melbourne" target="_blank">One More Song DJs</a></li>
+<li><a href="https://www.easyweddings.com.au/WeddingMusic/Melbourne" target="_blank">Easy Weddings Music Suppliers</a></li>
+<li><a href="https://www.reddit.com/r/AusWeddingPlanning/comments/1kvdcbd/wedding_djmc_recommendations" target="_blank">Reddit DJ/MC Recommendations</a></li>
+</ul>
+
+<h3>Bands</h3>
+<ul class="vendors-list">
+<li><a href="https://www.findaband.co/wedding-bands-melbourne" target="_blank">Findaband's Top 20 Melbourne Wedding Bands</a></li>
+<li><a href="https://www.heyjack.com.au/our-journal/music/melbournes-best-wedding-bands" target="_blank">Hey Jack's Best Wedding Bands</a></li>
+<li><a href="https://www.easyweddings.com.au/WeddingMusic/Melbourne" target="_blank">Easy Weddings Bands Directory</a></li>
+<li><a href="https://melbourneentertainmentco.com.au/bands" target="_blank">Melbourne Entertainment Co. Live Bands</a></li>
+</ul>
+
+<h3>Drummers</h3>
+<ul class="vendors-list">
+<li><a href="https://zaffetroyale.com.au/" target="_blank">Zaffet Royale (Lebanese Drummers & DJs)</a></li>
+<li><a href="https://www.instagram.com/ykentertainmentmelbourne?hl=en" target="_blank">Yanni K Entertainment (Greek/Balkan/Arabic Drummers)</a></li>
+<li><a href="https://www.youtube.com/watch?v=7vzLmNMqLmM" target="_blank">Melbourne Films Lebanese Drummers</a></li>
+<li><a href="https://melbourneentertainmentco.com.au/lebanese-drums" target="_blank">Melbourne Entertainment Co. Lebanese Drums</a></li>
+</ul>
+
+<h3>Suppliers (Planners, Stylists, etc.)</h3>
+<ul class="vendors-list">
+<li><a href="https://www.easyweddings.com.au/wedding/Melbourne" target="_blank">Easy Weddings Melbourne Suppliers Directory</a></li>
+<li><a href="https://simplycelebrant.com.au/best-wedding-vendors" target="_blank">Simply Celebrant's Best Vendors</a></li>
+<li><a href="https://www.katemorgan.net.au/post/surprising-ways-to-find-melbourne-s-best-wedding-suppliers" target="_blank">Kate Morgan's Supplier Guide</a></li>
+<li><a href="https://onefinedayweddingexpo.com.au/wedding-hub/wedding-tips/best-wedding-event-hire-businesses-melbourne" target="_blank">One Fine Day Event Hire</a></li>
+</ul>
+</div>
+
 <!-- LIVE QUOTE -->
 <div class="section">
 <h2>Live Quote Overview</h2>
@@ -283,12 +388,19 @@ Total Investment: $<span id="total">0.00</span>
 <p><strong>Venue:</strong> <span id="qRoom"></span></p>
 <p><strong>Service Level:</strong> <span id="qTier"></span></p>
 <p><strong>Total Guests:</strong> <span id="qGuests"></span> (<span id="qAdults"></span> Adults, <span id="qChildren"></span> Children)</p>
+<p><strong>Preferences Summary:</strong> <span id="qPrefs"></span></p>
 <p><strong>Total Investment:</strong> $<span id="qTotal"></span></p>
 <p><strong>Per Adult:</strong> $<span id="qPerAdult"></span></p>
 <p><strong>Per Child:</strong> $<span id="qPerChild"></span></p>
 <p><strong>Selected Menu Summary:</strong></p>
 <ul id="qMenu"></ul>
+<button onclick="exportQuote()">Export Quote to PDF</button>
 </div>
+
+<footer>
+  <img src="members-lounge-logo.png" alt="The Members Lounge Parkville">
+  <p>© 2026 The Members Lounge | Reggio Calabria Club | Parkville, Melbourne | Excellence in Every Celebration</p>
+</footer>
 
 <script>
 function showTab(i){
@@ -298,7 +410,7 @@ function showTab(i){
     t.classList.toggle('active', index===i);
     sections[index].classList.toggle('active', index===i);
   });
-  if(i===5) updateQuote();
+  if(i===7) updateQuote();
 }
 
 function updateTier(){
@@ -337,7 +449,7 @@ function calculate(){
 
   document.getElementById('total').innerText=total.toFixed(2);
   document.getElementById('perAdult').innerText=perAdult.toFixed(2);
-  document.getElementById('perChild') ? document.getElementById('perChild').innerText=perChild.toFixed(2) : '';
+  document.getElementById('perChild').innerText=perChild.toFixed(2);
 
   syncDashboard();
 }
@@ -357,7 +469,13 @@ function updateQuote(){
   document.getElementById('qChildren').innerText=document.getElementById('children').value;
   document.getElementById('qTotal').innerText=document.getElementById('total').innerText;
   document.getElementById('qPerAdult').innerText=document.getElementById('perAdult').innerText;
-  document.getElementById('qPerChild') ? document.getElementById('qPerChild').innerText=document.getElementById('perChild').innerText : '';
+  document.getElementById('qPerChild').innerText=document.getElementById('perChild').innerText;
+
+  const prefs = [];
+  if(document.getElementById('theme').value) prefs.push(`Theme: ${document.getElementById('theme').value}`);
+  if(document.getElementById('requests').value) prefs.push(`Requests: ${document.getElementById('requests').value}`);
+  if(document.getElementById('dietary').value) prefs.push(`Dietary: ${document.getElementById('dietary').value}`);
+  document.getElementById('qPrefs').innerText = prefs.join(' | ');
 
   const menuList = document.getElementById('qMenu');
   menuList.innerHTML = '';
@@ -381,13 +499,40 @@ function addTimelineRow(){
   row.innerHTML = '<td><input type="time"></td><td><input type="text" placeholder="Custom Moment"></td><td><input type="text" placeholder="Details"></td>';
 }
 
-document.querySelectorAll('input, select').forEach(el => {
+function exportQuote(){
+  // Placeholder for PDF export - can be expanded modularly
+  alert('Exporting quote to PDF... (Feature coming soon)');
+}
+
+document.querySelectorAll('input, select, textarea').forEach(el => {
   el.addEventListener('input', () => {
     calculate();
-    if(el.id === 'adults' || el.id === 'children') document.getElementById('guests').value = parseInt(document.getElementById('adults').value) + parseInt(document.getElementById('children').value);
+    if(el.id === 'adults' || el.id === 'children') document.getElementById('guests').value = parseInt(document.getElementById('adults').value || 0) + parseInt(document.getElementById('children').value || 0);
     if(el.id === 'tier') updateTier();
-    if(el.closest('.checkbox-list') || el.id === 'beverages') updateQuote();
+    if(el.closest('.checkbox-list') || el.id === 'beverages' || el.closest('#preferences')) updateQuote();
   });
+});
+
+// Auto-save feature for efficiency (using localStorage as example)
+window.addEventListener('beforeunload', () => {
+  const data = {
+    names: document.getElementById('names').value,
+    date: document.getElementById('date').value,
+    // Add more fields as needed
+  };
+  localStorage.setItem('weddingAppData', JSON.stringify(data));
+});
+
+window.addEventListener('load', () => {
+  const saved = JSON.parse(localStorage.getItem('weddingAppData'));
+  if(saved){
+    document.getElementById('names').value = saved.names || '';
+    document.getElementById('date').value = saved.date || '';
+    // Restore more
+  }
+  updateTier();
+  calculate();
+  updateQuote();
 });
 
 updateTier();
@@ -396,3 +541,4 @@ calculate();
 
 </body>
 </html>
+```" id
