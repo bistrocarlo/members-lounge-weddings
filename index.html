@@ -460,7 +460,7 @@ doctype html>
             <h2>Exact Selection Rules</h2>
             <ul class="small">
               <li><b>Canapés:</b> exactly 3</li>
-              <li><b>Grande Antipasto:</b> fixed inclusion (auto)</li>
+              <li><b>Grande Antipasto:</b> exactly 7</li>
               <li><b>Entrée / Pasta:</b> exactly 2</li>
               <li><b>Mains:</b> exactly 2</li>
               <li><b>Dessert:</b> exactly 1</li>
@@ -498,7 +498,7 @@ doctype html>
         </div>
 
         <!-- Selections -->
-        <div class="course" data-course="Canapés" data-limit="3" data-exact="4">
+        <div class="course" data-course="Canapés" data-limit="3" data-exact="3">
           <h3>Canapés (choose exactly 3)</h3>
           <div class="row" id="list-Canapés"></div>
           <div class="count" id="count-Canapés">0/3 selected</div>
@@ -506,9 +506,11 @@ doctype html>
         </div>
 
         <div class="course" data-course="Antipasto">
-          <h3>Grande Antipasto (fixed inclusion)</h3>
-          <div class="small" id="antipastoFixed"></div>
-        </div>
+          <h3>Grande Antipasto (choose exactly 7)</h3>
+          <div class="row" id="list-Antipasto"></div>
+          <div class="count" id="count-Antipasto">0/7 selected</div>
+          <div class="warn" id="warn-Mains">You must select exactly 7 antipasto options.</div>
+         </div>
 
         <div class="course" data-course="Pasta" data-limit="2" data-exact="2">
           <h3>Entrée / Pasta (choose exactly 2)</h3>
@@ -634,8 +636,10 @@ doctype html>
   const MENU = {
     "Canapés": [
       "Prawn Wonton Wrap",
-      "Arancini",
-      "Meatballs",
+      "Arancini Vegetarian",
+      "Meatballs (Pork & Beef)",
+      "Tiropita",
+      "Scaglia di Parmigiano & Honey"
     ],
     "Antipasto": [
       "Bocconcini & Ricotta",
@@ -645,29 +649,38 @@ doctype html>
       "Tomato bruschetta",
       "Mini Sausages",
       "Calamari fritti"
+      "Feta & Kefalograviera",
+      "Trio of dips with pita bread",
+      "Cevape (Beef)"
     ],
     "Pasta": [
-      "Elicoidali al Ragú (four meat sauce)",
-      "Gnocchi Pesto (vegetarian)",
-      "Pasta Napoli (tomato & herbs)"
+      "Penne al Ragú (pork, beef, sausage ragu)",
+      "Gnocchi Pesto (vegetarian & nut free)",
+      "Pasta Napoli (tomato, garlic & basil)"
     ],
     "Mains": [
       "Pollo Proviciale (char-grilled chicken breast on a Chimmichurri dressing)",
       "Cotoletta de Pesce (barramundi + southern Italian herb crumbed coating)",
-      "Stingo di Agniello (lamb shank in a white wine & butter sauce)"
+      "Stingo di Agniello (lamb shank in a white wine & tomato sauce)"
+      "Bondiola (char-grilled pork fillet with a salmoriglio dressing)",
+      "Short Ribs (Braised beef short ribs topped with gremolata )",
+      "Pipi Ripieni (Vegan rice filled pepper with a vegetable medley)"
     ],
     "Dessert": [
       "Roaming assorted desserts (mini cannoli + mini cheesecakes + lemon tarts)",
       "Individual Dessert Selection (select two individual desserts)",
-      "Gelato station"
+      "Gelato Tradizionale (Cassata, Tartuffo, Bacio)"
     ],
     "Supper": [
       "Pizza",
+      "Porchetta roll",
+      "Hot Chips",
     ]
   };
 
   // Exact rules
   const RULES = {
+    "Antipato": { exact: 7, max: 7 }
     "Canapés": { exact: 3, max: 3 },
     "Pasta":   { exact: 2, max: 2 },
     "Mains":   { exact: 2, max: 2 },
