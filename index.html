@@ -197,9 +197,14 @@
       background:#fff;
     }
 
+    /* Admin pricing panel hidden by default */
+    .adminPricing{ display:none; }
+    .adminPricing.show{ display:block; }
+
     @media print{
       .tabs-wrap, .actions, .btn { display:none !important; }
       .card{ box-shadow:none; }
+      .adminPricing{ display:none !important; } /* never print pricing */
     }
   </style>
 </head>
@@ -272,7 +277,7 @@
           <table class="table" aria-label="Quote breakdown">
             <tbody>
               <tr><td>Room hire</td><td id="qRoom">$0.00</td></tr>
-              <tr><td>Food (menu-driven)</td><td id="qFood">$0.00</td></tr>
+              <tr><td>Food</td><td id="qFood">$0.00</td></tr>
               <tr><td>Drinks</td><td id="qDrinks">$0.00</td></tr>
               <tr><td>Dry hire</td><td id="qDry">$0.00</td></tr>
               <tr><td>Security</td><td id="qSec">$0.00</td></tr>
@@ -310,8 +315,8 @@
 
           <div class="divider"></div>
 
-          <h2>Admin Pricing (Editable)</h2>
-          <div class="hint">These defaults are safe. Adjust anytime. Quote updates live.</div>
+          <h2>Admin Controls (Pricing Factors)</h2>
+          <div class="hint">These affect the calculation but are not itemised to the customer.</div>
 
           <div class="row">
             <div>
@@ -324,11 +329,6 @@
               <input id="childFactor" type="number" min="0" step="0.05" value="0.30">
               <div class="small">Kids cost as a fraction of adult food (default 0.30).</div>
             </div>
-          </div>
-
-          <div class="divider"></div>
-          <div class="small">
-            Tip: If you want kids to be exactly “$30”, we can swap this factor model to a fixed child price later.
           </div>
         </div>
       </div>
@@ -353,8 +353,9 @@
               <select id="venueSpace">
                 <option>Sala Reggio Ballroom</option>
                 <option>Members Lounge Restaurant</option>
-                <option>FIOR Parkville</option>
-                <option>ALORA Mount Macedon</option>
+                <option>FIOR (Catering Booking)</option>
+                <option>Ottimo Room</option>
+                <option>Bistroteca</option>
               </select>
             </div>
           </div>
@@ -377,9 +378,9 @@
         <div class="card">
           <h2>What couples do next</h2>
           <div class="small">
-            1) Build the food menu (exact selection rules) <br>
+            1) Select your menu (exact rules) <br>
             2) Choose drinks <br>
-            3) Summary shows a clean breakdown & total estimate.
+            3) Summary shows your final selections & total estimate.
           </div>
           <div class="divider"></div>
           <div class="small">
@@ -392,10 +393,8 @@
     <!-- PAGE 3: FOOD -->
     <section class="page" id="page-food">
       <div class="card">
-        <h2>Food Builder (Menu-Driven)</h2>
-        <div class="hint">
-          Selection rules are enforced (no over-selecting). “Complete menu” requires meeting all exact counts.
-        </div>
+        <h2>Food Builder</h2>
+        <div class="hint">Selection rules are enforced (no over-selecting). Complete the required picks.</div>
 
         <div class="statusRow">
           <span class="badge" id="foodCompleteBadge">Menu: Draft</span>
@@ -404,10 +403,16 @@
 
         <div class="divider"></div>
 
+        <!-- Admin toggle -->
+        <div class="actions" style="margin-top:0;">
+          <button class="btn" id="togglePricing">🔒 Admin: Show Pricing</button>
+        </div>
+
         <div class="grid">
-          <div class="card">
-            <h2>Per-Adult Course Pricing (AUD)</h2>
-            <div class="hint">Defaults are a sensible starting point (edit anytime).</div>
+          <!-- Hidden admin pricing panel -->
+          <div class="card adminPricing" id="adminPricingCard" aria-hidden="true">
+            <h2>Admin Pricing (Hidden from customers)</h2>
+            <div class="hint">Edit anytime. This section never prints.</div>
 
             <div class="row">
               <div>
@@ -448,18 +453,18 @@
               <input id="enableSupperPricing" type="checkbox">
               Add supper pricing to food total (fixed pizza)
             </label>
-            <div class="small">If checked, supper pricing will be added automatically (no selection required).</div>
+            <div class="small">If checked, supper pricing is included automatically.</div>
           </div>
 
           <div class="card">
-            <h2>Exact Selection Rules</h2>
+            <h2>Rules & Add-ons</h2>
             <ul class="small">
               <li><b>Canapés:</b> exactly 3</li>
               <li><b>Grande Antipasto:</b> exactly 7</li>
               <li><b>Entrée / Pasta:</b> exactly 2</li>
               <li><b>Mains:</b> exactly 2 (from 6 options)</li>
               <li><b>Dessert:</b> exactly 1</li>
-              <li><b>Supper:</b> fixed pizza</li>
+              <li><b>Supper:</b> Pizza (fixed)</li>
             </ul>
 
             <div class="divider"></div>
@@ -531,9 +536,6 @@
         <div class="course">
           <h3>Supper / Late Night (fixed)</h3>
           <div class="small"><b>Included:</b> Pizza</div>
-          <div class="small" style="margin-top:6px;">
-            If you want supper to affect pricing, tick “Add supper pricing to food total (fixed pizza)” above.
-          </div>
         </div>
 
         <div class="actions">
@@ -627,7 +629,7 @@
 
 <script>
   // -----------------------------
-  // MENU DATA (Updated as requested)
+  // MENU DATA
   // -----------------------------
   const MENU = {
     "Canapés": [
@@ -671,7 +673,6 @@
     ]
   };
 
-  // Exact rules (Supper removed as a selectable course)
   const RULES = {
     "Canapés":  { exact: 3, max: 3 },
     "Antipasto":{ exact: 7, max: 7 },
@@ -710,9 +711,7 @@
     setActivePage(TAB_ORDER[(idx - 1 + TAB_ORDER.length) % TAB_ORDER.length]);
   }
 
-  document.querySelectorAll(".tab[data-page]").forEach(tab => {
-    tab.addEventListener("click", () => setActivePage(tab.dataset.page));
-  });
+  document.querySelectorAll(".tab[data-page]").forEach(tab => tab.addEventListener("click", () => setActivePage(tab.dataset.page)));
   document.getElementById("ghostNext").addEventListener("click", nextPage);
 
   document.getElementById("nextQ").addEventListener("click", nextPage);
@@ -746,6 +745,7 @@
   const adultFactorEl = $("adultFactor");
   const childFactorEl = $("childFactor");
 
+  // Admin pricing elements (hidden panel)
   const pCanapesEl  = $("pCanapes");
   const pAntipastoEl= $("pAntipasto");
   const pPastaEl    = $("pPasta");
@@ -793,10 +793,13 @@
   const foodRuleBadgeEl = $("foodRuleBadge");
   const drinksCompleteBadgeEl = $("drinksCompleteBadge");
 
+  const adminPricingCard = $("adminPricingCard");
+  const togglePricingBtn = $("togglePricing");
+
   // -----------------------------
   // HELPERS
   // -----------------------------
-  const STORAGE_KEY = "memberslounge_wedding_signature_series_v4";
+  const STORAGE_KEY = "memberslounge_wedding_signature_series_v5";
 
   function aud(n){
     const x = Number(n || 0);
@@ -817,6 +820,20 @@
     if(state) el.classList.add(state);
     el.textContent = text;
   }
+
+  // -----------------------------
+  // Admin toggle for pricing
+  // -----------------------------
+  function setPricingVisible(isVisible){
+    adminPricingCard.classList.toggle("show", isVisible);
+    adminPricingCard.setAttribute("aria-hidden", isVisible ? "false" : "true");
+    togglePricingBtn.textContent = isVisible ? "🔒 Admin: Hide Pricing" : "🔒 Admin: Show Pricing";
+  }
+  togglePricingBtn.addEventListener("click", () => {
+    const isVisible = adminPricingCard.classList.contains("show");
+    setPricingVisible(!isVisible);
+  });
+  setPricingVisible(false); // default hidden
 
   // -----------------------------
   // MENU RENDER
@@ -881,13 +898,14 @@
   // CALCS
   // -----------------------------
   function coursePricesAdult(){
+    // Defaults (still work even if panel hidden)
     return {
-      Canapés:  Number(pCanapesEl.value || 0),
-      Antipasto:Number(pAntipastoEl.value || 0),
-      Pasta:    Number(pPastaEl.value || 0),
-      Mains:    Number(pMainsEl.value || 0),
-      Dessert:  Number(pDessertEl.value || 0),
-      Supper:   Number(pSupperEl.value || 0) // fixed pizza price (if enabled)
+      Canapés:  Number(pCanapesEl?.value || 12),
+      Antipasto:Number(pAntipastoEl?.value || 28),
+      Pasta:    Number(pPastaEl?.value || 15),
+      Mains:    Number(pMainsEl?.value || 34),
+      Dessert:  Number(pDessertEl?.value || 10),
+      Supper:   Number(pSupperEl?.value || 0) // fixed pizza if enabled
     };
   }
 
@@ -909,10 +927,8 @@
     if(sel.Mains.length === RULES["Mains"].exact) perAdult += prices.Mains;
     if(sel.Dessert.length === RULES["Dessert"].exact) perAdult += prices.Dessert;
 
-    // Supper fixed pizza: only adds into cost if enabled
-    if(enableSupperPricingEl.checked) perAdult += prices.Supper;
+    if(enableSupperPricingEl && enableSupperPricingEl.checked) perAdult += prices.Supper;
 
-    // Add-ons (non per-person)
     let addOns = 0;
     if(fruitPlatterEl.checked){
       addOns += Number(tablesEl.value || 0) * Number(fruitPerTableEl.value || 0);
@@ -1051,12 +1067,10 @@
     lines.push(`<b>Room hire:</b> ${aud(roomHireEl.value)}`);
     lines.push(`<b>Dry hire:</b> ${aud(dryHireEl.value)}`);
     lines.push(`<b>Security:</b> ${aud(securityEl.value)}`);
-
-    lines.push(`<b>Food total:</b> ${aud(q.food.total)} <span class="small">(per-adult: ${aud(q.food.perAdult)})</span>`);
+    lines.push(`<b>Food total:</b> ${aud(q.food.total)}`);
     if(q.food.addOns > 0){
       lines.push(`<b>Food add-ons:</b> ${aud(q.food.addOns)} <span class="small">(fruit platters)</span>`);
     }
-
     lines.push(`<b>Drinks total:</b> ${aud(q.drinks.total)} <span class="small">(${escapeHtml(q.drinks.note)})</span>`);
     lines.push(`<div class="total"><div>Total Estimated Cost</div><div class="mono">${aud(q.total)}</div></div>`);
 
@@ -1070,7 +1084,7 @@
     lines.push(`<b>Pasta:</b> ${sel.Pasta.length ? sel.Pasta.map(escapeHtml).join(", ") : "—"}`);
     lines.push(`<b>Mains:</b> ${sel.Mains.length ? sel.Mains.map(escapeHtml).join(", ") : "—"}${vegMainEl.checked ? " + Vegetarian option" : ""}`);
     lines.push(`<b>Dessert:</b> ${sel.Dessert.length ? sel.Dessert.map(escapeHtml).join(", ") : "—"}${fruitPlatterEl.checked ? " + Fruit platter add-on" : ""}`);
-    lines.push(`<b>Supper:</b> Pizza (fixed)${enableSupperPricingEl.checked ? ` <span class="small">(${aud(pSupperEl.value)} per adult included)</span>` : ""}`);
+    lines.push(`<b>Supper:</b> Pizza (fixed)`);
 
     finalSummaryEl.innerHTML = lines.join("<br>");
   }
@@ -1097,9 +1111,9 @@
       roomHire: roomHireEl.value, dryHire: dryHireEl.value, security: securityEl.value,
       adultFactor: adultFactorEl.value, childFactor: childFactorEl.value,
       prices: {
-        pCanapes: pCanapesEl.value, pAntipasto: pAntipastoEl.value, pPasta: pPastaEl.value,
-        pMains: pMainsEl.value, pDessert: pDessertEl.value, pSupper: pSupperEl.value,
-        enableSupperPricing: enableSupperPricingEl.checked
+        pCanapes: pCanapesEl?.value, pAntipasto: pAntipastoEl?.value, pPasta: pPastaEl?.value,
+        pMains: pMainsEl?.value, pDessert: pDessertEl?.value, pSupper: pSupperEl?.value,
+        enableSupperPricing: enableSupperPricingEl?.checked
       },
       couple: {
         coupleName: coupleNameEl.value, weddingDate: weddingDateEl.value, venueSpace: venueSpaceEl.value,
@@ -1126,13 +1140,13 @@
     childFactorEl.value = s.childFactor ?? 0.30;
 
     if(s.prices){
-      pCanapesEl.value = s.prices.pCanapes ?? 12;
-      pAntipastoEl.value = s.prices.pAntipasto ?? 28;
-      pPastaEl.value = s.prices.pPasta ?? 15;
-      pMainsEl.value = s.prices.pMains ?? 34;
-      pDessertEl.value = s.prices.pDessert ?? 10;
-      pSupperEl.value = s.prices.pSupper ?? 0;
-      enableSupperPricingEl.checked = !!s.prices.enableSupperPricing;
+      if(pCanapesEl) pCanapesEl.value = s.prices.pCanapes ?? 12;
+      if(pAntipastoEl) pAntipastoEl.value = s.prices.pAntipasto ?? 28;
+      if(pPastaEl) pPastaEl.value = s.prices.pPasta ?? 15;
+      if(pMainsEl) pMainsEl.value = s.prices.pMains ?? 34;
+      if(pDessertEl) pDessertEl.value = s.prices.pDessert ?? 10;
+      if(pSupperEl) pSupperEl.value = s.prices.pSupper ?? 0;
+      if(enableSupperPricingEl) enableSupperPricingEl.checked = !!s.prices.enableSupperPricing;
     }
 
     if(s.couple){
@@ -1212,6 +1226,7 @@
   function bindRecalc(ids){
     ids.forEach(id => {
       const el = document.getElementById(id);
+      if(!el) return;
       el.addEventListener("input", renderAll);
       el.addEventListener("change", renderAll);
     });
