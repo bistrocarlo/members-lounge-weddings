@@ -416,11 +416,11 @@
 
             <div class="row">
               <div>
-                <label for="pCanapes">Canapés (4 picks)</label>
+                <label for="pCanapes">Canapés (3 picks)</label>
                 <input id="pCanapes" type="number" min="0" step="0.5" value="12">
               </div>
               <div>
-                <label for="pAntipasto">Grande Antipasto (fixed)</label>
+                <label for="pAntipasto">Grande Antipasto (7 picks)</label>
                 <input id="pAntipasto" type="number" min="0" step="0.5" value="28">
               </div>
             </div>
@@ -459,8 +459,8 @@
           <div class="card">
             <h2>Exact Selection Rules</h2>
             <ul class="small">
-              <li><b>Canapés:</b> exactly 4</li>
-              <li><b>Grande Antipasto:</b> fixed inclusion (auto)</li>
+              <li><b>Canapés:</b> exactly 3</li>
+              <li><b>Grande Antipasto:</b> exactly 7</li>
               <li><b>Entrée / Pasta:</b> exactly 2</li>
               <li><b>Mains:</b> exactly 2</li>
               <li><b>Dessert:</b> exactly 1</li>
@@ -498,16 +498,18 @@
         </div>
 
         <!-- Selections -->
-        <div class="course" data-course="Canapés" data-limit="4" data-exact="4">
-          <h3>Canapés (choose exactly 4)</h3>
+        <div class="course" data-course="Canapés" data-limit="3" data-exact="3">
+          <h3>Canapés (choose exactly 3)</h3>
           <div class="row" id="list-Canapés"></div>
-          <div class="count" id="count-Canapés">0/4 selected</div>
-          <div class="warn" id="warn-Canapés">You must select exactly 4 canapés.</div>
+          <div class="count" id="count-Canapés">0/3 selected</div>
+          <div class="warn" id="warn-Canapés">You must select exactly 3 canapés.</div>
         </div>
 
-        <div class="course" data-course="Antipasto">
-          <h3>Grande Antipasto (fixed inclusion)</h3>
-          <div class="small" id="antipastoFixed"></div>
+        <div class="course" data-course="Antipasto" data-limit="7" data-exact="7">
+          <h3>Grande Antipasto (choose exactly 7)</h3>
+          <div class="row" id="list-Antipasto"></div>
+          <div class="count" id="count-Antipasto">0/7 selected</div>
+          <div class="warn" id="warn-Antipasto">You must select exactly 7 antipasto items.</div>
         </div>
 
         <div class="course" data-course="Pasta" data-limit="2" data-exact="2">
@@ -629,16 +631,16 @@
 
 <script>
   // -----------------------------
-  // MENU DATA (Edit anytime)
+  // MENU DATA (Updated as requested)
   // -----------------------------
   const MENU = {
     "Canapés": [
-      "Potato Croquettes",
+      "Italian Meatballs",
       "Arancini",
-      "Pizza",
-      "Meatballs",
-      "Calamari Fritti",
-      "Cocktail Sausages"
+      "Prawn Wonton Wrap",
+      "Potato Croquette",
+      "Parmesan & Honey",
+      "Italian Rosemary Focaccia"
     ],
     "Antipasto": [
       "Italian dinner rolls",
@@ -647,7 +649,11 @@
       "Eggplant parmigiana",
       "Grilled capsicum, olives & artichokes",
       "Tomato bruschetta",
-      "Calamari fritti"
+      "Calamari fritti",
+      "Trio of dips with pita bread",
+      "Feta & Kefalograviera",
+      "Cevape",
+      "Tiropita"
     ],
     "Pasta": [
       "Elicoidali al Ragú (four meat sauce)",
@@ -678,13 +684,14 @@
     ]
   };
 
-  // Exact rules
+  // Exact rules (Updated as requested)
   const RULES = {
-    "Canapés": { exact: 4, max: 4 },
-    "Pasta":   { exact: 2, max: 2 },
-    "Mains":   { exact: 2, max: 2 },
-    "Dessert": { exact: 1, max: 1 },
-    "Supper":  { exact: 0, max: 6 } // 0 means optional
+    "Canapés":  { exact: 3, max: 3 },
+    "Antipasto":{ exact: 7, max: 7 },
+    "Pasta":    { exact: 2, max: 2 },
+    "Mains":    { exact: 2, max: 2 },
+    "Dessert":  { exact: 1, max: 1 },
+    "Supper":   { exact: 0, max: 6 } // 0 means optional
   };
 
   // -----------------------------
@@ -762,7 +769,6 @@
   const pSupperEl   = $("pSupper");
   const enableSupperPricingEl = $("enableSupperPricing");
 
-  const antipastoFixedEl = $("antipastoFixed");
   const vegMainEl = $("vegMain");
   const fruitPlatterEl = $("fruitPlatter");
   const tablesEl = $("tables");
@@ -805,7 +811,7 @@
   // -----------------------------
   // HELPERS
   // -----------------------------
-  const STORAGE_KEY = "memberslounge_wedding_signature_series_v2";
+  const STORAGE_KEY = "memberslounge_wedding_signature_series_v3";
 
   function aud(n){
     const x = Number(n || 0);
@@ -846,16 +852,8 @@
     });
   }
 
-  function renderFixedAntipasto(){
-    antipastoFixedEl.innerHTML = `
-      <div class="small">
-        Included: ${MENU["Antipasto"].map(escapeHtml).join(", ")}.
-      </div>
-    `;
-  }
-
   function getSelections(){
-    const out = { Canapés:[], Pasta:[], Mains:[], Dessert:[], Supper:[] };
+    const out = { Canapés:[], Antipasto:[], Pasta:[], Mains:[], Dessert:[], Supper:[] };
     document.querySelectorAll('input[type="checkbox"][data-course]:checked').forEach(cb => {
       const c = cb.dataset.course;
       if(out[c]) out[c].push(cb.value);
@@ -879,17 +877,17 @@
 
     // Exact rule warnings
     if(rule.exact > 0){
-      warnEl.style.display = (checked2.length === rule.exact) ? "none" : "block";
+      if(warnEl) warnEl.style.display = (checked2.length === rule.exact) ? "none" : "block";
     }else{
       // Optional: only warn if at max
-      warnEl.style.display = (checked2.length >= rule.max) ? "block" : "none";
+      if(warnEl) warnEl.style.display = (checked2.length >= rule.max) ? "block" : "none";
     }
   }
 
   function menuIsComplete(){
     const sel = getSelections();
     let ok = true;
-    ["Canapés","Pasta","Mains","Dessert"].forEach(course => {
+    ["Canapés","Antipasto","Pasta","Mains","Dessert"].forEach(course => {
       const rule = RULES[course];
       if(sel[course].length !== rule.exact) ok = false;
     });
@@ -920,15 +918,14 @@
     const sel = getSelections();
     const prices = coursePricesAdult();
 
-    // We only include course price when the course is "validly selected" (meets exact rule),
-    // except antipasto which is always included.
+    // We only include course price when the course is "validly selected" (meets exact rule).
     let perAdult = 0;
 
-    // Canapés: only if exactly 4 chosen
+    // Canapés: only if exactly 3 chosen
     if(sel.Canapés.length === RULES["Canapés"].exact) perAdult += prices.Canapés;
 
-    // Antipasto always included
-    perAdult += prices.Antipasto;
+    // Antipasto: only if exactly 7 chosen
+    if(sel.Antipasto.length === RULES["Antipasto"].exact) perAdult += prices.Antipasto;
 
     // Pasta: only if exactly 2 chosen
     if(sel.Pasta.length === RULES["Pasta"].exact) perAdult += prices.Pasta;
@@ -1017,7 +1014,7 @@
     // per-course exactness
     const sel = getSelections();
     let incomplete = [];
-    ["Canapés","Pasta","Mains","Dessert"].forEach(c => {
+    ["Canapés","Antipasto","Pasta","Mains","Dessert"].forEach(c => {
       const need = RULES[c].exact;
       const got = sel[c].length;
       if(got !== need) incomplete.push(`${c} ${got}/${need}`);
@@ -1096,7 +1093,7 @@
 
     lines.push(`<b>Selections:</b>`);
     lines.push(`<b>Canapés:</b> ${sel.Canapés.length ? sel.Canapés.map(escapeHtml).join(", ") : "—"}`);
-    lines.push(`<b>Grande Antipasto:</b> Included`);
+    lines.push(`<b>Grande Antipasto:</b> ${sel.Antipasto.length ? sel.Antipasto.map(escapeHtml).join(", ") : "—"}`);
     lines.push(`<b>Pasta:</b> ${sel.Pasta.length ? sel.Pasta.map(escapeHtml).join(", ") : "—"}`);
     lines.push(`<b>Mains:</b> ${sel.Mains.length ? sel.Mains.map(escapeHtml).join(", ") : "—"}${vegMainEl.checked ? " + Vegetarian option" : ""}`);
     lines.push(`<b>Dessert:</b> ${sel.Dessert.length ? sel.Dessert.map(escapeHtml).join(", ") : "—"}${fruitPlatterEl.checked ? " + Fruit platter add-on" : ""}`);
@@ -1116,7 +1113,7 @@
   // SAVE / LOAD
   // -----------------------------
   function getState(){
-    const selections = { Canapés:[], Pasta:[], Mains:[], Dessert:[], Supper:[] };
+    const selections = { Canapés:[], Antipasto:[], Pasta:[], Mains:[], Dessert:[], Supper:[] };
     document.querySelectorAll('input[type="checkbox"][data-course]:checked').forEach(cb => {
       const c = cb.dataset.course;
       if(selections[c]) selections[c].push(cb.value);
@@ -1274,13 +1271,13 @@
   // INIT
   // -----------------------------
   addCheckboxList("Canapés","list-Canapés");
+  addCheckboxList("Antipasto","list-Antipasto");
   addCheckboxList("Pasta","list-Pasta");
   addCheckboxList("Mains","list-Mains");
   addCheckboxList("Dessert","list-Dessert");
   addCheckboxList("Supper","list-Supper");
-  renderFixedAntipasto();
 
-  ["Canapés","Pasta","Mains","Dessert","Supper"].forEach(bindCourse);
+  ["Canapés","Antipasto","Pasta","Mains","Dessert","Supper"].forEach(bindCourse);
   renderAll();
 </script>
 </body>
