@@ -477,14 +477,14 @@
         </div>
 
         <div class="course" data-course="canapes">
-          <h3>Canapés (choose any)</h3>
+          <h3>Canapés (choose up to 3)</h3>
           <div class="row" id="list-canapes"></div>
           <div class="count" id="count-canapes">0 selected</div>
           <div class="warnBox" id="warn-canapes"></div>
         </div>
 
         <div class="course" data-course="antipasto">
-          <h3>Antipasto Plates (choose any)</h3>
+          <h3>Antipasto Plates (choose up to 7)</h3>
           <div class="small">Hot items are marked 🔥 (Calamari, Cevape, Meatballs in sugo, Sausages).</div>
           <div class="row" id="list-antipasto"></div>
           <div class="count" id="count-antipasto">0 selected</div>
@@ -492,21 +492,21 @@
         </div>
 
         <div class="course" data-course="pasta">
-          <h3>Entrée / Pasta (choose any)</h3>
+          <h3>Entrée / Pasta (choose up to 2)</h3>
           <div class="row" id="list-pasta"></div>
           <div class="count" id="count-pasta">0 selected</div>
           <div class="warnBox" id="warn-pasta"></div>
         </div>
 
         <div class="course" data-course="mains">
-          <h3>Mains (choose any)</h3>
+          <h3>Mains (choose up to 2)</h3>
           <div class="row" id="list-mains"></div>
           <div class="count" id="count-mains">0 selected</div>
           <div class="warnBox" id="warn-mains"></div>
         </div>
 
         <div class="course" data-course="dessert">
-          <h3>Dessert (choose any)</h3>
+          <h3>Dessert (choose up to 2)</h3>
           <div class="row" id="list-dessert"></div>
           <div class="count" id="count-dessert">0 selected</div>
           <div class="warnBox" id="warn-dessert"></div>
@@ -754,13 +754,14 @@
     "Italian pork sausages": true
   };
 
-  // ✅ MODULAR RULES: no minimums. Only prevent selecting more than exists.
+  // ✅ UPDATED RULES (your request)
+  // min is allowed to be 0 for all. max as specified.
   const RULES = {
-    canapes:   { max: MENU.canapes.length },
-    antipasto: { max: MENU.antipasto.length },
-    pasta:     { max: MENU.pasta.length },
-    mains:     { max: MENU.mains.length },
-    dessert:   { max: MENU.dessert.length }
+    canapes:   { min: 0, max: 3 },
+    antipasto: { min: 0, max: 7 },
+    pasta:     { min: 0, max: 2 },
+    mains:     { min: 0, max: 2 },
+    dessert:   { min: 0, max: 2 }
   };
 
   // -----------------------------
@@ -917,388 +918,3 @@
     const out = { canapes:[], antipasto:[], pasta:[], mains:[], dessert:[] };
     document.querySelectorAll('input[type="checkbox"][data-course]:checked').forEach(cb => {
       const c = cb.dataset.course;
-      if(out[c]) out[c].push(cb.value);
-    });
-    return out;
-  }
-
-  function enforceLimit(courseKey){
-    const rule = RULES[courseKey];
-    if(!rule) return;
-
-    const checked = Array.prototype.slice.call(
-      document.querySelectorAll(`input[type="checkbox"][data-course="${courseKey}"]:checked`)
-    );
-    if(checked.length > rule.max){
-      checked[checked.length - 1].checked = false;
-    }
-
-    const checked2 = Array.prototype.slice.call(
-      document.querySelectorAll(`input[type="checkbox"][data-course="${courseKey}"]:checked`)
-    );
-
-    const countEl = document.getElementById(`count-${courseKey}`);
-    const warnEl  = document.getElementById(`warn-${courseKey}`);
-
-    if(countEl) countEl.textContent = `${checked2.length} selected`;
-    if(warnEl) warnEl.style.display = "none"; // ✅ modular: no warnings
-  }
-
-  // -----------------------------
-  // CALCS
-  // -----------------------------
-  function coursePricesAdult(){
-    return {
-      canapes:  Number(pCanapesEl.value || 0),
-      antipasto:Number(pAntipastoEl.value || 0),
-      pasta:    Number(pPastaEl.value || 0),
-      mains:    Number(pMainsEl.value || 0),
-      dessert:  Number(pDessertEl.value || 0),
-      supper:   Number(pSupperEl.value || 0)
-    };
-  }
-
-  function foodSubtotal(){
-    const adults = Number(adultsEl.value || 0);
-    const kids   = Number(childrenEl.value || 0);
-
-    const adultFactor = Number(adultFactorEl.value || 1);
-    const childFactor = Number(childFactorEl.value || 0.30);
-
-    const sel = getSelections();
-    const prices = coursePricesAdult();
-
-    // ✅ Course-driven pricing:
-    // If at least 1 item is selected in that course, add that course price once (per adult).
-    let perAdult = 0;
-    if(sel.canapes.length   > 0) perAdult += prices.canapes;
-    if(sel.antipasto.length > 0) perAdult += prices.antipasto;
-    if(sel.pasta.length     > 0) perAdult += prices.pasta;
-    if(sel.mains.length     > 0) perAdult += prices.mains;
-    if(sel.dessert.length   > 0) perAdult += prices.dessert;
-
-    if(enableSupperPricingEl.checked) perAdult += prices.supper;
-
-    let addOns = 0;
-    if(fruitPlatterEl.checked){
-      addOns += Number(tablesEl.value || 0) * Number(fruitPerTableEl.value || 0);
-    }
-
-    const adultFood = adults * (perAdult * adultFactor);
-    const childFood = kids   * (perAdult * adultFactor * childFactor);
-
-    return { perAdult, adultFood, childFood, addOns, total: adultFood + childFood + addOns };
-  }
-
-  function drinksSubtotal(){
-    const adults = Number(adultsEl.value || 0);
-    const mode = drinkModeEl.value;
-
-    if(mode === "bar")   return { total: 0, note: "Bar prices (no package estimated)." };
-    if(mode === "pkg20") return { total: adults * 20, note: "$20 per adult (4 hrs)." };
-    if(mode === "custom"){
-      return {
-        total: adults * Number(customDrinkPriceEl.value || 0),
-        note: (customDrinkNoteEl.value || "Custom drinks package.")
-      };
-    }
-    return { total: 0, note: "" };
-  }
-
-  function fixedSubtotal(){ return sum([roomHireEl.value, dryHireEl.value, securityEl.value]); }
-
-  function quoteTotals(){
-    const food = foodSubtotal();
-    const drinks = drinksSubtotal();
-    const fixed = fixedSubtotal();
-    return {
-      adults: Number(adultsEl.value || 0),
-      children: Number(childrenEl.value || 0),
-      food, drinks, fixed,
-      total: food.total + drinks.total + fixed
-    };
-  }
-
-  // -----------------------------
-  // RENDER
-  // -----------------------------
-  function renderDrinkInfo(){
-    const mode = drinkModeEl.value;
-    if(customDrinkRow) customDrinkRow.style.display = (mode === "custom") ? "grid" : "none";
-
-    if(mode === "bar"){
-      if(drinkInfoEl) drinkInfoEl.textContent = "Bar prices selected. Quote shows $0 for drinks (indicative only).";
-      setBadge(drinksCompleteBadgeEl, "ok", "Drinks: Bar prices");
-      setBadge(drinksBadgeEl, "ok", "Drinks: Bar prices");
-    } else if(mode === "pkg20"){
-      if(drinkInfoEl) drinkInfoEl.textContent = "$20 per adult drink package (4 hours).";
-      setBadge(drinksCompleteBadgeEl, "ok", "Drinks: $20/adult");
-      setBadge(drinksBadgeEl, "ok", "Drinks: $20/adult");
-    } else {
-      if(drinkInfoEl) drinkInfoEl.textContent = "Custom drink package per adult.";
-      const price = Number(customDrinkPriceEl.value || 0);
-      if(price > 0){
-        setBadge(drinksCompleteBadgeEl, "ok", "Drinks: Custom set");
-        setBadge(drinksBadgeEl, "ok", "Drinks: Custom set");
-      }else{
-        setBadge(drinksCompleteBadgeEl, "warn", "Drinks: Custom (set price)");
-        setBadge(drinksBadgeEl, "warn", "Drinks: Custom (set price)");
-      }
-    }
-  }
-
-  function renderMenuStatus(){
-    // ✅ Modular rules: Always “Custom”, no requirements.
-    setBadge(foodCompleteBadgeEl, "ok", "Menu: Custom");
-    setBadge(foodRuleBadgeEl, "ok", "Rules: Modular");
-    setBadge(menuBadgeEl, "ok", "Menu: Custom");
-  }
-
-  function renderQuote(){
-    const q = quoteTotals();
-
-    if(qRoomEl) qRoomEl.textContent = aud(roomHireEl.value);
-    if(qDryEl)  qDryEl.textContent  = aud(dryHireEl.value);
-    if(qSecEl)  qSecEl.textContent  = aud(securityEl.value);
-
-    if(qFoodEl)   qFoodEl.textContent   = aud(q.food.total);
-    if(qDrinksEl) qDrinksEl.textContent = aud(q.drinks.total);
-    if(qTotalEl)  qTotalEl.textContent  = aud(q.total);
-
-    if(kpiAdultsEl)   kpiAdultsEl.textContent   = q.adults;
-    if(kpiChildrenEl) kpiChildrenEl.textContent = q.children;
-    if(kpiFoodEl)     kpiFoodEl.textContent     = aud(q.food.total);
-
-    const guests = Math.max(1, q.adults + q.children);
-    if(kpiAvgEl) kpiAvgEl.textContent = aud(q.total / guests);
-  }
-
-  function renderSummary(){
-    const q = quoteTotals();
-    const sel = getSelections();
-
-    const chips = [];
-    Object.keys(sel).forEach(k => {
-      (sel[k]||[]).forEach(item => chips.push(`<span class="pill">${escapeHtml(COURSE_LABEL[k])}: ${escapeHtml(item)}</span>`));
-    });
-    chips.push(`<span class="pill">Supper: Pizza (fixed)</span>`);
-    if(vegMainEl.checked) chips.push(`<span class="pill">Vegetarian: Noted</span>`);
-    if(fruitPlatterEl.checked) chips.push(`<span class="pill">Fruit platter add-on</span>`);
-    if(chipsEl) chipsEl.innerHTML = chips.join(" ");
-
-    const venueText = venueSpaceEl ? (venueSpaceEl.options[venueSpaceEl.selectedIndex]?.text || "—") : "—";
-
-    const lines = [];
-    lines.push(`<b>Couple:</b> ${escapeHtml(coupleNameEl.value || "—")}`);
-    lines.push(`<b>Date:</b> ${escapeHtml(weddingDateEl.value || "—")}`);
-    lines.push(`<b>Venue:</b> ${escapeHtml(venueText)}`);
-    lines.push(`<b>Email:</b> ${escapeHtml(emailEl.value || "—")}`);
-    lines.push(`<b>Phone:</b> ${escapeHtml(phoneEl.value || "—")}`);
-    if((notesEl.value || "").trim()) lines.push(`<b>Notes:</b> ${escapeHtml(notesEl.value.trim())}`);
-
-    lines.push(`<hr style="border:none;border-top:1px solid rgba(0,0,0,.10);margin:12px 0">`);
-
-    lines.push(`<b>Guests:</b> Adults ${q.adults}, Children ${q.children}`);
-    lines.push(`<b>Room hire:</b> ${aud(roomHireEl.value)}`);
-    lines.push(`<b>Dry hire:</b> ${aud(dryHireEl.value)}`);
-    lines.push(`<b>Security:</b> ${aud(securityEl.value)}`);
-
-    lines.push(`<b>Food total:</b> ${aud(q.food.total)} <span class="small">(per-adult selected courses: ${aud(q.food.perAdult)})</span>`);
-    if(q.food.addOns > 0) lines.push(`<b>Food add-ons:</b> ${aud(q.food.addOns)} <span class="small">(fruit platters)</span>`);
-    lines.push(`<b>Drinks total:</b> ${aud(q.drinks.total)} <span class="small">(${escapeHtml(q.drinks.note)})</span>`);
-
-    lines.push(`<div class="total"><div>Total Estimated Cost</div><div class="mono">${aud(q.total)}</div></div>`);
-    lines.push(`<hr style="border:none;border-top:1px solid rgba(0,0,0,.10);margin:12px 0">`);
-
-    lines.push(`<b>Selections:</b>`);
-    lines.push(`<b>Canapés:</b> ${sel.canapes.length ? sel.canapes.map(escapeHtml).join(", ") : "—"}`);
-    lines.push(`<b>Antipasto:</b> ${sel.antipasto.length ? sel.antipasto.map(escapeHtml).join(", ") : "—"}`);
-    lines.push(`<b>Pasta:</b> ${sel.pasta.length ? sel.pasta.map(escapeHtml).join(", ") : "—"}`);
-    lines.push(`<b>Mains:</b> ${sel.mains.length ? sel.mains.map(escapeHtml).join(", ") : "—"}${vegMainEl.checked ? " + Vegetarian option" : ""}`);
-    lines.push(`<b>Dessert:</b> ${sel.dessert.length ? sel.dessert.map(escapeHtml).join(", ") : "—"}${fruitPlatterEl.checked ? " + Fruit platter add-on" : ""}`);
-    lines.push(`<b>Supper:</b> Pizza (fixed)`);
-
-    if(finalSummaryEl) finalSummaryEl.innerHTML = lines.join("<br>");
-  }
-
-  function renderAll(){
-    renderDrinkInfo();
-    renderMenuStatus();
-    renderQuote();
-    renderSummary();
-  }
-
-  // -----------------------------
-  // SAVE / LOAD (includes venue)
-  // -----------------------------
-  function getState(){
-    const selections = getSelections();
-    return {
-      adults: adultsEl.value, children: childrenEl.value,
-      roomHire: roomHireEl.value, dryHire: dryHireEl.value, security: securityEl.value,
-      adultFactor: adultFactorEl.value, childFactor: childFactorEl.value,
-      prices: {
-        pCanapes: pCanapesEl.value, pAntipasto: pAntipastoEl.value, pPasta: pPastaEl.value,
-        pMains: pMainsEl.value, pDessert: pDessertEl.value, pSupper: pSupperEl.value,
-        enableSupperPricing: enableSupperPricingEl.checked
-      },
-      couple: {
-        coupleName: coupleNameEl.value,
-        weddingDate: weddingDateEl.value,
-        venueSpace: venueSpaceEl.value,
-        email: emailEl.value, phone: phoneEl.value, notes: notesEl.value
-      },
-      drinks: {
-        mode: drinkModeEl.value, customPrice: customDrinkPriceEl.value, customNote: customDrinkNoteEl.value
-      },
-      menu: {
-        selections, vegMain: vegMainEl.checked,
-        fruitPlatter: fruitPlatterEl.checked, tables: tablesEl.value, fruitPerTable: fruitPerTableEl.value
-      }
-    };
-  }
-
-  function setState(s){
-    adultsEl.value   = s.adults ?? 120;
-    childrenEl.value = s.children ?? 20;
-    roomHireEl.value = s.roomHire ?? 0;
-    dryHireEl.value  = s.dryHire ?? 0;
-    securityEl.value = s.security ?? 0;
-
-    adultFactorEl.value = s.adultFactor ?? 1;
-    childFactorEl.value = s.childFactor ?? 0.30;
-
-    if(s.prices){
-      pCanapesEl.value = s.prices.pCanapes ?? 12;
-      pAntipastoEl.value = s.prices.pAntipasto ?? 28;
-      pPastaEl.value = s.prices.pPasta ?? 15;
-      pMainsEl.value = s.prices.pMains ?? 34;
-      pDessertEl.value = s.prices.pDessert ?? 10;
-      pSupperEl.value = s.prices.pSupper ?? 0;
-      enableSupperPricingEl.checked = !!s.prices.enableSupperPricing;
-    }
-
-    if(s.couple){
-      coupleNameEl.value = s.couple.coupleName ?? "";
-      weddingDateEl.value = s.couple.weddingDate ?? "";
-      venueSpaceEl.value = s.couple.venueSpace ?? "members";
-      emailEl.value = s.couple.email ?? "";
-      phoneEl.value = s.couple.phone ?? "";
-      notesEl.value = s.couple.notes ?? "";
-      applyVenueProfile(venueSpaceEl.value);
-    }
-
-    if(s.drinks){
-      drinkModeEl.value = s.drinks.mode ?? "bar";
-      customDrinkPriceEl.value = s.drinks.customPrice ?? 0;
-      customDrinkNoteEl.value = s.drinks.customNote ?? "";
-    }
-
-    vegMainEl.checked = !!(s.menu && s.menu.vegMain);
-    fruitPlatterEl.checked = !!(s.menu && s.menu.fruitPlatter);
-    tablesEl.value = (s.menu && s.menu.tables) ?? 10;
-    fruitPerTableEl.value = (s.menu && s.menu.fruitPerTable) ?? 35;
-
-    document.querySelectorAll('input[type="checkbox"][data-course]').forEach(cb => cb.checked = false);
-
-    if(s.menu && s.menu.selections){
-      Object.keys(RULES).forEach(courseKey => {
-        (s.menu.selections[courseKey] || []).forEach(item => {
-          const all = Array.prototype.slice.call(document.querySelectorAll(`input[type="checkbox"][data-course="${courseKey}"]`));
-          const found = all.find(x => x.value === item);
-          if(found) found.checked = true;
-        });
-        enforceLimit(courseKey);
-      });
-    }
-
-    renderAll();
-  }
-
-  on($("saveDraft"), "click", () => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(getState()));
-    alert("Saved ✅");
-  });
-
-  on($("loadDraft"), "click", () => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw) return alert("No saved draft found.");
-    try{
-      setState(JSON.parse(raw));
-      alert("Loaded ✅");
-    }catch(e){
-      alert("Could not load draft.");
-    }
-  });
-
-  on($("resetAll"), "click", () => {
-    if(!confirm("Reset everything?")) return;
-    localStorage.removeItem(STORAGE_KEY);
-    location.reload();
-  });
-
-  on($("printQuote"), "click", () => window.print());
-  on($("printSummary"), "click", () => window.print());
-
-  on($("copySummary"), "click", async () => {
-    const text = (finalSummaryEl?.textContent || "").trim();
-    try{
-      await navigator.clipboard.writeText(text);
-      alert("Copied ✅");
-    }catch(e){
-      alert("Copy failed. You can select the text and copy manually.");
-    }
-  });
-
-  // -----------------------------
-  // RECALC BIND
-  // -----------------------------
-  function bindRecalc(ids){
-    ids.forEach(id => {
-      const el = document.getElementById(id);
-      if(!el) return;
-      el.addEventListener("input", renderAll);
-      el.addEventListener("change", renderAll);
-    });
-  }
-
-  bindRecalc([
-    "adults","children","roomHire","dryHire","security",
-    "adultFactor","childFactor",
-    "pCanapes","pAntipasto","pPasta","pMains","pDessert","pSupper","enableSupperPricing",
-    "coupleName","weddingDate","venueSpace","email","phone","notes",
-    "drinkMode","customDrinkPrice","customDrinkNote",
-    "vegMain","fruitPlatter","tables","fruitPerTable"
-  ]);
-
-  function bindCourse(courseKey){
-    document.querySelectorAll(`input[type="checkbox"][data-course="${courseKey}"]`).forEach(cb => {
-      cb.addEventListener("change", () => {
-        enforceLimit(courseKey);
-        renderAll();
-      });
-    });
-    enforceLimit(courseKey);
-  }
-
-  // Venue change -> apply profile + re-render
-  on(venueSpaceEl, "change", () => {
-    applyVenueProfile(venueSpaceEl.value);
-    renderAll();
-  });
-
-  // -----------------------------
-  // INIT
-  // -----------------------------
-  addCheckboxList("canapes","list-canapes");
-  addCheckboxList("antipasto","list-antipasto");
-  addCheckboxList("pasta","list-pasta");
-  addCheckboxList("mains","list-mains");
-  addCheckboxList("dessert","list-dessert");
-  ["canapes","antipasto","pasta","mains","dessert"].forEach(bindCourse);
-
-  applyVenueProfile(venueSpaceEl?.value || "members");
-  renderAll();
-</script>
-</body>
-</html>
