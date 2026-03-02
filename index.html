@@ -44,9 +44,7 @@
       box-shadow:0 6px 18px rgba(0,0,0,.03);
       gap:10px;
     }
-    .logoImg{
-      height:34px; width:auto; display:block;
-    }
+    .logoImg{ height:34px; width:auto; display:block; }
     .logoFallback{
       display:inline-flex; align-items:center; gap:10px;
       font-weight:800; letter-spacing:.14em; font-size:12px;
@@ -183,6 +181,20 @@
       font-size:12px;
       margin:6px 6px 0 0;
     }
+    .hotTag{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin-left:8px;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid rgba(180,83,9,.35);
+      background: rgba(180,83,9,.08);
+      color: var(--warn);
+      font-size:11px;
+      font-weight:900;
+      white-space:nowrap;
+    }
 
     .kpi{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;}
     @media(min-width:920px){ .kpi{grid-template-columns:1fr 1fr 1fr 1fr;} }
@@ -210,8 +222,7 @@
   <header>
     <div class="brandline">
       <div class="logoWrap">
-        <!-- LOGO: Put a file called "logo.png" in the SAME repo folder as index.html -->
-        <!-- It will auto-load. If missing, the fallback text shows. -->
+        <!-- Put a file called "logo.png" next to index.html -->
         <img class="logoImg" id="logoImg" src="logo.png" alt="The Members Lounge Logo"
              onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='inline-flex';">
         <span class="logoFallback" id="logoFallback" style="display:none;">✨ <span>THE MEMBERS LOUNGE</span></span>
@@ -416,11 +427,11 @@
 
             <div class="row">
               <div>
-                <label for="pCanapes">Canapés (4 picks)</label>
+                <label for="pCanapes">Canapés (3 picks)</label>
                 <input id="pCanapes" type="number" min="0" step="0.5" value="12">
               </div>
               <div>
-                <label for="pAntipasto">Grande Antipasto (fixed)</label>
+                <label for="pAntipasto">Antipasto (7 plates from 12)</label>
                 <input id="pAntipasto" type="number" min="0" step="0.5" value="28">
               </div>
             </div>
@@ -442,7 +453,7 @@
                 <input id="pDessert" type="number" min="0" step="0.5" value="10">
               </div>
               <div>
-                <label for="pSupper">Supper (optional)</label>
+                <label for="pSupper">Supper (fixed Pizza)</label>
                 <input id="pSupper" type="number" min="0" step="0.5" value="0">
               </div>
             </div>
@@ -451,7 +462,7 @@
 
             <label style="margin-top:0;">
               <input id="enableSupperPricing" type="checkbox">
-              Add supper pricing to food total (only if supper is selected)
+              Add supper pricing to food total (Pizza only)
             </label>
             <div class="small">If unchecked, supper remains “informational” and won’t affect the quote.</div>
           </div>
@@ -459,19 +470,19 @@
           <div class="card">
             <h2>Exact Selection Rules</h2>
             <ul class="small">
-              <li><b>Canapés:</b> exactly 4</li>
-              <li><b>Grande Antipasto:</b> fixed inclusion (auto)</li>
+              <li><b>Canapés:</b> exactly 3 (from 6)</li>
+              <li><b>Antipasto:</b> exactly 7 plates (from 12) — hot items marked 🔥</li>
               <li><b>Entrée / Pasta:</b> exactly 2</li>
               <li><b>Mains:</b> exactly 2</li>
               <li><b>Dessert:</b> exactly 1</li>
-              <li><b>Supper:</b> optional (up to 6)</li>
+              <li><b>Supper:</b> fixed Pizza only</li>
             </ul>
 
             <div class="divider"></div>
 
             <label>
               <input id="vegMain" type="checkbox">
-              Add Vegetarian Main option (Calzone / seasonal veg filling)
+              Vegetarian option noted (as required)
             </label>
 
             <label style="margin-top:12px;">
@@ -498,16 +509,19 @@
         </div>
 
         <!-- Selections -->
-        <div class="course" data-course="Canapés" data-limit="4" data-exact="4">
-          <h3>Canapés (choose exactly 4)</h3>
+        <div class="course" data-course="Canapés" data-limit="3" data-exact="3">
+          <h3>Canapés (choose exactly 3)</h3>
           <div class="row" id="list-Canapés"></div>
-          <div class="count" id="count-Canapés">0/4 selected</div>
-          <div class="warn" id="warn-Canapés">You must select exactly 4 canapés.</div>
+          <div class="count" id="count-Canapés">0/3 selected</div>
+          <div class="warn" id="warn-Canapés">You must select exactly 3 canapés.</div>
         </div>
 
-        <div class="course" data-course="Antipasto">
-          <h3>Grande Antipasto (fixed inclusion)</h3>
-          <div class="small" id="antipastoFixed"></div>
+        <div class="course" data-course="Antipasto" data-limit="7" data-exact="7">
+          <h3>Antipasto Plates (choose exactly 7)</h3>
+          <div class="small">Hot items are marked 🔥 (Calamari, Cevape, Sausages).</div>
+          <div class="row" id="list-Antipasto"></div>
+          <div class="count" id="count-Antipasto">0/7 selected</div>
+          <div class="warn" id="warn-Antipasto">You must select exactly 7 antipasto plates.</div>
         </div>
 
         <div class="course" data-course="Pasta" data-limit="2" data-exact="2">
@@ -531,11 +545,10 @@
           <div class="warn" id="warn-Dessert">You must select exactly 1 dessert option.</div>
         </div>
 
-        <div class="course" data-course="Supper" data-limit="6" data-exact="0">
-          <h3>Supper / Late Night (optional — up to 6)</h3>
-          <div class="row" id="list-Supper"></div>
-          <div class="count" id="count-Supper">0/6 selected</div>
-          <div class="warn" id="warn-Supper">Maximum 6 supper selections.</div>
+        <div class="course">
+          <h3>Supper / Late Night (fixed)</h3>
+          <div class="small">Pizza Only (fixed). No selection required.</div>
+          <div class="count">Included: Pizza</div>
         </div>
 
         <div class="actions">
@@ -629,25 +642,44 @@
 
 <script>
   // -----------------------------
-  // MENU DATA (Edit anytime)
+  // SAFARI-SAFE HELPERS (no replaceAll)
+  // -----------------------------
+  function repAll(str, find, replace){ return String(str).split(find).join(replace); }
+  function escapeHtml(str){
+    return String(str || "")
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;")
+      .replace(/'/g,"&#039;");
+  }
+  function sum(arr){ return arr.reduce((a,b)=>a+Number(b||0),0); }
+
+  // -----------------------------
+  // MENU DATA (as per adjustments)
   // -----------------------------
   const MENU = {
     "Canapés": [
-      "Potato Croquettes",
       "Arancini",
-      "Pizza",
       "Meatballs",
-      "Calamari Fritti",
-      "Cocktail Sausages"
+      "Prawn wraps",
+      "Parmesan with honey drizzle",
+      "Caprese bites",
+      "Croquettes"
     ],
     "Antipasto": [
       "Italian dinner rolls",
-      "Bocconcini & Ricotta",
-      "Salumi",
+      "Salumi selection",
+      "Feta",
+      "Kefalograviera",
+      "Tiropita",
+      "Trio of dips with pita",
+      "Grilled vegetables",
       "Eggplant parmigiana",
-      "Grilled capsicum, olives & artichokes",
-      "Tomato bruschetta",
-      "Calamari fritti"
+      "Bocconcini",
+      "Calamari fritti",
+      "Cevape",
+      "Italian pork sausages"
     ],
     "Pasta": [
       "Elicoidali al Ragú (four meat sauce)",
@@ -655,36 +687,33 @@
       "Pasta Napoli (tomato & herbs)"
     ],
     "Mains": [
-      "Pollo alla Rosmarino (roasted chicken breast + rosemary butter pangrattato)",
-      "Pesce con Salmoriglio (barramundi + southern Italian olive oil herb dressing)",
-      "Chicken Scallopini (white wine & butter sauce)"
+      "Chargrilled chicken breast with a chimichurri dressing",
+      "Italian crumbed barramundi fillet",
+      "Lamb shank with white wine and tomato",
+      "Braised beef short ribs in a red wine jus",
+      "Bondiola, pork fillet with a salmoriglio sauce",
+      "Stuffed pepper with seasonal vegetables and cauliflower steak"
     ],
     "Dessert": [
       "Roaming assorted desserts (mini cannoli + mini cheesecakes + lemon tarts)",
       "Marks Quality Cakes (select two individual desserts)",
       "Gelato station"
-    ],
-    "Supper": [
-      "Assorted Rolls",
-      "Pizza",
-      "Arancini Balls",
-      "Meatballs",
-      "Fried Calamari",
-      "Prawns",
-      "Popcorn Chicken",
-      "Eggplant Patties",
-      "Pasta",
-      "Potato Croquettes"
     ]
+  };
+
+  const HOT_ANTIPASTO = {
+    "Calamari fritti": true,
+    "Cevape": true,
+    "Italian pork sausages": true
   };
 
   // Exact rules
   const RULES = {
-    "Canapés": { exact: 4, max: 4 },
-    "Pasta":   { exact: 2, max: 2 },
-    "Mains":   { exact: 2, max: 2 },
-    "Dessert": { exact: 1, max: 1 },
-    "Supper":  { exact: 0, max: 6 } // 0 means optional
+    "Canapés":   { exact: 3, max: 3 },
+    "Antipasto": { exact: 7, max: 7 },
+    "Pasta":     { exact: 2, max: 2 },
+    "Mains":     { exact: 2, max: 2 },
+    "Dessert":   { exact: 1, max: 1 }
   };
 
   // -----------------------------
@@ -722,7 +751,6 @@
   });
   document.getElementById("ghostNext").addEventListener("click", nextPage);
 
-  // Buttons
   document.getElementById("nextQ").addEventListener("click", nextPage);
   document.getElementById("backC").addEventListener("click", prevPage);
   document.getElementById("nextC").addEventListener("click", nextPage);
@@ -762,7 +790,6 @@
   const pSupperEl   = $("pSupper");
   const enableSupperPricingEl = $("enableSupperPricing");
 
-  const antipastoFixedEl = $("antipastoFixed");
   const vegMainEl = $("vegMain");
   const fruitPlatterEl = $("fruitPlatter");
   const tablesEl = $("tables");
@@ -811,15 +838,6 @@
     const x = Number(n || 0);
     return x.toLocaleString("en-AU", { style:"currency", currency:"AUD" });
   }
-  function escapeHtml(str){
-    return String(str || "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
-  function sum(arr){ return arr.reduce((a,b)=>a+Number(b||0),0); }
 
   function setBadge(el, state, text){
     el.classList.remove("ok","warn","bad");
@@ -833,29 +851,26 @@
   function addCheckboxList(course, listId){
     const wrap = document.getElementById(listId);
     wrap.innerHTML = "";
-    MENU[course].forEach(item => {
-      const safe = (course + "-" + item).replaceAll(" ","_").replaceAll("/","-");
+
+    (MENU[course] || []).forEach(item => {
+      const safe = repAll(repAll(course + "-" + item, " ", "_"), "/", "-");
       const div = document.createElement("div");
+
+      const isHot = (course === "Antipasto" && HOT_ANTIPASTO[item]);
+
       div.innerHTML = `
         <label>
-          <input type="checkbox" data-course="${course}" value="${escapeHtml(item)}" id="cb-${safe}">
+          <input type="checkbox" data-course="${escapeHtml(course)}" value="${escapeHtml(item)}" id="cb-${safe}">
           ${escapeHtml(item)}
+          ${isHot ? `<span class="hotTag">🔥 HOT</span>` : ``}
         </label>
       `;
       wrap.appendChild(div);
     });
   }
 
-  function renderFixedAntipasto(){
-    antipastoFixedEl.innerHTML = `
-      <div class="small">
-        Included: ${MENU["Antipasto"].map(escapeHtml).join(", ")}.
-      </div>
-    `;
-  }
-
   function getSelections(){
-    const out = { Canapés:[], Pasta:[], Mains:[], Dessert:[], Supper:[] };
+    const out = { Canapés:[], Antipasto:[], Pasta:[], Mains:[], Dessert:[] };
     document.querySelectorAll('input[type="checkbox"][data-course]:checked').forEach(cb => {
       const c = cb.dataset.course;
       if(out[c]) out[c].push(cb.value);
@@ -877,21 +892,17 @@
 
     if(countEl) countEl.textContent = `${checked2.length}/${rule.max} selected`;
 
-    // Exact rule warnings
-    if(rule.exact > 0){
+    if(rule.exact > 0 && warnEl){
       warnEl.style.display = (checked2.length === rule.exact) ? "none" : "block";
-    }else{
-      // Optional: only warn if at max
-      warnEl.style.display = (checked2.length >= rule.max) ? "block" : "none";
     }
   }
 
   function menuIsComplete(){
     const sel = getSelections();
     let ok = true;
-    ["Canapés","Pasta","Mains","Dessert"].forEach(course => {
+    ["Canapés","Antipasto","Pasta","Mains","Dessert"].forEach(course => {
       const rule = RULES[course];
-      if(sel[course].length !== rule.exact) ok = false;
+      if((sel[course]||[]).length !== rule.exact) ok = false;
     });
     return ok;
   }
@@ -920,27 +931,16 @@
     const sel = getSelections();
     const prices = coursePricesAdult();
 
-    // We only include course price when the course is "validly selected" (meets exact rule),
-    // except antipasto which is always included.
+    // include course only when exact rule met
     let perAdult = 0;
+    if((sel.Canapés||[]).length === RULES["Canapés"].exact) perAdult += prices.Canapés;
+    if((sel.Antipasto||[]).length === RULES["Antipasto"].exact) perAdult += prices.Antipasto;
+    if((sel.Pasta||[]).length === RULES["Pasta"].exact) perAdult += prices.Pasta;
+    if((sel.Mains||[]).length === RULES["Mains"].exact) perAdult += prices.Mains;
+    if((sel.Dessert||[]).length === RULES["Dessert"].exact) perAdult += prices.Dessert;
 
-    // Canapés: only if exactly 4 chosen
-    if(sel.Canapés.length === RULES["Canapés"].exact) perAdult += prices.Canapés;
-
-    // Antipasto always included
-    perAdult += prices.Antipasto;
-
-    // Pasta: only if exactly 2 chosen
-    if(sel.Pasta.length === RULES["Pasta"].exact) perAdult += prices.Pasta;
-
-    // Mains: only if exactly 2 chosen
-    if(sel.Mains.length === RULES["Mains"].exact) perAdult += prices.Mains;
-
-    // Dessert: only if exactly 1 chosen
-    if(sel.Dessert.length === RULES["Dessert"].exact) perAdult += prices.Dessert;
-
-    // Supper: optional; included only if enabled + any selected
-    if(enableSupperPricingEl.checked && sel.Supper.length > 0) perAdult += prices.Supper;
+    // Supper fixed Pizza only; included only if enabled
+    if(enableSupperPricingEl.checked) perAdult += prices.Supper;
 
     // Add-ons (non per-person)
     let addOns = 0;
@@ -1014,12 +1014,11 @@
   }
 
   function renderMenuStatus(){
-    // per-course exactness
     const sel = getSelections();
     let incomplete = [];
-    ["Canapés","Pasta","Mains","Dessert"].forEach(c => {
+    ["Canapés","Antipasto","Pasta","Mains","Dessert"].forEach(c => {
       const need = RULES[c].exact;
-      const got = sel[c].length;
+      const got = (sel[c]||[]).length;
       if(got !== need) incomplete.push(`${c} ${got}/${need}`);
     });
 
@@ -1059,10 +1058,11 @@
 
     const chips = [];
     Object.entries(sel).forEach(([course, items]) => {
-      items.forEach(item => chips.push(`<span class="pill">${escapeHtml(course)}: ${escapeHtml(item)}</span>`));
+      (items||[]).forEach(item => chips.push(`<span class="pill">${escapeHtml(course)}: ${escapeHtml(item)}</span>`));
     });
-    if(vegMainEl.checked) chips.push(`<span class="pill">Mains: Vegetarian main option</span>`);
-    if(fruitPlatterEl.checked) chips.push(`<span class="pill">Dessert: Fruit platter add-on</span>`);
+    chips.push(`<span class="pill">Supper: Pizza (fixed)</span>`);
+    if(vegMainEl.checked) chips.push(`<span class="pill">Vegetarian: Noted</span>`);
+    if(fruitPlatterEl.checked) chips.push(`<span class="pill">Fruit platter add-on</span>`);
     chipsEl.innerHTML = chips.join(" ");
 
     const lines = [];
@@ -1095,12 +1095,12 @@
     lines.push(`<b>Menu completion:</b> ${menuIsComplete() ? "✅ Complete" : "⚠️ Incomplete (finish required picks)"}<br>`);
 
     lines.push(`<b>Selections:</b>`);
-    lines.push(`<b>Canapés:</b> ${sel.Canapés.length ? sel.Canapés.map(escapeHtml).join(", ") : "—"}`);
-    lines.push(`<b>Grande Antipasto:</b> Included`);
-    lines.push(`<b>Pasta:</b> ${sel.Pasta.length ? sel.Pasta.map(escapeHtml).join(", ") : "—"}`);
-    lines.push(`<b>Mains:</b> ${sel.Mains.length ? sel.Mains.map(escapeHtml).join(", ") : "—"}${vegMainEl.checked ? " + Vegetarian option" : ""}`);
-    lines.push(`<b>Dessert:</b> ${sel.Dessert.length ? sel.Dessert.map(escapeHtml).join(", ") : "—"}${fruitPlatterEl.checked ? " + Fruit platter add-on" : ""}`);
-    lines.push(`<b>Supper:</b> ${sel.Supper.length ? sel.Supper.map(escapeHtml).join(", ") : "—"}`);
+    lines.push(`<b>Canapés:</b> ${(sel.Canapés||[]).length ? (sel.Canapés||[]).map(escapeHtml).join(", ") : "—"}`);
+    lines.push(`<b>Antipasto (7 plates):</b> ${(sel.Antipasto||[]).length ? (sel.Antipasto||[]).map(escapeHtml).join(", ") : "—"}`);
+    lines.push(`<b>Pasta:</b> ${(sel.Pasta||[]).length ? (sel.Pasta||[]).map(escapeHtml).join(", ") : "—"}`);
+    lines.push(`<b>Mains:</b> ${(sel.Mains||[]).length ? (sel.Mains||[]).map(escapeHtml).join(", ") : "—"}${vegMainEl.checked ? " + Vegetarian option" : ""}`);
+    lines.push(`<b>Dessert:</b> ${(sel.Dessert||[]).length ? (sel.Dessert||[]).map(escapeHtml).join(", ") : "—"}${fruitPlatterEl.checked ? " + Fruit platter add-on" : ""}`);
+    lines.push(`<b>Supper:</b> Pizza (fixed)`);
 
     finalSummaryEl.innerHTML = lines.join("<br>");
   }
@@ -1116,7 +1116,7 @@
   // SAVE / LOAD
   // -----------------------------
   function getState(){
-    const selections = { Canapés:[], Pasta:[], Mains:[], Dessert:[], Supper:[] };
+    const selections = { Canapés:[], Antipasto:[], Pasta:[], Mains:[], Dessert:[] };
     document.querySelectorAll('input[type="checkbox"][data-course]:checked').forEach(cb => {
       const c = cb.dataset.course;
       if(selections[c]) selections[c].push(cb.value);
@@ -1185,16 +1185,14 @@
     tablesEl.value = (s.menu && s.menu.tables) ?? 10;
     fruitPerTableEl.value = (s.menu && s.menu.fruitPerTable) ?? 35;
 
-    // Clear all checks
     document.querySelectorAll('input[type="checkbox"][data-course]').forEach(cb => cb.checked = false);
 
-    // Restore checks
     if(s.menu && s.menu.selections){
       Object.entries(s.menu.selections).forEach(([course, items]) => {
         (items || []).forEach(item => {
-          const cb = [...document.querySelectorAll(`input[type="checkbox"][data-course="${course}"]`)]
-            .find(x => x.value === item);
-          if(cb) cb.checked = true;
+          const all = Array.prototype.slice.call(document.querySelectorAll(`input[type="checkbox"][data-course="${course}"]`));
+          const found = all.find(x => x.value === item);
+          if(found) found.checked = true;
         });
         enforceLimit(course);
       });
@@ -1274,13 +1272,12 @@
   // INIT
   // -----------------------------
   addCheckboxList("Canapés","list-Canapés");
+  addCheckboxList("Antipasto","list-Antipasto");
   addCheckboxList("Pasta","list-Pasta");
   addCheckboxList("Mains","list-Mains");
   addCheckboxList("Dessert","list-Dessert");
-  addCheckboxList("Supper","list-Supper");
-  renderFixedAntipasto();
 
-  ["Canapés","Pasta","Mains","Dessert","Supper"].forEach(bindCourse);
+  ["Canapés","Antipasto","Pasta","Mains","Dessert"].forEach(bindCourse);
   renderAll();
 </script>
 </body>
