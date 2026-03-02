@@ -213,15 +213,15 @@
   <header>
     <div class="brandline">
       <div class="logoWrap">
-        <!-- Put a file called "logo.png" next to index.html -->
-        <img class="logoImg" id="logoImg" src="logo.png" alt="The Members Lounge Logo"
+        <!-- Venue profiles switch this automatically -->
+        <img class="logoImg" id="brandLogo" src="members.png" alt="Brand Logo"
              onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='inline-flex';">
         <span class="logoFallback" id="logoFallback" style="display:none;">✨ <span>THE MEMBERS LOUNGE</span></span>
       </div>
     </div>
 
-    <h1><span class="gold">Wedding Signature Series</span></h1>
-    <div class="sub">Reggio Calabria Club, Parkville</div>
+    <h1><span class="gold" id="brandTitle">Wedding Signature Series</span></h1>
+    <div class="sub" id="brandSubtitle">Reggio Calabria Club, Parkville</div>
     <div class="small" style="margin-top:6px;">GitHub Pages ready • White / Black / Gold • Multi-page tabs (no long scroll)</div>
   </header>
 
@@ -353,11 +353,12 @@
             <div>
               <label for="venueSpace">Venue Space</label>
               <select id="venueSpace">
-                <option>Sala Reggio Ballroom</option>
-                <option>Members Lounge Restaurant</option>
-                <option>FIOR Parkville</option>
-                <option>ALORA Macedon</option>
+                <option value="members">Sala Reggio Ballroom</option>
+                <option value="members">Members Lounge Restaurant</option>
+                <option value="fior">FIOR Parkville</option>
+                <option value="alora">ALORA Macedon</option>
               </select>
+              <div class="small">Venue selection switches branding automatically.</div>
             </div>
           </div>
 
@@ -377,14 +378,14 @@
         </div>
 
         <div class="card">
-          <h2>What couples do next</h2>
-          <div class="small">
-            1) Build the food menu (exact selection rules)<br>
-            2) Choose drinks<br>
-            3) Summary shows a clean breakdown & total estimate.
+          <h2>Venue Profile</h2>
+          <div class="small" id="venueProfileText">
+            Select a venue to apply branding + default costing (only fills if your cost fields are still $0).
           </div>
           <div class="divider"></div>
-          <div class="small">The Quote tab is always live, so couples can see the cost impact instantly.</div>
+          <div class="small">
+            If you want different menus per venue later (FIOR vs ALORA), we can also do that.
+          </div>
         </div>
       </div>
     </section>
@@ -601,18 +602,15 @@
           <h2>Selected Items</h2>
           <div id="chips"></div>
           <div class="divider"></div>
-          <div class="small">Put <b>logo.png</b> next to <b>index.html</b> to display your Members Lounge logo in the header.</div>
+          <div class="small">Put <b>members.png</b>, <b>fior.png</b>, <b>alora.png</b> next to <b>index.html</b> to switch branding automatically.</div>
         </div>
       </div>
     </section>
   </main>
 
-  <footer>Members Lounge | Reggio Calabria Club, Parkville</footer>
+  <footer id="brandFooter">Members Lounge | Reggio Calabria Club, Parkville</footer>
 
 <script>
-  // -----------------------------
-  // SAFE HELPERS
-  // -----------------------------
   function escapeHtml(str){
     return String(str || "")
       .replace(/&/g,"&amp;")
@@ -622,16 +620,94 @@
       .replace(/'/g,"&#039;");
   }
   function sum(arr){ return arr.reduce((a,b)=>a+Number(b||0),0); }
-
   const $ = (id) => document.getElementById(id);
+  function on(el, ev, fn){ if(el) el.addEventListener(ev, fn); }
 
-  function on(el, ev, fn){
-    if(!el) return;
-    el.addEventListener(ev, fn);
+  // -----------------------------
+  // VENUE PROFILES (EDIT THESE NUMBERS)
+  // -----------------------------
+  const VENUE_PROFILES = {
+    members: {
+      label: "Members Lounge / Reggio Calabria Club (Parkville)",
+      logo: "members.png",
+      subtitle: "Reggio Calabria Club, Parkville",
+      footer: "Members Lounge | Reggio Calabria Club, Parkville",
+      defaults: { roomHire: 0, dryHire: 0, security: 0 } // <-- set your real defaults here
+    },
+    fior: {
+      label: "FIOR Parkville",
+      logo: "fior.png",
+      subtitle: "FIOR, Parkville",
+      footer: "FIOR | Parkville",
+      defaults: { roomHire: 0, dryHire: 0, security: 0 } // <-- set your real defaults here
+    },
+    alora: {
+      label: "ALORA Macedon",
+      logo: "alora.png",
+      subtitle: "ALORA, Macedon",
+      footer: "ALORA | Macedon",
+      defaults: { roomHire: 0, dryHire: 0, security: 0 } // <-- set your real defaults here
+    }
+  };
+
+  function safeSetLogo(src){
+    const img = $("brandLogo");
+    const fallback = $("logoFallback");
+    if(!img) return;
+
+    img.style.display = "block";
+    if(fallback) fallback.style.display = "none";
+
+    img.onerror = function(){
+      // If venue logo missing, fallback to members.png, then text fallback
+      if(src !== "members.png"){
+        safeSetLogo("members.png");
+        return;
+      }
+      img.style.display = "none";
+      if(fallback) fallback.style.display = "inline-flex";
+    };
+
+    img.src = src;
+  }
+
+  function applyVenueProfile(profileKey){
+    const key = profileKey || "members";
+    const p = VENUE_PROFILES[key] || VENUE_PROFILES.members;
+
+    // Branding
+    const titleEl = $("brandTitle");
+    const subtitleEl = $("brandSubtitle");
+    const footerEl = $("brandFooter");
+    if(titleEl) titleEl.textContent = "Wedding Signature Series";
+    if(subtitleEl) subtitleEl.textContent = p.subtitle;
+    if(footerEl) footerEl.textContent = p.footer;
+
+    safeSetLogo(p.logo);
+
+    // Info text on couple tab
+    const info = $("venueProfileText");
+    if(info){
+      info.innerHTML = `<b>Active venue:</b> ${escapeHtml(p.label)}<br>
+        Branding switches automatically. Default costing fills only if your cost fields are still $0.`;
+    }
+
+    // Default costing (only fill if fields still 0 to avoid overwriting manual values)
+    const roomHireEl = $("roomHire");
+    const dryHireEl = $("dryHire");
+    const securityEl = $("security");
+
+    const r = Number(roomHireEl?.value || 0);
+    const d = Number(dryHireEl?.value || 0);
+    const s = Number(securityEl?.value || 0);
+
+    if(roomHireEl && r === 0) roomHireEl.value = p.defaults.roomHire;
+    if(dryHireEl && d === 0)  dryHireEl.value  = p.defaults.dryHire;
+    if(securityEl && s === 0) securityEl.value = p.defaults.security;
   }
 
   // -----------------------------
-  // MENU DATA (ASCII KEYS, PRETTY LABELS)
+  // MENU DATA (ASCII KEYS)
   // -----------------------------
   const COURSE_LABEL = {
     canapes: "Canapés",
@@ -811,7 +887,7 @@
   // -----------------------------
   // HELPERS
   // -----------------------------
-  const STORAGE_KEY = "memberslounge_wedding_signature_series_v3_ascii";
+  const STORAGE_KEY = "memberslounge_wedding_signature_series_v4_venues";
 
   function aud(n){
     const x = Number(n || 0);
@@ -836,8 +912,7 @@
     (MENU[courseKey] || []).forEach((item, idx) => {
       const div = document.createElement("div");
       const isHot = (courseKey === "antipasto" && HOT_ANTIPASTO[item]);
-
-      const id = `cb-${courseKey}-${idx}`; // safe id
+      const id = `cb-${courseKey}-${idx}`;
 
       div.innerHTML = `
         <label>
@@ -866,7 +941,6 @@
     const checked = Array.prototype.slice.call(
       document.querySelectorAll(`input[type="checkbox"][data-course="${courseKey}"]:checked`)
     );
-
     if(checked.length > rule.max){
       checked[checked.length - 1].checked = false;
     }
@@ -1040,10 +1114,12 @@
     if(fruitPlatterEl.checked) chips.push(`<span class="pill">Fruit platter add-on</span>`);
     if(chipsEl) chipsEl.innerHTML = chips.join(" ");
 
+    const venueText = venueSpaceEl ? (venueSpaceEl.options[venueSpaceEl.selectedIndex]?.text || "—") : "—";
+
     const lines = [];
     lines.push(`<b>Couple:</b> ${escapeHtml(coupleNameEl.value || "—")}`);
     lines.push(`<b>Date:</b> ${escapeHtml(weddingDateEl.value || "—")}`);
-    lines.push(`<b>Venue:</b> ${escapeHtml(venueSpaceEl.value || "—")}`);
+    lines.push(`<b>Venue:</b> ${escapeHtml(venueText)}`);
     lines.push(`<b>Email:</b> ${escapeHtml(emailEl.value || "—")}`);
     lines.push(`<b>Phone:</b> ${escapeHtml(phoneEl.value || "—")}`);
     if((notesEl.value || "").trim()) lines.push(`<b>Notes:</b> ${escapeHtml(notesEl.value.trim())}`);
@@ -1082,7 +1158,7 @@
   }
 
   // -----------------------------
-  // SAVE / LOAD
+  // SAVE / LOAD (includes venue)
   // -----------------------------
   function getState(){
     const selections = getSelections();
@@ -1096,7 +1172,9 @@
         enableSupperPricing: enableSupperPricingEl.checked
       },
       couple: {
-        coupleName: coupleNameEl.value, weddingDate: weddingDateEl.value, venueSpace: venueSpaceEl.value,
+        coupleName: coupleNameEl.value,
+        weddingDate: weddingDateEl.value,
+        venueSpace: venueSpaceEl.value,
         email: emailEl.value, phone: phoneEl.value, notes: notesEl.value
       },
       drinks: {
@@ -1132,10 +1210,11 @@
     if(s.couple){
       coupleNameEl.value = s.couple.coupleName ?? "";
       weddingDateEl.value = s.couple.weddingDate ?? "";
-      venueSpaceEl.value = s.couple.venueSpace ?? "Sala Reggio Ballroom";
+      venueSpaceEl.value = s.couple.venueSpace ?? "members";
       emailEl.value = s.couple.email ?? "";
       phoneEl.value = s.couple.phone ?? "";
       notesEl.value = s.couple.notes ?? "";
+      applyVenueProfile(venueSpaceEl.value);
     }
 
     if(s.drinks){
@@ -1201,7 +1280,7 @@
   });
 
   // -----------------------------
-  // EVENTS / RECALC
+  // RECALC BIND
   // -----------------------------
   function bindRecalc(ids){
     ids.forEach(id => {
@@ -1231,6 +1310,12 @@
     enforceLimit(courseKey);
   }
 
+  // Venue change -> apply profile + re-render
+  on(venueSpaceEl, "change", () => {
+    applyVenueProfile(venueSpaceEl.value);
+    renderAll();
+  });
+
   // -----------------------------
   // INIT
   // -----------------------------
@@ -1239,8 +1324,10 @@
   addCheckboxList("pasta","list-pasta");
   addCheckboxList("mains","list-mains");
   addCheckboxList("dessert","list-dessert");
-
   ["canapes","antipasto","pasta","mains","dessert"].forEach(bindCourse);
+
+  // Default venue profile at load
+  applyVenueProfile(venueSpaceEl?.value || "members");
   renderAll();
 </script>
 </body>
