@@ -1,0 +1,930 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Members Lounge | Wedding Signature Series</title>
+
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#111111;
+      --muted:#4b5563;
+      --line:rgba(0,0,0,.10);
+      --gold:#b08d2a;
+      --goldSoft:rgba(176,141,42,.10);
+      --card:#f7f7f8;
+      --shadow:0 12px 28px rgba(0,0,0,.08);
+      --radius:16px;
+      --ok:#0f7a3a;
+      --warn:#b45309;
+      --bad:#b91c1c;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:"Century Gothic", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    .container{ max-width:1100px; margin:0 auto; padding:0 18px; }
+
+    /* Top bar */
+    .topbar{
+      position:sticky; top:0; z-index:20;
+      background:rgba(255,255,255,.92);
+      backdrop-filter:saturate(1.2) blur(8px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; padding:12px 0;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      min-width:220px;
+    }
+    .brand img{
+      height:46px; width:auto; display:block;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.08));
+    }
+    .brand .titles{ line-height:1.1; }
+    .brand .titles .name{ font-weight:700; letter-spacing:.4px; }
+    .brand .titles .sub{ font-size:12.5px; color:var(--muted); }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      border:1px solid var(--line);
+      padding:8px 12px;
+      border-radius:999px;
+      background:#fff;
+      font-size:13px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .dot{
+      width:9px; height:9px; border-radius:999px; background:var(--gold);
+      box-shadow:0 0 0 5px var(--goldSoft);
+      flex:0 0 auto;
+    }
+
+    /* Tabs */
+    .tabs-wrap{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .tab-btn{
+      border:1px solid var(--line);
+      background:#fff;
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:700;
+      font-size:13.5px;
+      cursor:pointer;
+      transition: transform .08s ease, background .18s ease, border-color .18s ease;
+    }
+    .tab-btn:hover{ transform: translateY(-1px); border-color:rgba(176,141,42,.55); }
+    .tab-btn.active{
+      background:var(--gold);
+      color:#fff;
+      border-color:var(--gold);
+    }
+
+    /* Sections */
+    .section{ display:none; padding:22px 0 44px; }
+    .section.active{ display:block; }
+
+    /* Cards & layout */
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+    }
+    @media (min-width: 900px){
+      .grid.two{ grid-template-columns: 1fr 1fr; }
+      .grid.three{ grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow:0 8px 18px rgba(0,0,0,.04);
+    }
+    .card.white{
+      background:#fff;
+    }
+    .card h2, .card h3{
+      margin:0 0 12px;
+      letter-spacing:.2px;
+    }
+    .card h2{ font-size:18px; }
+    .card h3{ font-size:16px; }
+    .muted{ color:var(--muted); }
+    .small{ font-size:13px; }
+    .gold{ color:var(--gold); }
+    .divider{ height:1px; background:var(--line); margin:14px 0; }
+
+    /* Inputs */
+    label{
+      display:block;
+      font-size:13px;
+      color:var(--muted);
+      margin:10px 0 6px;
+      font-weight:700;
+    }
+    input, select, textarea{
+      width:100%;
+      padding:11px 12px;
+      border-radius:12px;
+      border:1px solid rgba(0,0,0,.14);
+      outline:none;
+      background:#fff;
+      font-family:inherit;
+      font-size:14px;
+    }
+    textarea{ min-height:96px; resize:vertical; }
+
+    .row{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
+    @media (min-width: 900px){
+      .row.two{ grid-template-columns: 1fr 1fr; }
+      .row.three{ grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    /* Buttons */
+    .btn{
+      border:none;
+      border-radius:999px;
+      padding:12px 16px;
+      font-weight:800;
+      cursor:pointer;
+      transition: transform .08s ease, opacity .18s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); }
+    .btn.primary{ background:var(--gold); color:#fff; }
+    .btn.ghost{ background:#fff; border:1px solid var(--line); color:var(--text); }
+    .btn.danger{ background:var(--bad); color:#fff; }
+
+    /* Hero */
+    .hero{
+      position:relative;
+      border-radius:22px;
+      overflow:hidden;
+      background:
+        radial-gradient(1200px 420px at 10% 15%, rgba(176,141,42,.20), transparent 55%),
+        radial-gradient(900px 380px at 95% 0%, rgba(0,0,0,.08), transparent 55%),
+        linear-gradient(180deg, #ffffff, #fbfbfb);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      padding:28px 18px;
+    }
+    .hero-inner{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:18px;
+      align-items:center;
+    }
+    @media (min-width: 900px){
+      .hero-inner{ grid-template-columns: 1.25fr .75fr; }
+    }
+    .hero h1{
+      margin:0 0 10px;
+      font-size:34px;
+      letter-spacing:.6px;
+    }
+    .hero p{
+      margin:0;
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.55;
+    }
+
+    .hero-badges{
+      display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;
+    }
+
+    .stat{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:16px;
+      padding:14px;
+      box-shadow:0 10px 22px rgba(0,0,0,.05);
+    }
+    .stat .k{ font-size:12px; color:var(--muted); font-weight:800; letter-spacing:.3px; }
+    .stat .v{ margin-top:6px; font-size:18px; font-weight:900; }
+    .stat .v .gold{ font-weight:900; }
+
+    /* Selection list */
+    .select-note{
+      display:flex; align-items:flex-start; gap:10px;
+      padding:12px 14px;
+      border:1px dashed rgba(176,141,42,.55);
+      background:rgba(176,141,42,.07);
+      border-radius:14px;
+      color:#3b2f0b;
+    }
+    .select-note b{ color:#2f2609; }
+    .badge{
+      display:inline-flex; align-items:center;
+      padding:4px 10px; border-radius:999px;
+      border:1px solid var(--line);
+      font-size:12px; font-weight:800;
+      background:#fff;
+      color:var(--muted);
+    }
+
+    /* Quote box */
+    .quote{
+      border-radius:22px;
+      padding:18px;
+      background:linear-gradient(180deg, rgba(176,141,42,.98), rgba(150,120,35,.98));
+      color:#fff;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,.2);
+    }
+    .quote .big{
+      font-size:30px;
+      font-weight:950;
+      letter-spacing:.5px;
+      margin:8px 0 0;
+    }
+    .quote .line{
+      display:flex; justify-content:space-between; gap:12px;
+      padding:8px 0;
+      border-bottom:1px solid rgba(255,255,255,.25);
+      font-size:14px;
+    }
+    .quote .line:last-child{ border-bottom:none; }
+
+    .warn{ color:var(--warn); font-weight:800; }
+    .ok{ color:var(--ok); font-weight:800; }
+
+    footer{
+      border-top:1px solid var(--line);
+      padding:18px 0;
+      color:var(--muted);
+      font-size:12.5px;
+    }
+
+    /* Print */
+    @media print{
+      .topbar, .tabs-wrap, .no-print{ display:none !important; }
+      body{ background:#fff; }
+      .card, .hero, .quote{ box-shadow:none !important; }
+      .section{ display:block !important; }
+      .section:not(.active){ display:block !important; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="container">
+      <div class="topbar-inner">
+        <div class="brand" role="banner">
+          <img src="MembersLoungeLogo.png" alt="The Members Lounge Logo">
+          <div class="titles">
+            <div class="name">The Members Lounge</div>
+            <div class="sub">Wedding Signature Series • Parkville</div>
+          </div>
+        </div>
+
+        <div class="tabs-wrap" role="navigation" aria-label="App sections">
+          <button class="tab-btn active" onclick="openTab('front')" id="tab-front">Front Page</button>
+          <button class="tab-btn" onclick="openTab('couple')" id="tab-couple">Couple</button>
+          <button class="tab-btn" onclick="openTab('venue')" id="tab-venue">Venue</button>
+          <button class="tab-btn" onclick="openTab('food')" id="tab-food">Food</button>
+          <button class="tab-btn" onclick="openTab('quote')" id="tab-quote">Quote</button>
+          <button class="tab-btn" onclick="openTab('deposit')" id="tab-deposit">Deposit</button>
+        </div>
+
+        <div class="pill" aria-label="Status">
+          <span class="dot"></span>
+          <span id="statusText">Ready</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FRONT PAGE -->
+  <section class="section active" id="front">
+    <div class="container">
+      <div class="hero">
+        <div class="hero-inner">
+          <div>
+            <h1>Wedding Signature Series</h1>
+            <p>
+              A clean, elegant planning & quoting experience built for <b>The Members Lounge</b>.
+              Keep it simple, beautiful, and structured — couple details, venue costs, food selections, a live quote,
+              and a deposit page to lock in the date.
+            </p>
+
+            <div class="hero-badges">
+              <span class="badge">Clean</span>
+              <span class="badge">Gold & White</span>
+              <span class="badge">Live Quote</span>
+              <span class="badge">Deposit Tracking</span>
+              <span class="badge">Print-ready</span>
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
+              <button class="btn primary" onclick="openTab('couple')">Start Planning</button>
+              <button class="btn ghost" onclick="openTab('quote')">View Quote</button>
+              <button class="btn ghost" onclick="window.print()">Print / Save PDF</button>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="stat">
+              <div class="k">Estimated Total</div>
+              <div class="v" id="frontTotal">$0</div>
+              <div class="small muted" style="margin-top:6px;">Updates as you enter venue + drinks.</div>
+            </div>
+            <div class="stat" style="margin-top:12px;">
+              <div class="k">Approx Cost Per Adult</div>
+              <div class="v"><span class="gold" id="frontPerAdult">$0</span></div>
+              <div class="small muted" style="margin-top:6px;">Weighted per adult guest.</div>
+            </div>
+            <div class="stat" style="margin-top:12px;">
+              <div class="k">Balance After Deposit</div>
+              <div class="v" id="frontBalance">$0</div>
+              <div class="small muted" style="margin-top:6px;">Based on deposit entered.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:14px"></div>
+
+      <div class="grid two">
+        <div class="card white">
+          <h2>What this includes</h2>
+          <div class="divider"></div>
+          <div class="small muted" style="line-height:1.7">
+            • Couple & date details<br>
+            • Venue costs: room hire, dry hire, security<br>
+            • Drinks package per adult<br>
+            • Food: choose <b>2 mains</b> from 6 options<br>
+            • Live quote + per adult estimate<br>
+            • Deposit page: record deposit, show balance, add payment notes
+          </div>
+        </div>
+
+        <div class="card white">
+          <h2>Quick actions</h2>
+          <div class="divider"></div>
+          <div class="row two">
+            <button class="btn primary" onclick="calculateAll()">Refresh totals</button>
+            <button class="btn ghost" onclick="resetAll()">Reset form</button>
+          </div>
+          <div class="small muted" style="margin-top:10px; line-height:1.7">
+            Tip: upload your logo file named <b>MembersLoungeLogo.png</b> in the same folder as this <b>index.html</b>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COUPLE -->
+  <section class="section" id="couple">
+    <div class="container">
+      <div class="grid two">
+        <div class="card">
+          <h2>Couple Details</h2>
+
+          <div class="row two">
+            <div>
+              <label for="bride">Bride Name</label>
+              <input id="bride" type="text" placeholder="e.g., Stephanie">
+            </div>
+            <div>
+              <label for="groom">Groom Name</label>
+              <input id="groom" type="text" placeholder="e.g., Daniel">
+            </div>
+          </div>
+
+          <div class="row two">
+            <div>
+              <label for="weddingDate">Preferred Date</label>
+              <input id="weddingDate" type="date">
+            </div>
+            <div>
+              <label for="roomChoice">Room / Space</label>
+              <input id="roomChoice" type="text" placeholder="e.g., Sala Reggio Ballroom">
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="row three">
+            <div>
+              <label for="adults">Adult Guests</label>
+              <input id="adults" type="number" min="0" placeholder="e.g., 120" oninput="calculateAll()">
+            </div>
+            <div>
+              <label for="children">Children</label>
+              <input id="children" type="number" min="0" placeholder="e.g., 10" oninput="calculateAll()">
+            </div>
+            <div>
+              <label for="notes">Notes</label>
+              <input id="notes" type="text" placeholder="Short notes (optional)">
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <button class="btn primary" onclick="openTab('venue')">Next: Venue</button>
+          </div>
+        </div>
+
+        <div class="card white">
+          <h2>Summary</h2>
+          <div class="divider"></div>
+          <div class="small muted" id="coupleSummary" style="line-height:1.7;">
+            Enter details to generate a summary.
+          </div>
+          <div class="divider"></div>
+          <div class="row two">
+            <button class="btn ghost" onclick="openTab('front')">Back: Front</button>
+            <button class="btn ghost" onclick="openTab('quote')">Jump: Quote</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VENUE -->
+  <section class="section" id="venue">
+    <div class="container">
+      <div class="grid two">
+        <div class="card">
+          <h2>Venue Costs</h2>
+          <div class="small muted">Fixed costs + drinks per adult. These drive the live estimate.</div>
+
+          <div class="row two" style="margin-top:8px;">
+            <div>
+              <label for="roomHire">Room Hire (AUD $)</label>
+              <input id="roomHire" type="number" min="0" step="1" placeholder="e.g., 3500" oninput="calculateAll()">
+            </div>
+            <div>
+              <label for="dryHire">Dry Hire (AUD $)</label>
+              <input id="dryHire" type="number" min="0" step="1" placeholder="e.g., 1500" oninput="calculateAll()">
+            </div>
+          </div>
+
+          <div class="row two">
+            <div>
+              <label for="security">Security (AUD $)</label>
+              <input id="security" type="number" min="0" step="1" placeholder="e.g., 600" oninput="calculateAll()">
+            </div>
+            <div>
+              <label for="drinksPerAdult">Drinks Package (Per Adult AUD $)</label>
+              <input id="drinksPerAdult" type="number" min="0" step="0.01" placeholder="e.g., 48" oninput="calculateAll()">
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <button class="btn primary" onclick="openTab('food')">Next: Food</button>
+          </div>
+        </div>
+
+        <div class="card white">
+          <h2>Live Totals</h2>
+          <div class="divider"></div>
+
+          <div class="quote" aria-label="Live quote preview">
+            <div class="line"><span>Fixed Costs</span><b id="fixedPreview">$0</b></div>
+            <div class="line"><span>Drinks (Adults)</span><b id="drinksPreview">$0</b></div>
+            <div class="line"><span>Total Estimate</span><b id="totalPreview">$0</b></div>
+            <div class="big" id="perAdultPreview">$0 <span class="small" style="opacity:.9">per adult</span></div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="row two">
+            <button class="btn ghost" onclick="openTab('couple')">Back: Couple</button>
+            <button class="btn ghost" onclick="openTab('quote')">Next: Quote</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOD -->
+  <section class="section" id="food">
+    <div class="container">
+      <div class="grid two">
+        <div class="card">
+          <h2>Food Selection</h2>
+
+          <div class="select-note">
+            <span class="dot" style="margin-top:4px;"></span>
+            <div class="small">
+              <b>Main Course:</b> choose <b>2</b> options from the list of 6.<br>
+              <span class="muted">Supper is fixed: Pizza (no selection).</span>
+            </div>
+          </div>
+
+          <label for="mains">Select 2 Mains (hold Ctrl/⌘ to multi-select)</label>
+          <select id="mains" multiple size="8" onchange="enforceMaxSelection('mains', 2); calculateAll();">
+            <option>Chargrilled chicken breast with chimichurri dressing</option>
+            <option>Italian crumbed barramundi fillet</option>
+            <option>Lamb shank with white wine and tomato</option>
+            <option>Braised beef short ribs in a red wine jus</option>
+            <option>Bondiola pork fillet with salmoriglio sauce</option>
+            <option>Stuffed pepper with seasonal vegetables and cauliflower steak</option>
+          </select>
+
+          <label for="dietary">Dietary Notes (optional)</label>
+          <textarea id="dietary" placeholder="e.g., gluten-free, vegetarian, allergies (optional)"></textarea>
+
+          <div class="divider"></div>
+
+          <div class="row two">
+            <button class="btn ghost" onclick="openTab('venue')">Back: Venue</button>
+            <button class="btn primary" onclick="openTab('quote')">Next: Quote</button>
+          </div>
+        </div>
+
+        <div class="card white">
+          <h2>Selected Summary</h2>
+          <div class="divider"></div>
+
+          <div class="small muted" id="foodSummary" style="line-height:1.7;">
+            Pick 2 mains to see them here.
+          </div>
+
+          <div class="divider"></div>
+          <div class="small muted" style="line-height:1.7;">
+            <b>Supper:</b> Pizza (fixed)
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <section class="section" id="quote">
+    <div class="container">
+      <div class="grid two">
+        <div class="card">
+          <h2>Live Quote</h2>
+          <div class="small muted">
+            This is an estimate based on fixed venue costs + drinks per adult.
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="row two">
+            <button class="btn primary" onclick="calculateAll()">Refresh Quote</button>
+            <button class="btn ghost" onclick="window.print()">Print / Save PDF</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="small muted" id="quoteDetails" style="line-height:1.7;"></div>
+
+          <div class="divider"></div>
+
+          <div class="row two">
+            <button class="btn ghost" onclick="openTab('food')">Back: Food</button>
+            <button class="btn primary" onclick="openTab('deposit')">Next: Deposit</button>
+          </div>
+        </div>
+
+        <div class="card white">
+          <h2>Estimate</h2>
+          <div class="divider"></div>
+
+          <div class="quote">
+            <div class="line"><span>Fixed Costs</span><b id="fixedQ">$0</b></div>
+            <div class="line"><span>Drinks (Adults)</span><b id="drinksQ">$0</b></div>
+            <div class="line"><span>Total Estimate</span><b id="totalQ">$0</b></div>
+            <div class="big" id="perAdultQ">$0 <span class="small" style="opacity:.9">per adult</span></div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="small muted" style="line-height:1.7;">
+            <span class="ok">Per adult</span> uses adult guests as the major denominator (weighted).
+            Children are captured for planning, but not used for the per-adult calculation.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEPOSIT -->
+  <section class="section" id="deposit">
+    <div class="container">
+      <div class="grid two">
+        <div class="card">
+          <h2>Deposit & Confirmation</h2>
+          <div class="small muted">
+            Record the deposit and track the balance. (This page does not process payments—it's for client-facing confirmation + internal tracking.)
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="row two">
+            <div>
+              <label for="depositAmount">Deposit Amount Paid (AUD $)</label>
+              <input id="depositAmount" type="number" min="0" step="1" placeholder="e.g., 2000" oninput="calculateAll()">
+            </div>
+            <div>
+              <label for="depositDate">Deposit Date</label>
+              <input id="depositDate" type="date">
+            </div>
+          </div>
+
+          <div class="row two">
+            <div>
+              <label for="paymentMethod">Payment Method</label>
+              <select id="paymentMethod">
+                <option value="">Select</option>
+                <option>Card</option>
+                <option>Bank Transfer</option>
+                <option>Cash</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div>
+              <label for="reference">Reference / Receipt No.</label>
+              <input id="reference" type="text" placeholder="Optional">
+            </div>
+          </div>
+
+          <label for="depositNotes">Payment Notes (optional)</label>
+          <textarea id="depositNotes" placeholder="Any notes for the deposit/payment (optional)"></textarea>
+
+          <div class="divider"></div>
+
+          <div class="row two">
+            <button class="btn ghost" onclick="openTab('quote')">Back: Quote</button>
+            <button class="btn primary" onclick="calculateAll(); openTab('front');">Finish</button>
+          </div>
+        </div>
+
+        <div class="card white">
+          <h2>Balance</h2>
+          <div class="divider"></div>
+
+          <div class="quote">
+            <div class="line"><span>Total Estimate</span><b id="totalD">$0</b></div>
+            <div class="line"><span>Deposit Paid</span><b id="depositD">$0</b></div>
+            <div class="line"><span>Balance Remaining</span><b id="balanceD">$0</b></div>
+            <div class="big" id="statusD">Not confirmed</div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="small muted" id="depositSummary" style="line-height:1.7;">
+            Enter deposit details to generate a confirmation summary.
+          </div>
+
+          <div class="divider"></div>
+          <div class="row two">
+            <button class="btn ghost" onclick="window.print()">Print / Save PDF</button>
+            <button class="btn danger" onclick="clearDeposit()">Clear Deposit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+        <div><b>The Members Lounge</b> • Reggio Calabria Club, Parkville</div>
+        <div class="muted">Wedding Signature Series • Estimate & deposit tracker</div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ---------- Utilities ----------
+    const money = (n) => {
+      const num = Number(n || 0);
+      return "$" + num.toLocaleString(undefined, {maximumFractionDigits: 0});
+    };
+    const money2 = (n) => {
+      const num = Number(n || 0);
+      return "$" + num.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    };
+    const valNum = (id) => {
+      const v = document.getElementById(id).value;
+      const n = parseFloat(v);
+      return Number.isFinite(n) ? n : 0;
+    };
+    const valInt = (id) => {
+      const v = document.getElementById(id).value;
+      const n = parseInt(v, 10);
+      return Number.isFinite(n) ? n : 0;
+    };
+    const textVal = (id) => (document.getElementById(id).value || "").trim();
+
+    function selectedOptionsText(selectId){
+      const sel = document.getElementById(selectId);
+      return Array.from(sel.selectedOptions).map(o => o.textContent.trim());
+    }
+
+    // ---------- Tabs ----------
+    const tabIds = ["front","couple","venue","food","quote","deposit"];
+    function openTab(id){
+      tabIds.forEach(s => {
+        const el = document.getElementById(s);
+        if(el) el.classList.remove("active");
+        const tb = document.getElementById("tab-" + s);
+        if(tb) tb.classList.remove("active");
+      });
+      document.getElementById(id).classList.add("active");
+      document.getElementById("tab-" + id).classList.add("active");
+      setStatus("Ready");
+      // keep summaries fresh
+      calculateAll();
+      window.scrollTo({top:0, behavior:"smooth"});
+    }
+
+    // ---------- Selection enforcement ----------
+    function enforceMaxSelection(selectId, max){
+      const sel = document.getElementById(selectId);
+      const chosen = Array.from(sel.selectedOptions);
+      if(chosen.length > max){
+        // Deselect last selected option
+        chosen[chosen.length - 1].selected = false;
+        setStatus("Limit: choose " + max);
+      }else{
+        setStatus("Ready");
+      }
+      // Update summary
+      calculateAll();
+    }
+
+    // ---------- Status ----------
+    function setStatus(msg){
+      const s = document.getElementById("statusText");
+      if(s) s.textContent = msg;
+    }
+
+    // ---------- Core calculations ----------
+    function compute(){
+      const adults = valInt("adults");
+      const roomHire = valNum("roomHire");
+      const dryHire = valNum("dryHire");
+      const security = valNum("security");
+      const drinksPerAdult = valNum("drinksPerAdult");
+
+      const fixed = roomHire + dryHire + security;
+      const drinks = drinksPerAdult * Math.max(adults, 0);
+      const total = fixed + drinks;
+
+      const perAdult = adults > 0 ? (total / adults) : 0;
+
+      const deposit = valNum("depositAmount");
+      const balance = Math.max(total - deposit, 0);
+
+      return { adults, fixed, drinks, total, perAdult, deposit, balance };
+    }
+
+    function calculateAll(){
+      const c = compute();
+
+      // Couple summary
+      const bride = textVal("bride");
+      const groom = textVal("groom");
+      const date = document.getElementById("weddingDate").value;
+      const roomChoice = textVal("roomChoice");
+      const kids = valInt("children");
+      const notes = textVal("notes");
+
+      const coupleLine =
+        (bride || groom) ? `<b>${escapeHtml(bride || "Bride")} & ${escapeHtml(groom || "Groom")}</b>` : `<b>Couple</b>`;
+      const dateLine = date ? `Date: <b>${escapeHtml(date)}</b>` : `Date: <span class="muted">not set</span>`;
+      const roomLine = roomChoice ? `Room: <b>${escapeHtml(roomChoice)}</b>` : `Room: <span class="muted">not set</span>`;
+
+      document.getElementById("coupleSummary").innerHTML = `
+        ${coupleLine}<br>
+        ${dateLine}<br>
+        ${roomLine}<br>
+        Guests: <b>${c.adults}</b> adults${kids ? `, <b>${kids}</b> children` : ""}<br>
+        ${notes ? `Notes: <span class="muted">${escapeHtml(notes)}</span>` : ""}
+      `;
+
+      // Food summary
+      const mains = selectedOptionsText("mains");
+      document.getElementById("foodSummary").innerHTML = mains.length
+        ? `<b>Mains chosen (${mains.length}/2):</b><br>• ${mains.map(escapeHtml).join("<br>• ")}`
+        : `Pick <b>2 mains</b> to show them here.`;
+
+      // Venue preview
+      document.getElementById("fixedPreview").textContent = money(c.fixed);
+      document.getElementById("drinksPreview").textContent = money(c.drinks);
+      document.getElementById("totalPreview").textContent = money(c.total);
+      document.getElementById("perAdultPreview").textContent = money2(c.perAdult);
+
+      // Quote box
+      document.getElementById("fixedQ").textContent = money(c.fixed);
+      document.getElementById("drinksQ").textContent = money(c.drinks);
+      document.getElementById("totalQ").textContent = money(c.total);
+      document.getElementById("perAdultQ").textContent = money2(c.perAdult);
+
+      // Deposit box
+      document.getElementById("totalD").textContent = money(c.total);
+      document.getElementById("depositD").textContent = money(c.deposit);
+      document.getElementById("balanceD").textContent = money(c.balance);
+
+      const confirmed = c.deposit > 0 && c.total > 0;
+      document.getElementById("statusD").textContent = confirmed ? "Deposit recorded" : "Not confirmed";
+
+      const depDate = document.getElementById("depositDate").value;
+      const method = document.getElementById("paymentMethod").value;
+      const ref = textVal("reference");
+
+      document.getElementById("depositSummary").innerHTML = `
+        <b>Deposit summary</b><br>
+        Deposit: <b>${money(c.deposit)}</b>${depDate ? ` on <b>${escapeHtml(depDate)}</b>` : ""}<br>
+        ${method ? `Method: <b>${escapeHtml(method)}</b><br>` : ""}
+        ${ref ? `Reference: <span class="muted">${escapeHtml(ref)}</span><br>` : ""}
+        Balance remaining: <b>${money(c.balance)}</b>
+      `;
+
+      // Quote details
+      const dietary = textVal("dietary");
+      document.getElementById("quoteDetails").innerHTML = `
+        <b>Details</b><br>
+        Adults: <b>${c.adults}</b><br>
+        Fixed costs: <b>${money(c.fixed)}</b> (room + dry + security)<br>
+        Drinks: <b>${money(c.drinks)}</b> (${money2(valNum("drinksPerAdult"))} per adult)<br>
+        Total estimate: <b>${money(c.total)}</b><br>
+        Approx per adult: <b>${money2(c.perAdult)}</b><br>
+        <div style="margin-top:10px">
+          <b>Food</b><br>
+          Mains: ${mains.length ? `<b>${mains.map(escapeHtml).join("</b> / <b>")}</b>` : `<span class="warn">Please choose 2 mains</span>`}<br>
+          Supper: <b>Pizza (fixed)</b><br>
+          ${dietary ? `Dietary notes: <span class="muted">${escapeHtml(dietary)}</span>` : ""}
+        </div>
+      `;
+
+      // Front page stats
+      document.getElementById("frontTotal").textContent = money(c.total);
+      document.getElementById("frontPerAdult").textContent = money2(c.perAdult);
+      document.getElementById("frontBalance").textContent = money(c.balance);
+
+      // Status hints
+      if(c.adults === 0) setStatus("Add adults");
+      if(c.adults > 0 && mains.length !== 2) setStatus("Choose 2 mains");
+      if(c.total > 0 && c.adults > 0 && mains.length === 2) setStatus("Ready");
+    }
+
+    // ---------- Reset ----------
+    function resetAll(){
+      const ids = [
+        "bride","groom","weddingDate","roomChoice","adults","children","notes",
+        "roomHire","dryHire","security","drinksPerAdult","dietary",
+        "depositAmount","depositDate","paymentMethod","reference","depositNotes"
+      ];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if(!el) return;
+        if(el.tagName === "SELECT") el.value = "";
+        else el.value = "";
+      });
+
+      // Clear mains selections
+      const mains = document.getElementById("mains");
+      Array.from(mains.options).forEach(o => o.selected = false);
+
+      setStatus("Reset");
+      calculateAll();
+      openTab("front");
+    }
+
+    function clearDeposit(){
+      document.getElementById("depositAmount").value = "";
+      document.getElementById("depositDate").value = "";
+      document.getElementById("paymentMethod").value = "";
+      document.getElementById("reference").value = "";
+      document.getElementById("depositNotes").value = "";
+      setStatus("Deposit cleared");
+      calculateAll();
+    }
+
+    // ---------- Safe HTML ----------
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    // Init
+    calculateAll();
+  </script>
+</body>
+</html>
