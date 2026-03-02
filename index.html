@@ -8,1262 +8,922 @@
   <style>
     :root{
       --bg:#ffffff;
-      --text:#0b0c10;
+      --text:#111111;
       --muted:#4b5563;
       --line:rgba(0,0,0,.10);
       --gold:#b08d2a;
       --goldSoft:rgba(176,141,42,.10);
-      --shadow:0 10px 26px rgba(0,0,0,.06);
+      --card:#f7f7f8;
+      --shadow:0 12px 28px rgba(0,0,0,.08);
       --radius:16px;
       --ok:#0f7a3a;
       --warn:#b45309;
       --bad:#b91c1c;
     }
-    *{box-sizing:border-box}
+
+    *{ box-sizing:border-box; }
     body{
       margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      font-family:"Century Gothic", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       background:var(--bg);
       color:var(--text);
     }
-    header{
-      padding:22px 18px 12px;
-      text-align:center;
+
+    a{ color:inherit; text-decoration:none; }
+    .container{ max-width:1100px; margin:0 auto; padding:0 18px; }
+
+    /* Top bar */
+    .topbar{
+      position:sticky; top:0; z-index:20;
+      background:rgba(255,255,255,.92);
+      backdrop-filter:saturate(1.2) blur(8px);
       border-bottom:1px solid var(--line);
-      background: linear-gradient(to bottom, #fff, #fff, rgba(176,141,42,.04));
     }
-    .brandline{
-      display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;
+    .topbar-inner{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; padding:12px 0;
     }
-    .logoWrap{
-      display:flex; align-items:center; justify-content:center;
-      padding:10px 14px;
-      border:1px solid var(--line);
-      border-radius:999px;
-      background:#fff;
-      box-shadow:0 6px 18px rgba(0,0,0,.03);
-      gap:10px;
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      min-width:220px;
     }
-    .logoImg{ height:34px; width:auto; display:block; }
-    .logoFallback{
-      display:inline-flex; align-items:center; gap:10px;
-      font-weight:800; letter-spacing:.14em; font-size:12px;
+    .brand img{
+      height:46px; width:auto; display:block;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.08));
     }
-    h1{margin:12px 0 6px; font-size:28px}
-    .sub{color:var(--muted); font-size:14px}
-    .gold{color:var(--gold)}
-
-    main{max-width:1180px; margin:0 auto; padding:10px 18px 70px;}
-
-    /* Sticky tabs */
-    .tabs-wrap{
-      position:sticky; top:0; z-index:10;
-      padding:10px 0 12px;
-      background: linear-gradient(to bottom, rgba(255,255,255,.98), rgba(255,255,255,.90), rgba(255,255,255,0));
-      backdrop-filter: blur(6px);
-    }
-    .tabs{display:flex; flex-wrap:wrap; gap:10px; justify-content:center;}
-    .tab{
-      cursor:pointer; user-select:none;
-      border:1px solid var(--line);
-      background:#fff; color:var(--text);
-      padding:10px 12px; border-radius:999px;
-      font-size:13px; display:flex; gap:8px; align-items:center;
-      transition:transform .08s ease, background .15s ease, border-color .15s ease;
-      box-shadow:0 6px 18px rgba(0,0,0,.03);
-      white-space:nowrap;
-    }
-    .tab:hover{transform: translateY(-1px)}
-    .tab.active{border-color: rgba(176,141,42,.60); background:var(--goldSoft); font-weight:800;}
-    .ghost{border-color: rgba(176,141,42,.60); background:var(--goldSoft); font-weight:900;}
-
-    .page{display:none}
-    .page.active{display:block}
-
-    .grid{display:grid; grid-template-columns:1fr; gap:14px; margin-top:8px;}
-    @media(min-width:920px){ .grid{grid-template-columns:1fr 1fr;} .span2{grid-column:1/-1;} }
-
-    .card{
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      padding:16px;
-      box-shadow:var(--shadow);
-    }
-    .card h2{margin:0 0 10px; font-size:16px;}
-    .hint{color:var(--muted); font-size:12px}
-
-    label{display:block; font-size:12px; color:var(--muted); margin:10px 0 6px;}
-    input, select, textarea{
-      width:100%;
-      padding:12px 12px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:#fff;
-      color:var(--text);
-      outline:none;
-    }
-    textarea{min-height:90px; resize:vertical}
-    input::placeholder, textarea::placeholder{color:rgba(75,85,99,.7)}
-
-    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-    .divider{height:1px; background:var(--line); margin:12px 0}
-    .small{font-size:12px; color:var(--muted)}
-    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
-
-    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;}
-    .btn{
-      cursor:pointer;
-      border:1px solid var(--line);
-      background:#fff;
-      color:var(--text);
-      padding:10px 12px;
-      border-radius:12px;
-      font-size:13px;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      box-shadow:0 10px 22px rgba(0,0,0,.04);
-    }
-    .btn:hover{border-color: rgba(176,141,42,.60)}
-    .btn.primary{border-color: rgba(176,141,42,.75); background:var(--goldSoft); font-weight:900;}
-    .btn.ghost{border-color: rgba(176,141,42,.75); background:var(--goldSoft); font-weight:900;}
-
-    /* Quote table */
-    .table{width:100%; border-collapse:collapse; font-size:13px;}
-    .table td{padding:10px 8px; border-bottom:1px solid var(--line); vertical-align:top;}
-    .table td:last-child{text-align:right; font-weight:900;}
-    .total{
-      display:flex; justify-content:space-between; align-items:baseline; gap:12px;
-      padding:12px 14px;
-      border-radius:14px;
-      border:1px solid rgba(176,141,42,.35);
-      background: rgba(176,141,42,.08);
-      margin-top:10px;
-      font-weight:900;
-    }
-
-    /* Menu builder */
-    .course{margin-top:12px; border-top:1px solid var(--line); padding-top:12px;}
-    .course h3{margin:0 0 8px; font-size:14px;}
-    .count{color:var(--muted); font-size:12px; margin-top:8px;}
-    .warn{
-      margin-top:10px;
-      padding:10px 12px;
-      border-radius:12px;
-      border:1px solid rgba(176,141,42,.35);
-      background: rgba(176,141,42,.08);
-      color:#47370a;
-      display:none;
-    }
-    .statusRow{
-      display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:10px;
-    }
-    .badge{
-      display:inline-flex; gap:8px; align-items:center;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:#fff;
-      font-size:12px;
-      font-weight:800;
-    }
-    .badge.ok{border-color: rgba(15,122,58,.35); background: rgba(15,122,58,.08); color: var(--ok);}
-    .badge.warn{border-color: rgba(180,83,9,.35); background: rgba(180,83,9,.08); color: var(--warn);}
-    .badge.bad{border-color: rgba(185,28,28,.35); background: rgba(185,28,28,.08); color: var(--bad);}
+    .brand .titles{ line-height:1.1; }
+    .brand .titles .name{ font-weight:700; letter-spacing:.4px; }
+    .brand .titles .sub{ font-size:12.5px; color:var(--muted); }
 
     .pill{
       display:inline-flex; align-items:center; gap:8px;
-      padding:6px 10px; border-radius:999px;
-      background:var(--goldSoft);
-      border:1px solid rgba(176,141,42,.35);
-      color:var(--text);
-      font-size:12px;
-      margin:6px 6px 0 0;
+      border:1px solid var(--line);
+      padding:8px 12px;
+      border-radius:999px;
+      background:#fff;
+      font-size:13px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .dot{
+      width:9px; height:9px; border-radius:999px; background:var(--gold);
+      box-shadow:0 0 0 5px var(--goldSoft);
+      flex:0 0 auto;
     }
 
-    .kpi{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;}
-    @media(min-width:920px){ .kpi{grid-template-columns:1fr 1fr 1fr 1fr;} }
-    .kpi .box{border:1px solid var(--line); background:#fff; border-radius:14px; padding:12px;}
-    .kpi .box .label{font-size:11px; color:var(--muted)}
-    .kpi .box .value{font-size:18px; font-weight:900; margin-top:4px}
+    /* Tabs */
+    .tabs-wrap{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .tab-btn{
+      border:1px solid var(--line);
+      background:#fff;
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:700;
+      font-size:13.5px;
+      cursor:pointer;
+      transition: transform .08s ease, background .18s ease, border-color .18s ease;
+    }
+    .tab-btn:hover{ transform: translateY(-1px); border-color:rgba(176,141,42,.55); }
+    .tab-btn.active{
+      background:var(--gold);
+      color:#fff;
+      border-color:var(--gold);
+    }
 
-    footer{
-      text-align:center;
-      color:var(--muted);
-      font-size:12px;
-      padding:18px 0 26px;
-      border-top:1px solid var(--line);
+    /* Sections */
+    .section{ display:none; padding:22px 0 44px; }
+    .section.active{ display:block; }
+
+    /* Cards & layout */
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+    }
+    @media (min-width: 900px){
+      .grid.two{ grid-template-columns: 1fr 1fr; }
+      .grid.three{ grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow:0 8px 18px rgba(0,0,0,.04);
+    }
+    .card.white{
       background:#fff;
     }
+    .card h2, .card h3{
+      margin:0 0 12px;
+      letter-spacing:.2px;
+    }
+    .card h2{ font-size:18px; }
+    .card h3{ font-size:16px; }
+    .muted{ color:var(--muted); }
+    .small{ font-size:13px; }
+    .gold{ color:var(--gold); }
+    .divider{ height:1px; background:var(--line); margin:14px 0; }
 
-    /* Admin pricing panel hidden by default */
-    .adminPricing{ display:none; }
-    .adminPricing.show{ display:block; }
+    /* Inputs */
+    label{
+      display:block;
+      font-size:13px;
+      color:var(--muted);
+      margin:10px 0 6px;
+      font-weight:700;
+    }
+    input, select, textarea{
+      width:100%;
+      padding:11px 12px;
+      border-radius:12px;
+      border:1px solid rgba(0,0,0,.14);
+      outline:none;
+      background:#fff;
+      font-family:inherit;
+      font-size:14px;
+    }
+    textarea{ min-height:96px; resize:vertical; }
 
+    .row{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
+    @media (min-width: 900px){
+      .row.two{ grid-template-columns: 1fr 1fr; }
+      .row.three{ grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    /* Buttons */
+    .btn{
+      border:none;
+      border-radius:999px;
+      padding:12px 16px;
+      font-weight:800;
+      cursor:pointer;
+      transition: transform .08s ease, opacity .18s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); }
+    .btn.primary{ background:var(--gold); color:#fff; }
+    .btn.ghost{ background:#fff; border:1px solid var(--line); color:var(--text); }
+    .btn.danger{ background:var(--bad); color:#fff; }
+
+    /* Hero */
+    .hero{
+      position:relative;
+      border-radius:22px;
+      overflow:hidden;
+      background:
+        radial-gradient(1200px 420px at 10% 15%, rgba(176,141,42,.20), transparent 55%),
+        radial-gradient(900px 380px at 95% 0%, rgba(0,0,0,.08), transparent 55%),
+        linear-gradient(180deg, #ffffff, #fbfbfb);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      padding:28px 18px;
+    }
+    .hero-inner{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:18px;
+      align-items:center;
+    }
+    @media (min-width: 900px){
+      .hero-inner{ grid-template-columns: 1.25fr .75fr; }
+    }
+    .hero h1{
+      margin:0 0 10px;
+      font-size:34px;
+      letter-spacing:.6px;
+    }
+    .hero p{
+      margin:0;
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.55;
+    }
+
+    .hero-badges{
+      display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;
+    }
+
+    .stat{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:16px;
+      padding:14px;
+      box-shadow:0 10px 22px rgba(0,0,0,.05);
+    }
+    .stat .k{ font-size:12px; color:var(--muted); font-weight:800; letter-spacing:.3px; }
+    .stat .v{ margin-top:6px; font-size:18px; font-weight:900; }
+    .stat .v .gold{ font-weight:900; }
+
+    /* Selection list */
+    .select-note{
+      display:flex; align-items:flex-start; gap:10px;
+      padding:12px 14px;
+      border:1px dashed rgba(176,141,42,.55);
+      background:rgba(176,141,42,.07);
+      border-radius:14px;
+      color:#3b2f0b;
+    }
+    .select-note b{ color:#2f2609; }
+    .badge{
+      display:inline-flex; align-items:center;
+      padding:4px 10px; border-radius:999px;
+      border:1px solid var(--line);
+      font-size:12px; font-weight:800;
+      background:#fff;
+      color:var(--muted);
+    }
+
+    /* Quote box */
+    .quote{
+      border-radius:22px;
+      padding:18px;
+      background:linear-gradient(180deg, rgba(176,141,42,.98), rgba(150,120,35,.98));
+      color:#fff;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,.2);
+    }
+    .quote .big{
+      font-size:30px;
+      font-weight:950;
+      letter-spacing:.5px;
+      margin:8px 0 0;
+    }
+    .quote .line{
+      display:flex; justify-content:space-between; gap:12px;
+      padding:8px 0;
+      border-bottom:1px solid rgba(255,255,255,.25);
+      font-size:14px;
+    }
+    .quote .line:last-child{ border-bottom:none; }
+
+    .warn{ color:var(--warn); font-weight:800; }
+    .ok{ color:var(--ok); font-weight:800; }
+
+    footer{
+      border-top:1px solid var(--line);
+      padding:18px 0;
+      color:var(--muted);
+      font-size:12.5px;
+    }
+
+    /* Print */
     @media print{
-      .tabs-wrap, .actions, .btn { display:none !important; }
-      .card{ box-shadow:none; }
-      .adminPricing{ display:none !important; } /* never print pricing */
+      .topbar, .tabs-wrap, .no-print{ display:none !important; }
+      body{ background:#fff; }
+      .card, .hero, .quote{ box-shadow:none !important; }
+      .section{ display:block !important; }
+      .section:not(.active){ display:block !important; }
     }
   </style>
 </head>
 
 <body>
-  <header>
-    <div class="brandline">
-      <div class="logoWrap">
-        <img class="logoImg" id="logoImg" src="logo.png" alt="The Members Lounge Logo"
-             onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='inline-flex';">
-        <span class="logoFallback" id="logoFallback" style="display:none;">✨ <span>THE MEMBERS LOUNGE</span></span>
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="container">
+      <div class="topbar-inner">
+        <div class="brand" role="banner">
+          <img src="MembersLoungeLogo.png" alt="The Members Lounge Logo">
+          <div class="titles">
+            <div class="name">The Members Lounge</div>
+            <div class="sub">Wedding Signature Series • Parkville</div>
+          </div>
+        </div>
+
+        <div class="tabs-wrap" role="navigation" aria-label="App sections">
+          <button class="tab-btn active" onclick="openTab('front')" id="tab-front">Front Page</button>
+          <button class="tab-btn" onclick="openTab('couple')" id="tab-couple">Couple</button>
+          <button class="tab-btn" onclick="openTab('venue')" id="tab-venue">Venue</button>
+          <button class="tab-btn" onclick="openTab('food')" id="tab-food">Food</button>
+          <button class="tab-btn" onclick="openTab('quote')" id="tab-quote">Quote</button>
+          <button class="tab-btn" onclick="openTab('deposit')" id="tab-deposit">Deposit</button>
+        </div>
+
+        <div class="pill" aria-label="Status">
+          <span class="dot"></span>
+          <span id="statusText">Ready</span>
+        </div>
       </div>
-    </div>
-
-    <h1><span class="gold">Wedding Signature Series</span></h1>
-    <div class="sub">Reggio Calabria Club, Parkville</div>
-    <div class="small" style="margin-top:6px;">
-      GitHub Pages ready • White / Black / Gold • Multi-page tabs (no long scroll)
-    </div>
-  </header>
-
-  <div class="tabs-wrap">
-    <div class="tabs" role="tablist" aria-label="Wedding signature tabs">
-      <div class="tab active" data-page="quote" role="tab" aria-selected="true">🧾 Quote</div>
-      <div class="tab" data-page="couple" role="tab" aria-selected="false">💍 Couple</div>
-      <div class="tab" data-page="food" role="tab" aria-selected="false">🍽️ Food</div>
-      <div class="tab" data-page="drinks" role="tab" aria-selected="false">🍾 Drinks</div>
-      <div class="tab" data-page="summary" role="tab" aria-selected="false">✅ Summary</div>
-      <div class="tab ghost" id="ghostNext" title="Tap to move to next tab">👻 Next</div>
     </div>
   </div>
 
-  <main>
-    <!-- PAGE 1: QUOTE FIRST -->
-    <section class="page active" id="page-quote">
-      <div class="grid">
-        <div class="card">
-          <h2>Indicative Quote (Live)</h2>
-          <div class="hint">Room hire + dry hire + security + food + drinks = estimate.</div>
+  <!-- FRONT PAGE -->
+  <section class="section active" id="front">
+    <div class="container">
+      <div class="hero">
+        <div class="hero-inner">
+          <div>
+            <h1>Wedding Signature Series</h1>
+            <p>
+              A clean, elegant planning & quoting experience built for <b>The Members Lounge</b>.
+              Keep it simple, beautiful, and structured — couple details, venue costs, food selections, a live quote,
+              and a deposit page to lock in the date.
+            </p>
 
-          <div class="divider"></div>
-
-          <div class="row">
-            <div>
-              <label for="adults">Adults</label>
-              <input id="adults" type="number" min="0" step="1" value="120">
+            <div class="hero-badges">
+              <span class="badge">Clean</span>
+              <span class="badge">Gold & White</span>
+              <span class="badge">Live Quote</span>
+              <span class="badge">Deposit Tracking</span>
+              <span class="badge">Print-ready</span>
             </div>
-            <div>
-              <label for="children">Children (Under 12)</label>
-              <input id="children" type="number" min="0" step="1" value="20">
-            </div>
-          </div>
 
-          <label for="roomHire">Room Hire (AUD)</label>
-          <input id="roomHire" type="number" min="0" step="50" value="0">
-
-          <div class="row">
-            <div>
-              <label for="dryHire">Dry Hire (AUD)</label>
-              <input id="dryHire" type="number" min="0" step="50" value="0">
-            </div>
-            <div>
-              <label for="security">Security (AUD)</label>
-              <input id="security" type="number" min="0" step="50" value="0">
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
+              <button class="btn primary" onclick="openTab('couple')">Start Planning</button>
+              <button class="btn ghost" onclick="openTab('quote')">View Quote</button>
+              <button class="btn ghost" onclick="window.print()">Print / Save PDF</button>
             </div>
           </div>
 
-          <div class="divider"></div>
-
-          <table class="table" aria-label="Quote breakdown">
-            <tbody>
-              <tr><td>Room hire</td><td id="qRoom">$0.00</td></tr>
-              <tr><td>Food</td><td id="qFood">$0.00</td></tr>
-              <tr><td>Drinks</td><td id="qDrinks">$0.00</td></tr>
-              <tr><td>Dry hire</td><td id="qDry">$0.00</td></tr>
-              <tr><td>Security</td><td id="qSec">$0.00</td></tr>
-            </tbody>
-          </table>
-
-          <div class="total">
-            <div>Total Estimated Cost</div>
-            <div id="qTotal" class="mono">$0.00</div>
-          </div>
-
-          <div class="actions">
-            <button class="btn" id="saveDraft">💾 Save Draft</button>
-            <button class="btn" id="loadDraft">📥 Load Draft</button>
-            <button class="btn" id="resetAll">🧹 Reset</button>
-            <button class="btn" id="printQuote">🖨️ Print</button>
-            <button class="btn primary" id="nextQ">👻 Next</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <h2>Quick Snapshot</h2>
-
-          <div class="statusRow">
-            <span class="badge" id="menuBadge">Menu: Draft</span>
-            <span class="badge" id="drinksBadge">Drinks: Draft</span>
-          </div>
-
-          <div class="kpi">
-            <div class="box"><div class="label">Adults</div><div class="value" id="kpiAdults">120</div></div>
-            <div class="box"><div class="label">Children</div><div class="value" id="kpiChildren">20</div></div>
-            <div class="box"><div class="label">Food subtotal</div><div class="value mono" id="kpiFood">$0.00</div></div>
-            <div class="box"><div class="label">Avg per guest</div><div class="value mono" id="kpiAvg">$0.00</div></div>
-          </div>
-
-          <div class="divider"></div>
-
-          <h2>Admin Controls (Pricing Factors)</h2>
-          <div class="hint">These affect the calculation but are not itemised to the customer.</div>
-
-          <div class="row">
-            <div>
-              <label for="adultFactor">Adult pricing factor</label>
-              <input id="adultFactor" type="number" min="0" step="0.05" value="1.00">
-              <div class="small">Scales all adult food course pricing (1.00 = normal).</div>
+          <div class="grid">
+            <div class="stat">
+              <div class="k">Estimated Total</div>
+              <div class="v" id="frontTotal">$0</div>
+              <div class="small muted" style="margin-top:6px;">Updates as you enter venue + drinks.</div>
             </div>
-            <div>
-              <label for="childFactor">Child pricing factor</label>
-              <input id="childFactor" type="number" min="0" step="0.05" value="0.30">
-              <div class="small">Kids cost as a fraction of adult food (default 0.30).</div>
+            <div class="stat" style="margin-top:12px;">
+              <div class="k">Approx Cost Per Adult</div>
+              <div class="v"><span class="gold" id="frontPerAdult">$0</span></div>
+              <div class="small muted" style="margin-top:6px;">Weighted per adult guest.</div>
+            </div>
+            <div class="stat" style="margin-top:12px;">
+              <div class="k">Balance After Deposit</div>
+              <div class="v" id="frontBalance">$0</div>
+              <div class="small muted" style="margin-top:6px;">Based on deposit entered.</div>
             </div>
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- PAGE 2: COUPLE -->
-    <section class="page" id="page-couple">
-      <div class="grid">
+      <div style="height:14px"></div>
+
+      <div class="grid two">
+        <div class="card white">
+          <h2>What this includes</h2>
+          <div class="divider"></div>
+          <div class="small muted" style="line-height:1.7">
+            • Couple & date details<br>
+            • Venue costs: room hire, dry hire, security<br>
+            • Drinks package per adult<br>
+            • Food: choose <b>2 mains</b> from 6 options<br>
+            • Live quote + per adult estimate<br>
+            • Deposit page: record deposit, show balance, add payment notes
+          </div>
+        </div>
+
+        <div class="card white">
+          <h2>Quick actions</h2>
+          <div class="divider"></div>
+          <div class="row two">
+            <button class="btn primary" onclick="calculateAll()">Refresh totals</button>
+            <button class="btn ghost" onclick="resetAll()">Reset form</button>
+          </div>
+          <div class="small muted" style="margin-top:10px; line-height:1.7">
+            Tip: upload your logo file named <b>MembersLoungeLogo.png</b> in the same folder as this <b>index.html</b>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COUPLE -->
+  <section class="section" id="couple">
+    <div class="container">
+      <div class="grid two">
         <div class="card">
           <h2>Couple Details</h2>
 
-          <label for="coupleName">Couple Name</label>
-          <input id="coupleName" placeholder="e.g., Laura & Daniel">
-
-          <div class="row">
+          <div class="row two">
             <div>
-              <label for="weddingDate">Date of Choice</label>
+              <label for="bride">Bride Name</label>
+              <input id="bride" type="text" placeholder="e.g., Stephanie">
+            </div>
+            <div>
+              <label for="groom">Groom Name</label>
+              <input id="groom" type="text" placeholder="e.g., Daniel">
+            </div>
+          </div>
+
+          <div class="row two">
+            <div>
+              <label for="weddingDate">Preferred Date</label>
               <input id="weddingDate" type="date">
             </div>
             <div>
-              <label for="venueSpace">Venue Space</label>
-              <select id="venueSpace">
-                <option>Sala Reggio Ballroom</option>
-                <option>Members Lounge Restaurant</option>
-                <option>FIOR (Catering Booking)</option>
-                <option>Ottimo Room</option>
-                <option>Bistroteca</option>
-              </select>
+              <label for="roomChoice">Room / Space</label>
+              <input id="roomChoice" type="text" placeholder="e.g., Sala Reggio Ballroom">
             </div>
           </div>
 
-          <label for="email">Email</label>
-          <input id="email" type="email" placeholder="name@email.com">
+          <div class="divider"></div>
 
-          <label for="phone">Phone</label>
-          <input id="phone" type="tel" placeholder="04xx xxx xxx">
+          <div class="row three">
+            <div>
+              <label for="adults">Adult Guests</label>
+              <input id="adults" type="number" min="0" placeholder="e.g., 120" oninput="calculateAll()">
+            </div>
+            <div>
+              <label for="children">Children</label>
+              <input id="children" type="number" min="0" placeholder="e.g., 10" oninput="calculateAll()">
+            </div>
+            <div>
+              <label for="notes">Notes</label>
+              <input id="notes" type="text" placeholder="Short notes (optional)">
+            </div>
+          </div>
 
-          <label for="notes">Notes / Requirements</label>
-          <textarea id="notes" placeholder="Dietary notes, timing, styling, music, special requests…"></textarea>
-
-          <div class="actions">
-            <button class="btn ghost" id="backC">⬅️ Back</button>
-            <button class="btn primary" id="nextC">👻 Next</button>
+          <div class="row" style="margin-top:10px;">
+            <button class="btn primary" onclick="openTab('venue')">Next: Venue</button>
           </div>
         </div>
 
-        <div class="card">
-          <h2>What couples do next</h2>
-          <div class="small">
-            1) Select your menu (exact rules) <br>
-            2) Choose drinks <br>
-            3) Summary shows your final selections & total estimate.
+        <div class="card white">
+          <h2>Summary</h2>
+          <div class="divider"></div>
+          <div class="small muted" id="coupleSummary" style="line-height:1.7;">
+            Enter details to generate a summary.
           </div>
           <div class="divider"></div>
-          <div class="small">
-            The Quote tab is always live, so couples can see the cost impact instantly.
+          <div class="row two">
+            <button class="btn ghost" onclick="openTab('front')">Back: Front</button>
+            <button class="btn ghost" onclick="openTab('quote')">Jump: Quote</button>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- PAGE 3: FOOD -->
-    <section class="page" id="page-food">
-      <div class="card">
-        <h2>Food Builder</h2>
-        <div class="hint">Selection rules are enforced (no over-selecting). Complete the required picks.</div>
-
-        <div class="statusRow">
-          <span class="badge" id="foodCompleteBadge">Menu: Draft</span>
-          <span class="badge" id="foodRuleBadge">Rules: Incomplete</span>
-        </div>
-
-        <div class="divider"></div>
-
-        <!-- Admin toggle -->
-        <div class="actions" style="margin-top:0;">
-          <button class="btn" id="togglePricing">🔒 Admin: Show Pricing</button>
-        </div>
-
-        <div class="grid">
-          <!-- Hidden admin pricing panel -->
-          <div class="card adminPricing" id="adminPricingCard" aria-hidden="true">
-            <h2>Admin Pricing (Hidden from customers)</h2>
-            <div class="hint">Edit anytime. This section never prints.</div>
-
-            <div class="row">
-              <div>
-                <label for="pCanapes">Canapés (3 picks)</label>
-                <input id="pCanapes" type="number" min="0" step="0.5" value="12">
-              </div>
-              <div>
-                <label for="pAntipasto">Grande Antipasto (7 picks)</label>
-                <input id="pAntipasto" type="number" min="0" step="0.5" value="28">
-              </div>
-            </div>
-
-            <div class="row">
-              <div>
-                <label for="pPasta">Entrée / Pasta (2 picks)</label>
-                <input id="pPasta" type="number" min="0" step="0.5" value="15">
-              </div>
-              <div>
-                <label for="pMains">Mains (2 picks)</label>
-                <input id="pMains" type="number" min="0" step="0.5" value="34">
-              </div>
-            </div>
-
-            <div class="row">
-              <div>
-                <label for="pDessert">Dessert (1 pick)</label>
-                <input id="pDessert" type="number" min="0" step="0.5" value="10">
-              </div>
-              <div>
-                <label for="pSupper">Supper (fixed pizza)</label>
-                <input id="pSupper" type="number" min="0" step="0.5" value="0">
-              </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <label style="margin-top:0;">
-              <input id="enableSupperPricing" type="checkbox">
-              Add supper pricing to food total (fixed pizza)
-            </label>
-            <div class="small">If checked, supper pricing is included automatically.</div>
-          </div>
-
-          <div class="card">
-            <h2>Rules & Add-ons</h2>
-            <ul class="small">
-              <li><b>Canapés:</b> exactly 3</li>
-              <li><b>Grande Antipasto:</b> exactly 7</li>
-              <li><b>Entrée / Pasta:</b> exactly 2</li>
-              <li><b>Mains:</b> exactly 2 (from 6 options)</li>
-              <li><b>Dessert:</b> exactly 1</li>
-              <li><b>Supper:</b> Pizza (fixed)</li>
-            </ul>
-
-            <div class="divider"></div>
-
-            <label>
-              <input id="vegMain" type="checkbox">
-              Add Vegetarian Main option (Calzone / seasonal veg filling)
-            </label>
-
-            <label style="margin-top:12px;">
-              <input id="fruitPlatter" type="checkbox">
-              Add Fruit Platter (optional add-on)
-            </label>
-
-            <div class="row">
-              <div>
-                <label for="tables">Estimated Tables</label>
-                <input id="tables" type="number" min="0" step="1" value="10">
-              </div>
-              <div>
-                <label for="fruitPerTable">Fruit platter per table (AUD)</label>
-                <input id="fruitPerTable" type="number" min="0" step="1" value="35">
-              </div>
-            </div>
-
-            <div class="actions">
-              <button class="btn ghost" id="backF1">⬅️ Back</button>
-              <button class="btn primary" id="nextF1">👻 Next</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Selections -->
-        <div class="course" data-course="Canapés" data-limit="3" data-exact="3">
-          <h3>Canapés (choose exactly 3)</h3>
-          <div class="row" id="list-Canapés"></div>
-          <div class="count" id="count-Canapés">0/3 selected</div>
-          <div class="warn" id="warn-Canapés">You must select exactly 3 canapés.</div>
-        </div>
-
-        <div class="course" data-course="Antipasto" data-limit="7" data-exact="7">
-          <h3>Grande Antipasto (choose exactly 7)</h3>
-          <div class="row" id="list-Antipasto"></div>
-          <div class="count" id="count-Antipasto">0/7 selected</div>
-          <div class="warn" id="warn-Antipasto">You must select exactly 7 antipasto items.</div>
-        </div>
-
-        <div class="course" data-course="Pasta" data-limit="2" data-exact="2">
-          <h3>Entrée / Pasta (choose exactly 2)</h3>
-          <div class="row" id="list-Pasta"></div>
-          <div class="count" id="count-Pasta">0/2 selected</div>
-          <div class="warn" id="warn-Pasta">You must select exactly 2 pasta/entrée options.</div>
-        </div>
-
-        <div class="course" data-course="Mains" data-limit="2" data-exact="2">
-          <h3>Mains (choose exactly 2)</h3>
-          <div class="row" id="list-Mains"></div>
-          <div class="count" id="count-Mains">0/2 selected</div>
-          <div class="warn" id="warn-Mains">You must select exactly 2 mains.</div>
-        </div>
-
-        <div class="course" data-course="Dessert" data-limit="1" data-exact="1">
-          <h3>Dessert (choose exactly 1)</h3>
-          <div class="row" id="list-Dessert"></div>
-          <div class="count" id="count-Dessert">0/1 selected</div>
-          <div class="warn" id="warn-Dessert">You must select exactly 1 dessert option.</div>
-        </div>
-
-        <div class="course">
-          <h3>Supper / Late Night (fixed)</h3>
-          <div class="small"><b>Included:</b> Pizza</div>
-        </div>
-
-        <div class="actions">
-          <button class="btn ghost" id="backF2">⬅️ Back</button>
-          <button class="btn primary" id="nextF2">👻 Next</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- PAGE 4: DRINKS -->
-    <section class="page" id="page-drinks">
-      <div class="grid">
+  <!-- VENUE -->
+  <section class="section" id="venue">
+    <div class="container">
+      <div class="grid two">
         <div class="card">
-          <h2>Drinks</h2>
-          <div class="hint">Choose drinks. Quote updates live.</div>
+          <h2>Venue Costs</h2>
+          <div class="small muted">Fixed costs + drinks per adult. These drive the live estimate.</div>
 
-          <label for="drinkMode">Drinks Option</label>
-          <select id="drinkMode">
-            <option value="bar">Bar Prices (no package)</option>
-            <option value="pkg20">$20 per Adult Package (4 hrs)</option>
-            <option value="custom">Custom per Adult (set price)</option>
+          <div class="row two" style="margin-top:8px;">
+            <div>
+              <label for="roomHire">Room Hire (AUD $)</label>
+              <input id="roomHire" type="number" min="0" step="1" placeholder="e.g., 3500" oninput="calculateAll()">
+            </div>
+            <div>
+              <label for="dryHire">Dry Hire (AUD $)</label>
+              <input id="dryHire" type="number" min="0" step="1" placeholder="e.g., 1500" oninput="calculateAll()">
+            </div>
+          </div>
+
+          <div class="row two">
+            <div>
+              <label for="security">Security (AUD $)</label>
+              <input id="security" type="number" min="0" step="1" placeholder="e.g., 600" oninput="calculateAll()">
+            </div>
+            <div>
+              <label for="drinksPerAdult">Drinks Package (Per Adult AUD $)</label>
+              <input id="drinksPerAdult" type="number" min="0" step="0.01" placeholder="e.g., 48" oninput="calculateAll()">
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <button class="btn primary" onclick="openTab('food')">Next: Food</button>
+          </div>
+        </div>
+
+        <div class="card white">
+          <h2>Live Totals</h2>
+          <div class="divider"></div>
+
+          <div class="quote" aria-label="Live quote preview">
+            <div class="line"><span>Fixed Costs</span><b id="fixedPreview">$0</b></div>
+            <div class="line"><span>Drinks (Adults)</span><b id="drinksPreview">$0</b></div>
+            <div class="line"><span>Total Estimate</span><b id="totalPreview">$0</b></div>
+            <div class="big" id="perAdultPreview">$0 <span class="small" style="opacity:.9">per adult</span></div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="row two">
+            <button class="btn ghost" onclick="openTab('couple')">Back: Couple</button>
+            <button class="btn ghost" onclick="openTab('quote')">Next: Quote</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOD -->
+  <section class="section" id="food">
+    <div class="container">
+      <div class="grid two">
+        <div class="card">
+          <h2>Food Selection</h2>
+
+          <div class="select-note">
+            <span class="dot" style="margin-top:4px;"></span>
+            <div class="small">
+              <b>Main Course:</b> choose <b>2</b> options from the list of 6.<br>
+              <span class="muted">Supper is fixed: Pizza (no selection).</span>
+            </div>
+          </div>
+
+          <label for="mains">Select 2 Mains (hold Ctrl/⌘ to multi-select)</label>
+          <select id="mains" multiple size="8" onchange="enforceMaxSelection('mains', 2); calculateAll();">
+            <option>Chargrilled chicken breast with chimichurri dressing</option>
+            <option>Italian crumbed barramundi fillet</option>
+            <option>Lamb shank with white wine and tomato</option>
+            <option>Braised beef short ribs in a red wine jus</option>
+            <option>Bondiola pork fillet with salmoriglio sauce</option>
+            <option>Stuffed pepper with seasonal vegetables and cauliflower steak</option>
           </select>
 
-          <div class="row" id="customDrinkRow" style="display:none">
-            <div>
-              <label for="customDrinkPrice">Custom drink price per adult (AUD)</label>
-              <input id="customDrinkPrice" type="number" min="0" step="1" value="0">
-            </div>
-            <div>
-              <label for="customDrinkNote">Custom drink notes</label>
-              <input id="customDrinkNote" placeholder="e.g., Premium package details…">
-            </div>
-          </div>
+          <label for="dietary">Dietary Notes (optional)</label>
+          <textarea id="dietary" placeholder="e.g., gluten-free, vegetarian, allergies (optional)"></textarea>
 
           <div class="divider"></div>
-          <div class="small" id="drinkInfo"></div>
 
-          <div class="actions">
-            <button class="btn ghost" id="backD">⬅️ Back</button>
-            <button class="btn primary" id="nextD">👻 Next</button>
+          <div class="row two">
+            <button class="btn ghost" onclick="openTab('venue')">Back: Venue</button>
+            <button class="btn primary" onclick="openTab('quote')">Next: Quote</button>
           </div>
         </div>
 
-        <div class="card">
-          <h2>Status</h2>
-          <div class="statusRow">
-            <span class="badge" id="drinksCompleteBadge">Drinks: Draft</span>
-          </div>
+        <div class="card white">
+          <h2>Selected Summary</h2>
           <div class="divider"></div>
-          <div class="small">
-            “Bar prices” shows $0 for drinks (indicative). Package/custom adds into the quote.
+
+          <div class="small muted" id="foodSummary" style="line-height:1.7;">
+            Pick 2 mains to see them here.
+          </div>
+
+          <div class="divider"></div>
+          <div class="small muted" style="line-height:1.7;">
+            <b>Supper:</b> Pizza (fixed)
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- PAGE 5: SUMMARY -->
-    <section class="page" id="page-summary">
-      <div class="grid">
+  <!-- QUOTE -->
+  <section class="section" id="quote">
+    <div class="container">
+      <div class="grid two">
         <div class="card">
-          <h2>Final Summary</h2>
-          <div id="finalSummary" class="small">Complete the steps to see your summary.</div>
-
-          <div class="divider"></div>
-          <div class="actions">
-            <button class="btn" id="copySummary">📋 Copy</button>
-            <button class="btn" id="printSummary">🖨️ Print</button>
+          <h2>Live Quote</h2>
+          <div class="small muted">
+            This is an estimate based on fixed venue costs + drinks per adult.
           </div>
 
-          <div class="actions" style="margin-top:14px">
-            <button class="btn ghost" id="backS">⬅️ Back</button>
-            <button class="btn primary" id="toQuote">👻 Back to Quote</button>
+          <div class="divider"></div>
+
+          <div class="row two">
+            <button class="btn primary" onclick="calculateAll()">Refresh Quote</button>
+            <button class="btn ghost" onclick="window.print()">Print / Save PDF</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="small muted" id="quoteDetails" style="line-height:1.7;"></div>
+
+          <div class="divider"></div>
+
+          <div class="row two">
+            <button class="btn ghost" onclick="openTab('food')">Back: Food</button>
+            <button class="btn primary" onclick="openTab('deposit')">Next: Deposit</button>
           </div>
         </div>
 
-        <div class="card">
-          <h2>Selected Items</h2>
-          <div id="chips"></div>
+        <div class="card white">
+          <h2>Estimate</h2>
           <div class="divider"></div>
-          <div class="small">
-            Put <b>logo.png</b> next to <b>index.html</b> to display your Members Lounge logo in the header.
+
+          <div class="quote">
+            <div class="line"><span>Fixed Costs</span><b id="fixedQ">$0</b></div>
+            <div class="line"><span>Drinks (Adults)</span><b id="drinksQ">$0</b></div>
+            <div class="line"><span>Total Estimate</span><b id="totalQ">$0</b></div>
+            <div class="big" id="perAdultQ">$0 <span class="small" style="opacity:.9">per adult</span></div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="small muted" style="line-height:1.7;">
+            <span class="ok">Per adult</span> uses adult guests as the major denominator (weighted).
+            Children are captured for planning, but not used for the per-adult calculation.
           </div>
         </div>
       </div>
-    </section>
-  </main>
+    </div>
+  </section>
+
+  <!-- DEPOSIT -->
+  <section class="section" id="deposit">
+    <div class="container">
+      <div class="grid two">
+        <div class="card">
+          <h2>Deposit & Confirmation</h2>
+          <div class="small muted">
+            Record the deposit and track the balance. (This page does not process payments—it's for client-facing confirmation + internal tracking.)
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="row two">
+            <div>
+              <label for="depositAmount">Deposit Amount Paid (AUD $)</label>
+              <input id="depositAmount" type="number" min="0" step="1" placeholder="e.g., 2000" oninput="calculateAll()">
+            </div>
+            <div>
+              <label for="depositDate">Deposit Date</label>
+              <input id="depositDate" type="date">
+            </div>
+          </div>
+
+          <div class="row two">
+            <div>
+              <label for="paymentMethod">Payment Method</label>
+              <select id="paymentMethod">
+                <option value="">Select</option>
+                <option>Card</option>
+                <option>Bank Transfer</option>
+                <option>Cash</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div>
+              <label for="reference">Reference / Receipt No.</label>
+              <input id="reference" type="text" placeholder="Optional">
+            </div>
+          </div>
+
+          <label for="depositNotes">Payment Notes (optional)</label>
+          <textarea id="depositNotes" placeholder="Any notes for the deposit/payment (optional)"></textarea>
+
+          <div class="divider"></div>
+
+          <div class="row two">
+            <button class="btn ghost" onclick="openTab('quote')">Back: Quote</button>
+            <button class="btn primary" onclick="calculateAll(); openTab('front');">Finish</button>
+          </div>
+        </div>
+
+        <div class="card white">
+          <h2>Balance</h2>
+          <div class="divider"></div>
+
+          <div class="quote">
+            <div class="line"><span>Total Estimate</span><b id="totalD">$0</b></div>
+            <div class="line"><span>Deposit Paid</span><b id="depositD">$0</b></div>
+            <div class="line"><span>Balance Remaining</span><b id="balanceD">$0</b></div>
+            <div class="big" id="statusD">Not confirmed</div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="small muted" id="depositSummary" style="line-height:1.7;">
+            Enter deposit details to generate a confirmation summary.
+          </div>
+
+          <div class="divider"></div>
+          <div class="row two">
+            <button class="btn ghost" onclick="window.print()">Print / Save PDF</button>
+            <button class="btn danger" onclick="clearDeposit()">Clear Deposit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <footer>
-    Members Lounge | Reggio Calabria Club, Parkville
+    <div class="container">
+      <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+        <div><b>The Members Lounge</b> • Reggio Calabria Club, Parkville</div>
+        <div class="muted">Wedding Signature Series • Estimate & deposit tracker</div>
+      </div>
+    </div>
   </footer>
 
-<script>
-  // -----------------------------
-  // MENU DATA
-  // -----------------------------
-  const MENU = {
-    "Canapés": [
-      "Italian Meatballs",
-      "Arancini",
-      "Prawn Wonton Wrap",
-      "Potato Croquette",
-      "Parmesan & Honey",
-      "Italian Rosemary Focaccia"
-    ],
-    "Antipasto": [
-      "Sausages",
-      "Bocconcini & Ricotta",
-      "Salumi",
-      "Eggplant parmigiana",
-      "Grilled capsicum, olives & artichokes",
-      "Tomato bruschetta",
-      "Calamari fritti",
-      "Trio of dips with pita bread",
-      "Feta & Kefalograviera",
-      "Cevape",
-      "Tiropita"
-    ],
-    "Pasta": [
-      "Elicoidali al Ragú (four meat sauce)",
-      "Gnocchi Pesto (vegetarian)",
-      "Pasta Napoli (tomato & herbs)"
-    ],
-    "Mains": [
-      "Chargrilled chicken breast with a chimichurri dressing",
-      "Italian crumbed barramundi fillet",
-      "Lamb shank with white wine and tomato",
-      "Braised beef short ribs in a red wine jus",
-      "Bondiola (pork fillet) with a salmoriglio sauce",
-      "Stuffed pepper with seasonal vegetables and cauliflower steak"
-    ],
-    "Dessert": [
-      "Roaming assorted desserts (mini cannoli + mini cheesecakes + lemon tarts)",
-      "Marks Quality Cakes (select two individual desserts)",
-      "Gelato station"
-    ]
-  };
-
-  const RULES = {
-    "Canapés":  { exact: 3, max: 3 },
-    "Antipasto":{ exact: 7, max: 7 },
-    "Pasta":    { exact: 2, max: 2 },
-    "Mains":    { exact: 2, max: 2 },
-    "Dessert":  { exact: 1, max: 1 }
-  };
-
-  // -----------------------------
-  // NAV
-  // -----------------------------
-  const TAB_ORDER = ["quote","couple","food","drinks","summary"];
-
-  function setActivePage(page){
-    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-    const target = document.getElementById("page-" + page);
-    if(target) target.classList.add("active");
-
-    document.querySelectorAll(".tab[data-page]").forEach(t => {
-      const active = t.dataset.page === page;
-      t.classList.toggle("active", active);
-      t.setAttribute("aria-selected", active ? "true" : "false");
-    });
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    renderAll();
-  }
-  function nextPage(){
-    const current = document.querySelector(".tab[data-page].active")?.dataset.page || "quote";
-    const idx = TAB_ORDER.indexOf(current);
-    setActivePage(TAB_ORDER[(idx + 1) % TAB_ORDER.length]);
-  }
-  function prevPage(){
-    const current = document.querySelector(".tab[data-page].active")?.dataset.page || "quote";
-    const idx = TAB_ORDER.indexOf(current);
-    setActivePage(TAB_ORDER[(idx - 1 + TAB_ORDER.length) % TAB_ORDER.length]);
-  }
-
-  document.querySelectorAll(".tab[data-page]").forEach(tab => tab.addEventListener("click", () => setActivePage(tab.dataset.page)));
-  document.getElementById("ghostNext").addEventListener("click", nextPage);
-
-  document.getElementById("nextQ").addEventListener("click", nextPage);
-  document.getElementById("backC").addEventListener("click", prevPage);
-  document.getElementById("nextC").addEventListener("click", nextPage);
-  document.getElementById("backF1").addEventListener("click", prevPage);
-  document.getElementById("nextF1").addEventListener("click", nextPage);
-  document.getElementById("backF2").addEventListener("click", prevPage);
-  document.getElementById("nextF2").addEventListener("click", nextPage);
-  document.getElementById("backD").addEventListener("click", prevPage);
-  document.getElementById("nextD").addEventListener("click", nextPage);
-  document.getElementById("backS").addEventListener("click", prevPage);
-  document.getElementById("toQuote").addEventListener("click", () => setActivePage("quote"));
-
-  window.addEventListener("keydown", (e) => {
-    if(e.key === "ArrowRight") nextPage();
-    if(e.key === "ArrowLeft") prevPage();
-  });
-
-  // -----------------------------
-  // ELEMENTS
-  // -----------------------------
-  const $ = (id) => document.getElementById(id);
-
-  const adultsEl   = $("adults");
-  const childrenEl = $("children");
-  const roomHireEl = $("roomHire");
-  const dryHireEl  = $("dryHire");
-  const securityEl = $("security");
-
-  const adultFactorEl = $("adultFactor");
-  const childFactorEl = $("childFactor");
-
-  // Admin pricing elements (hidden panel)
-  const pCanapesEl  = $("pCanapes");
-  const pAntipastoEl= $("pAntipasto");
-  const pPastaEl    = $("pPasta");
-  const pMainsEl    = $("pMains");
-  const pDessertEl  = $("pDessert");
-  const pSupperEl   = $("pSupper");
-  const enableSupperPricingEl = $("enableSupperPricing");
-
-  const vegMainEl = $("vegMain");
-  const fruitPlatterEl = $("fruitPlatter");
-  const tablesEl = $("tables");
-  const fruitPerTableEl = $("fruitPerTable");
-
-  const drinkModeEl = $("drinkMode");
-  const customDrinkRow = $("customDrinkRow");
-  const customDrinkPriceEl = $("customDrinkPrice");
-  const customDrinkNoteEl = $("customDrinkNote");
-  const drinkInfoEl = $("drinkInfo");
-
-  const coupleNameEl = $("coupleName");
-  const weddingDateEl = $("weddingDate");
-  const venueSpaceEl = $("venueSpace");
-  const emailEl = $("email");
-  const phoneEl = $("phone");
-  const notesEl = $("notes");
-
-  const qRoomEl   = $("qRoom");
-  const qFoodEl   = $("qFood");
-  const qDrinksEl = $("qDrinks");
-  const qDryEl    = $("qDry");
-  const qSecEl    = $("qSec");
-  const qTotalEl  = $("qTotal");
-
-  const kpiAdultsEl  = $("kpiAdults");
-  const kpiChildrenEl= $("kpiChildren");
-  const kpiFoodEl    = $("kpiFood");
-  const kpiAvgEl     = $("kpiAvg");
-
-  const finalSummaryEl = $("finalSummary");
-  const chipsEl = $("chips");
-
-  const menuBadgeEl = $("menuBadge");
-  const drinksBadgeEl = $("drinksBadge");
-  const foodCompleteBadgeEl = $("foodCompleteBadge");
-  const foodRuleBadgeEl = $("foodRuleBadge");
-  const drinksCompleteBadgeEl = $("drinksCompleteBadge");
-
-  const adminPricingCard = $("adminPricingCard");
-  const togglePricingBtn = $("togglePricing");
-
-  // -----------------------------
-  // HELPERS
-  // -----------------------------
-  const STORAGE_KEY = "memberslounge_wedding_signature_series_v5";
-
-  function aud(n){
-    const x = Number(n || 0);
-    return x.toLocaleString("en-AU", { style:"currency", currency:"AUD" });
-  }
-  function escapeHtml(str){
-    return String(str || "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
-  function sum(arr){ return arr.reduce((a,b)=>a+Number(b||0),0); }
-
-  function setBadge(el, state, text){
-    el.classList.remove("ok","warn","bad");
-    if(state) el.classList.add(state);
-    el.textContent = text;
-  }
-
-  // -----------------------------
-  // Admin toggle for pricing
-  // -----------------------------
-  function setPricingVisible(isVisible){
-    adminPricingCard.classList.toggle("show", isVisible);
-    adminPricingCard.setAttribute("aria-hidden", isVisible ? "false" : "true");
-    togglePricingBtn.textContent = isVisible ? "🔒 Admin: Hide Pricing" : "🔒 Admin: Show Pricing";
-  }
-  togglePricingBtn.addEventListener("click", () => {
-    const isVisible = adminPricingCard.classList.contains("show");
-    setPricingVisible(!isVisible);
-  });
-  setPricingVisible(false); // default hidden
-
-  // -----------------------------
-  // MENU RENDER
-  // -----------------------------
-  function addCheckboxList(course, listId){
-    const wrap = document.getElementById(listId);
-    wrap.innerHTML = "";
-    MENU[course].forEach(item => {
-      const safe = (course + "-" + item).replaceAll(" ","_").replaceAll("/","-");
-      const div = document.createElement("div");
-      div.innerHTML = `
-        <label>
-          <input type="checkbox" data-course="${course}" value="${escapeHtml(item)}" id="cb-${safe}">
-          ${escapeHtml(item)}
-        </label>
-      `;
-      wrap.appendChild(div);
-    });
-  }
-
-  function getSelections(){
-    const out = { Canapés:[], Antipasto:[], Pasta:[], Mains:[], Dessert:[] };
-    document.querySelectorAll('input[type="checkbox"][data-course]:checked').forEach(cb => {
-      const c = cb.dataset.course;
-      if(out[c]) out[c].push(cb.value);
-    });
-    return out;
-  }
-
-  function enforceLimit(course){
-    const rule = RULES[course];
-    if(!rule) return;
-
-    const checked = document.querySelectorAll(`input[type="checkbox"][data-course="${course}"]:checked`);
-    if(checked.length > rule.max){
-      checked[checked.length - 1].checked = false;
-    }
-    const checked2 = document.querySelectorAll(`input[type="checkbox"][data-course="${course}"]:checked`);
-    const countEl = document.getElementById(`count-${course}`);
-    const warnEl  = document.getElementById(`warn-${course}`);
-
-    if(countEl) countEl.textContent = `${checked2.length}/${rule.max} selected`;
-
-    if(rule.exact > 0){
-      if(warnEl) warnEl.style.display = (checked2.length === rule.exact) ? "none" : "block";
-    }else{
-      if(warnEl) warnEl.style.display = (checked2.length >= rule.max) ? "block" : "none";
-    }
-  }
-
-  function menuIsComplete(){
-    const sel = getSelections();
-    let ok = true;
-    ["Canapés","Antipasto","Pasta","Mains","Dessert"].forEach(course => {
-      const rule = RULES[course];
-      if(sel[course].length !== rule.exact) ok = false;
-    });
-    return ok;
-  }
-
-  // -----------------------------
-  // CALCS
-  // -----------------------------
-  function coursePricesAdult(){
-    // Defaults (still work even if panel hidden)
-    return {
-      Canapés:  Number(pCanapesEl?.value || 12),
-      Antipasto:Number(pAntipastoEl?.value || 28),
-      Pasta:    Number(pPastaEl?.value || 15),
-      Mains:    Number(pMainsEl?.value || 34),
-      Dessert:  Number(pDessertEl?.value || 10),
-      Supper:   Number(pSupperEl?.value || 0) // fixed pizza if enabled
+  <script>
+    // ---------- Utilities ----------
+    const money = (n) => {
+      const num = Number(n || 0);
+      return "$" + num.toLocaleString(undefined, {maximumFractionDigits: 0});
     };
-  }
-
-  function foodSubtotal(){
-    const adults = Number(adultsEl.value || 0);
-    const kids   = Number(childrenEl.value || 0);
-
-    const adultFactor = Number(adultFactorEl.value || 1);
-    const childFactor = Number(childFactorEl.value || 0.30);
-
-    const sel = getSelections();
-    const prices = coursePricesAdult();
-
-    let perAdult = 0;
-
-    if(sel.Canapés.length === RULES["Canapés"].exact) perAdult += prices.Canapés;
-    if(sel.Antipasto.length === RULES["Antipasto"].exact) perAdult += prices.Antipasto;
-    if(sel.Pasta.length === RULES["Pasta"].exact) perAdult += prices.Pasta;
-    if(sel.Mains.length === RULES["Mains"].exact) perAdult += prices.Mains;
-    if(sel.Dessert.length === RULES["Dessert"].exact) perAdult += prices.Dessert;
-
-    if(enableSupperPricingEl && enableSupperPricingEl.checked) perAdult += prices.Supper;
-
-    let addOns = 0;
-    if(fruitPlatterEl.checked){
-      addOns += Number(tablesEl.value || 0) * Number(fruitPerTableEl.value || 0);
-    }
-
-    const adultFood = adults * (perAdult * adultFactor);
-    const childFood = kids   * (perAdult * adultFactor * childFactor);
-
-    return { perAdult, adultFood, childFood, addOns, total: adultFood + childFood + addOns };
-  }
-
-  function drinksSubtotal(){
-    const adults = Number(adultsEl.value || 0);
-    const mode = drinkModeEl.value;
-
-    if(mode === "bar")   return { total: 0, note: "Bar prices (no package estimated)." };
-    if(mode === "pkg20") return { total: adults * 20, note: "$20 per adult (4 hrs)." };
-    if(mode === "custom"){
-      return {
-        total: adults * Number(customDrinkPriceEl.value || 0),
-        note: (customDrinkNoteEl.value || "Custom drinks package.")
-      };
-    }
-    return { total: 0, note: "" };
-  }
-
-  function fixedSubtotal(){
-    return sum([roomHireEl.value, dryHireEl.value, securityEl.value]);
-  }
-
-  function quoteTotals(){
-    const food = foodSubtotal();
-    const drinks = drinksSubtotal();
-    const fixed = fixedSubtotal();
-    return {
-      adults: Number(adultsEl.value || 0),
-      children: Number(childrenEl.value || 0),
-      food, drinks, fixed,
-      total: food.total + drinks.total + fixed
+    const money2 = (n) => {
+      const num = Number(n || 0);
+      return "$" + num.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
     };
-  }
+    const valNum = (id) => {
+      const v = document.getElementById(id).value;
+      const n = parseFloat(v);
+      return Number.isFinite(n) ? n : 0;
+    };
+    const valInt = (id) => {
+      const v = document.getElementById(id).value;
+      const n = parseInt(v, 10);
+      return Number.isFinite(n) ? n : 0;
+    };
+    const textVal = (id) => (document.getElementById(id).value || "").trim();
 
-  // -----------------------------
-  // RENDER
-  // -----------------------------
-  function renderDrinkInfo(){
-    const mode = drinkModeEl.value;
-    customDrinkRow.style.display = (mode === "custom") ? "grid" : "none";
+    function selectedOptionsText(selectId){
+      const sel = document.getElementById(selectId);
+      return Array.from(sel.selectedOptions).map(o => o.textContent.trim());
+    }
 
-    if(mode === "bar"){
-      drinkInfoEl.textContent = "Bar prices selected. Quote shows $0 for drinks (indicative only).";
-      setBadge(drinksCompleteBadgeEl, "ok", "Drinks: Bar prices");
-      setBadge(drinksBadgeEl, "ok", "Drinks: Bar prices");
-    } else if(mode === "pkg20"){
-      drinkInfoEl.textContent = "$20 per adult drink package (4 hours).";
-      setBadge(drinksCompleteBadgeEl, "ok", "Drinks: $20/adult");
-      setBadge(drinksBadgeEl, "ok", "Drinks: $20/adult");
-    } else {
-      drinkInfoEl.textContent = "Custom drink package per adult.";
-      const price = Number(customDrinkPriceEl.value || 0);
-      if(price > 0){
-        setBadge(drinksCompleteBadgeEl, "ok", "Drinks: Custom set");
-        setBadge(drinksBadgeEl, "ok", "Drinks: Custom set");
+    // ---------- Tabs ----------
+    const tabIds = ["front","couple","venue","food","quote","deposit"];
+    function openTab(id){
+      tabIds.forEach(s => {
+        const el = document.getElementById(s);
+        if(el) el.classList.remove("active");
+        const tb = document.getElementById("tab-" + s);
+        if(tb) tb.classList.remove("active");
+      });
+      document.getElementById(id).classList.add("active");
+      document.getElementById("tab-" + id).classList.add("active");
+      setStatus("Ready");
+      // keep summaries fresh
+      calculateAll();
+      window.scrollTo({top:0, behavior:"smooth"});
+    }
+
+    // ---------- Selection enforcement ----------
+    function enforceMaxSelection(selectId, max){
+      const sel = document.getElementById(selectId);
+      const chosen = Array.from(sel.selectedOptions);
+      if(chosen.length > max){
+        // Deselect last selected option
+        chosen[chosen.length - 1].selected = false;
+        setStatus("Limit: choose " + max);
       }else{
-        setBadge(drinksCompleteBadgeEl, "warn", "Drinks: Custom (set price)");
-        setBadge(drinksBadgeEl, "warn", "Drinks: Custom (set price)");
+        setStatus("Ready");
       }
-    }
-  }
-
-  function renderMenuStatus(){
-    const sel = getSelections();
-    let incomplete = [];
-    ["Canapés","Antipasto","Pasta","Mains","Dessert"].forEach(c => {
-      const need = RULES[c].exact;
-      const got = sel[c].length;
-      if(got !== need) incomplete.push(`${c} ${got}/${need}`);
-    });
-
-    if(incomplete.length === 0){
-      setBadge(foodCompleteBadgeEl, "ok", "Menu: Complete");
-      setBadge(foodRuleBadgeEl, "ok", "Rules: Complete");
-      setBadge(menuBadgeEl, "ok", "Menu: Complete");
-    }else{
-      setBadge(foodCompleteBadgeEl, "warn", "Menu: Draft");
-      setBadge(foodRuleBadgeEl, "warn", "Rules: Incomplete");
-      setBadge(menuBadgeEl, "warn", "Menu: Draft");
-    }
-  }
-
-  function renderQuote(){
-    const q = quoteTotals();
-
-    qRoomEl.textContent   = aud(roomHireEl.value);
-    qDryEl.textContent    = aud(dryHireEl.value);
-    qSecEl.textContent    = aud(securityEl.value);
-
-    qFoodEl.textContent   = aud(q.food.total);
-    qDrinksEl.textContent = aud(q.drinks.total);
-    qTotalEl.textContent  = aud(q.total);
-
-    kpiAdultsEl.textContent   = q.adults;
-    kpiChildrenEl.textContent = q.children;
-    kpiFoodEl.textContent     = aud(q.food.total);
-
-    const guests = Math.max(1, q.adults + q.children);
-    kpiAvgEl.textContent = aud(q.total / guests);
-  }
-
-  function renderSummary(){
-    const q = quoteTotals();
-    const sel = getSelections();
-
-    const chips = [];
-    Object.entries(sel).forEach(([course, items]) => {
-      items.forEach(item => chips.push(`<span class="pill">${escapeHtml(course)}: ${escapeHtml(item)}</span>`));
-    });
-    chips.push(`<span class="pill">Supper: Pizza (fixed)</span>`);
-    if(vegMainEl.checked) chips.push(`<span class="pill">Mains: Vegetarian main option</span>`);
-    if(fruitPlatterEl.checked) chips.push(`<span class="pill">Dessert: Fruit platter add-on</span>`);
-    chipsEl.innerHTML = chips.join(" ");
-
-    const lines = [];
-    lines.push(`<b>Couple:</b> ${escapeHtml(coupleNameEl.value || "—")}`);
-    lines.push(`<b>Date:</b> ${escapeHtml(weddingDateEl.value || "—")}`);
-    lines.push(`<b>Venue:</b> ${escapeHtml(venueSpaceEl.value || "—")}`);
-    lines.push(`<b>Email:</b> ${escapeHtml(emailEl.value || "—")}`);
-    lines.push(`<b>Phone:</b> ${escapeHtml(phoneEl.value || "—")}`);
-    if((notesEl.value || "").trim()){
-      lines.push(`<b>Notes:</b> ${escapeHtml(notesEl.value.trim())}`);
+      // Update summary
+      calculateAll();
     }
 
-    lines.push(`<hr style="border:none;border-top:1px solid rgba(0,0,0,.10);margin:12px 0">`);
-
-    lines.push(`<b>Guests:</b> Adults ${q.adults}, Children ${q.children}`);
-    lines.push(`<b>Room hire:</b> ${aud(roomHireEl.value)}`);
-    lines.push(`<b>Dry hire:</b> ${aud(dryHireEl.value)}`);
-    lines.push(`<b>Security:</b> ${aud(securityEl.value)}`);
-    lines.push(`<b>Food total:</b> ${aud(q.food.total)}`);
-    if(q.food.addOns > 0){
-      lines.push(`<b>Food add-ons:</b> ${aud(q.food.addOns)} <span class="small">(fruit platters)</span>`);
-    }
-    lines.push(`<b>Drinks total:</b> ${aud(q.drinks.total)} <span class="small">(${escapeHtml(q.drinks.note)})</span>`);
-    lines.push(`<div class="total"><div>Total Estimated Cost</div><div class="mono">${aud(q.total)}</div></div>`);
-
-    lines.push(`<hr style="border:none;border-top:1px solid rgba(0,0,0,.10);margin:12px 0">`);
-
-    lines.push(`<b>Menu completion:</b> ${menuIsComplete() ? "✅ Complete" : "⚠️ Incomplete (finish required picks)"}<br>`);
-
-    lines.push(`<b>Selections:</b>`);
-    lines.push(`<b>Canapés:</b> ${sel.Canapés.length ? sel.Canapés.map(escapeHtml).join(", ") : "—"}`);
-    lines.push(`<b>Grande Antipasto:</b> ${sel.Antipasto.length ? sel.Antipasto.map(escapeHtml).join(", ") : "—"}`);
-    lines.push(`<b>Pasta:</b> ${sel.Pasta.length ? sel.Pasta.map(escapeHtml).join(", ") : "—"}`);
-    lines.push(`<b>Mains:</b> ${sel.Mains.length ? sel.Mains.map(escapeHtml).join(", ") : "—"}${vegMainEl.checked ? " + Vegetarian option" : ""}`);
-    lines.push(`<b>Dessert:</b> ${sel.Dessert.length ? sel.Dessert.map(escapeHtml).join(", ") : "—"}${fruitPlatterEl.checked ? " + Fruit platter add-on" : ""}`);
-    lines.push(`<b>Supper:</b> Pizza (fixed)`);
-
-    finalSummaryEl.innerHTML = lines.join("<br>");
-  }
-
-  function renderAll(){
-    renderDrinkInfo();
-    renderMenuStatus();
-    renderQuote();
-    renderSummary();
-  }
-
-  // -----------------------------
-  // SAVE / LOAD
-  // -----------------------------
-  function getState(){
-    const selections = { Canapés:[], Antipasto:[], Pasta:[], Mains:[], Dessert:[] };
-    document.querySelectorAll('input[type="checkbox"][data-course]:checked').forEach(cb => {
-      const c = cb.dataset.course;
-      if(selections[c]) selections[c].push(cb.value);
-    });
-
-    return {
-      adults: adultsEl.value, children: childrenEl.value,
-      roomHire: roomHireEl.value, dryHire: dryHireEl.value, security: securityEl.value,
-      adultFactor: adultFactorEl.value, childFactor: childFactorEl.value,
-      prices: {
-        pCanapes: pCanapesEl?.value, pAntipasto: pAntipastoEl?.value, pPasta: pPastaEl?.value,
-        pMains: pMainsEl?.value, pDessert: pDessertEl?.value, pSupper: pSupperEl?.value,
-        enableSupperPricing: enableSupperPricingEl?.checked
-      },
-      couple: {
-        coupleName: coupleNameEl.value, weddingDate: weddingDateEl.value, venueSpace: venueSpaceEl.value,
-        email: emailEl.value, phone: phoneEl.value, notes: notesEl.value
-      },
-      drinks: {
-        mode: drinkModeEl.value, customPrice: customDrinkPriceEl.value, customNote: customDrinkNoteEl.value
-      },
-      menu: {
-        selections, vegMain: vegMainEl.checked,
-        fruitPlatter: fruitPlatterEl.checked, tables: tablesEl.value, fruitPerTable: fruitPerTableEl.value
-      }
-    };
-  }
-
-  function setState(s){
-    adultsEl.value   = s.adults ?? 120;
-    childrenEl.value = s.children ?? 20;
-    roomHireEl.value = s.roomHire ?? 0;
-    dryHireEl.value  = s.dryHire ?? 0;
-    securityEl.value = s.security ?? 0;
-
-    adultFactorEl.value = s.adultFactor ?? 1;
-    childFactorEl.value = s.childFactor ?? 0.30;
-
-    if(s.prices){
-      if(pCanapesEl) pCanapesEl.value = s.prices.pCanapes ?? 12;
-      if(pAntipastoEl) pAntipastoEl.value = s.prices.pAntipasto ?? 28;
-      if(pPastaEl) pPastaEl.value = s.prices.pPasta ?? 15;
-      if(pMainsEl) pMainsEl.value = s.prices.pMains ?? 34;
-      if(pDessertEl) pDessertEl.value = s.prices.pDessert ?? 10;
-      if(pSupperEl) pSupperEl.value = s.prices.pSupper ?? 0;
-      if(enableSupperPricingEl) enableSupperPricingEl.checked = !!s.prices.enableSupperPricing;
+    // ---------- Status ----------
+    function setStatus(msg){
+      const s = document.getElementById("statusText");
+      if(s) s.textContent = msg;
     }
 
-    if(s.couple){
-      coupleNameEl.value = s.couple.coupleName ?? "";
-      weddingDateEl.value = s.couple.weddingDate ?? "";
-      venueSpaceEl.value = s.couple.venueSpace ?? "Sala Reggio Ballroom";
-      emailEl.value = s.couple.email ?? "";
-      phoneEl.value = s.couple.phone ?? "";
-      notesEl.value = s.couple.notes ?? "";
+    // ---------- Core calculations ----------
+    function compute(){
+      const adults = valInt("adults");
+      const roomHire = valNum("roomHire");
+      const dryHire = valNum("dryHire");
+      const security = valNum("security");
+      const drinksPerAdult = valNum("drinksPerAdult");
+
+      const fixed = roomHire + dryHire + security;
+      const drinks = drinksPerAdult * Math.max(adults, 0);
+      const total = fixed + drinks;
+
+      const perAdult = adults > 0 ? (total / adults) : 0;
+
+      const deposit = valNum("depositAmount");
+      const balance = Math.max(total - deposit, 0);
+
+      return { adults, fixed, drinks, total, perAdult, deposit, balance };
     }
 
-    if(s.drinks){
-      drinkModeEl.value = s.drinks.mode ?? "bar";
-      customDrinkPriceEl.value = s.drinks.customPrice ?? 0;
-      customDrinkNoteEl.value = s.drinks.customNote ?? "";
+    function calculateAll(){
+      const c = compute();
+
+      // Couple summary
+      const bride = textVal("bride");
+      const groom = textVal("groom");
+      const date = document.getElementById("weddingDate").value;
+      const roomChoice = textVal("roomChoice");
+      const kids = valInt("children");
+      const notes = textVal("notes");
+
+      const coupleLine =
+        (bride || groom) ? `<b>${escapeHtml(bride || "Bride")} & ${escapeHtml(groom || "Groom")}</b>` : `<b>Couple</b>`;
+      const dateLine = date ? `Date: <b>${escapeHtml(date)}</b>` : `Date: <span class="muted">not set</span>`;
+      const roomLine = roomChoice ? `Room: <b>${escapeHtml(roomChoice)}</b>` : `Room: <span class="muted">not set</span>`;
+
+      document.getElementById("coupleSummary").innerHTML = `
+        ${coupleLine}<br>
+        ${dateLine}<br>
+        ${roomLine}<br>
+        Guests: <b>${c.adults}</b> adults${kids ? `, <b>${kids}</b> children` : ""}<br>
+        ${notes ? `Notes: <span class="muted">${escapeHtml(notes)}</span>` : ""}
+      `;
+
+      // Food summary
+      const mains = selectedOptionsText("mains");
+      document.getElementById("foodSummary").innerHTML = mains.length
+        ? `<b>Mains chosen (${mains.length}/2):</b><br>• ${mains.map(escapeHtml).join("<br>• ")}`
+        : `Pick <b>2 mains</b> to show them here.`;
+
+      // Venue preview
+      document.getElementById("fixedPreview").textContent = money(c.fixed);
+      document.getElementById("drinksPreview").textContent = money(c.drinks);
+      document.getElementById("totalPreview").textContent = money(c.total);
+      document.getElementById("perAdultPreview").textContent = money2(c.perAdult);
+
+      // Quote box
+      document.getElementById("fixedQ").textContent = money(c.fixed);
+      document.getElementById("drinksQ").textContent = money(c.drinks);
+      document.getElementById("totalQ").textContent = money(c.total);
+      document.getElementById("perAdultQ").textContent = money2(c.perAdult);
+
+      // Deposit box
+      document.getElementById("totalD").textContent = money(c.total);
+      document.getElementById("depositD").textContent = money(c.deposit);
+      document.getElementById("balanceD").textContent = money(c.balance);
+
+      const confirmed = c.deposit > 0 && c.total > 0;
+      document.getElementById("statusD").textContent = confirmed ? "Deposit recorded" : "Not confirmed";
+
+      const depDate = document.getElementById("depositDate").value;
+      const method = document.getElementById("paymentMethod").value;
+      const ref = textVal("reference");
+
+      document.getElementById("depositSummary").innerHTML = `
+        <b>Deposit summary</b><br>
+        Deposit: <b>${money(c.deposit)}</b>${depDate ? ` on <b>${escapeHtml(depDate)}</b>` : ""}<br>
+        ${method ? `Method: <b>${escapeHtml(method)}</b><br>` : ""}
+        ${ref ? `Reference: <span class="muted">${escapeHtml(ref)}</span><br>` : ""}
+        Balance remaining: <b>${money(c.balance)}</b>
+      `;
+
+      // Quote details
+      const dietary = textVal("dietary");
+      document.getElementById("quoteDetails").innerHTML = `
+        <b>Details</b><br>
+        Adults: <b>${c.adults}</b><br>
+        Fixed costs: <b>${money(c.fixed)}</b> (room + dry + security)<br>
+        Drinks: <b>${money(c.drinks)}</b> (${money2(valNum("drinksPerAdult"))} per adult)<br>
+        Total estimate: <b>${money(c.total)}</b><br>
+        Approx per adult: <b>${money2(c.perAdult)}</b><br>
+        <div style="margin-top:10px">
+          <b>Food</b><br>
+          Mains: ${mains.length ? `<b>${mains.map(escapeHtml).join("</b> / <b>")}</b>` : `<span class="warn">Please choose 2 mains</span>`}<br>
+          Supper: <b>Pizza (fixed)</b><br>
+          ${dietary ? `Dietary notes: <span class="muted">${escapeHtml(dietary)}</span>` : ""}
+        </div>
+      `;
+
+      // Front page stats
+      document.getElementById("frontTotal").textContent = money(c.total);
+      document.getElementById("frontPerAdult").textContent = money2(c.perAdult);
+      document.getElementById("frontBalance").textContent = money(c.balance);
+
+      // Status hints
+      if(c.adults === 0) setStatus("Add adults");
+      if(c.adults > 0 && mains.length !== 2) setStatus("Choose 2 mains");
+      if(c.total > 0 && c.adults > 0 && mains.length === 2) setStatus("Ready");
     }
 
-    vegMainEl.checked = !!(s.menu && s.menu.vegMain);
-    fruitPlatterEl.checked = !!(s.menu && s.menu.fruitPlatter);
-    tablesEl.value = (s.menu && s.menu.tables) ?? 10;
-    fruitPerTableEl.value = (s.menu && s.menu.fruitPerTable) ?? 35;
-
-    document.querySelectorAll('input[type="checkbox"][data-course]').forEach(cb => cb.checked = false);
-
-    if(s.menu && s.menu.selections){
-      Object.entries(s.menu.selections).forEach(([course, items]) => {
-        (items || []).forEach(item => {
-          const cb = [...document.querySelectorAll(`input[type="checkbox"][data-course="${course}"]`)]
-            .find(x => x.value === item);
-          if(cb) cb.checked = true;
-        });
-        enforceLimit(course);
+    // ---------- Reset ----------
+    function resetAll(){
+      const ids = [
+        "bride","groom","weddingDate","roomChoice","adults","children","notes",
+        "roomHire","dryHire","security","drinksPerAdult","dietary",
+        "depositAmount","depositDate","paymentMethod","reference","depositNotes"
+      ];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if(!el) return;
+        if(el.tagName === "SELECT") el.value = "";
+        else el.value = "";
       });
+
+      // Clear mains selections
+      const mains = document.getElementById("mains");
+      Array.from(mains.options).forEach(o => o.selected = false);
+
+      setStatus("Reset");
+      calculateAll();
+      openTab("front");
     }
 
-    renderAll();
-  }
-
-  document.getElementById("saveDraft").addEventListener("click", () => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(getState()));
-    alert("Saved ✅");
-  });
-
-  document.getElementById("loadDraft").addEventListener("click", () => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw) return alert("No saved draft found.");
-    try{
-      setState(JSON.parse(raw));
-      alert("Loaded ✅");
-    }catch(e){
-      alert("Could not load draft.");
+    function clearDeposit(){
+      document.getElementById("depositAmount").value = "";
+      document.getElementById("depositDate").value = "";
+      document.getElementById("paymentMethod").value = "";
+      document.getElementById("reference").value = "";
+      document.getElementById("depositNotes").value = "";
+      setStatus("Deposit cleared");
+      calculateAll();
     }
-  });
 
-  document.getElementById("resetAll").addEventListener("click", () => {
-    if(!confirm("Reset everything?")) return;
-    localStorage.removeItem(STORAGE_KEY);
-    location.reload();
-  });
-
-  document.getElementById("printQuote").addEventListener("click", () => window.print());
-  document.getElementById("printSummary").addEventListener("click", () => window.print());
-
-  document.getElementById("copySummary").addEventListener("click", async () => {
-    const text = (finalSummaryEl.textContent || "").trim();
-    try{
-      await navigator.clipboard.writeText(text);
-      alert("Copied ✅");
-    }catch(e){
-      alert("Copy failed. You can select the text and copy manually.");
+    // ---------- Safe HTML ----------
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
     }
-  });
 
-  // -----------------------------
-  // EVENTS
-  // -----------------------------
-  function bindRecalc(ids){
-    ids.forEach(id => {
-      const el = document.getElementById(id);
-      if(!el) return;
-      el.addEventListener("input", renderAll);
-      el.addEventListener("change", renderAll);
-    });
-  }
-
-  bindRecalc([
-    "adults","children","roomHire","dryHire","security",
-    "adultFactor","childFactor",
-    "pCanapes","pAntipasto","pPasta","pMains","pDessert","pSupper","enableSupperPricing",
-    "coupleName","weddingDate","venueSpace","email","phone","notes",
-    "drinkMode","customDrinkPrice","customDrinkNote",
-    "vegMain","fruitPlatter","tables","fruitPerTable"
-  ]);
-
-  function bindCourse(course){
-    document.querySelectorAll(`input[type="checkbox"][data-course="${course}"]`).forEach(cb => {
-      cb.addEventListener("change", () => {
-        enforceLimit(course);
-        renderAll();
-      });
-    });
-    enforceLimit(course);
-  }
-
-  drinkModeEl.addEventListener("change", renderAll);
-
-  // -----------------------------
-  // INIT
-  // -----------------------------
-  addCheckboxList("Canapés","list-Canapés");
-  addCheckboxList("Antipasto","list-Antipasto");
-  addCheckboxList("Pasta","list-Pasta");
-  addCheckboxList("Mains","list-Mains");
-  addCheckboxList("Dessert","list-Dessert");
-
-  ["Canapés","Antipasto","Pasta","Mains","Dessert"].forEach(bindCourse);
-  renderAll();
-</script>
+    // Init
+    calculateAll();
+  </script>
 </body>
 </html>
