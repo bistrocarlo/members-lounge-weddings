@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>The Members Lounge | Wedding Signature Series</title>
+  <title>The Members Lounge | Event Signature Selection</title>
 
   <style>
     :root{
@@ -213,19 +213,18 @@
   <header>
     <div class="brandline">
       <div class="logoWrap">
-        <!-- Venue profiles switch this automatically -->
         <img class="logoImg" id="brandLogo" src="members.png" alt="Brand Logo"
              onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='inline-flex';">
         <span class="logoFallback" id="logoFallback" style="display:none;">✨ <span>THE MEMBERS LOUNGE</span></span>
       </div>
     </div>
 
-    <h1><span class="gold" id="brandTitle">Wedding Signature Series</span></h1>
-    <div class="sub" id="brandSubtitle">Reggio Calabria Club, Parkville<
+    <h1><span class="gold" id="brandTitle">Event Signature Selection</span></h1>
+    <div class="sub" id="brandSubtitle">Reggio Calabria Club, Parkville</div>
   </header>
 
   <div class="tabs-wrap">
-    <div class="tabs" role="tablist" aria-label="Wedding signature tabs">
+    <div class="tabs" role="tablist" aria-label="Event signature tabs">
       <div class="tab active" data-page="quote" role="tab" aria-selected="true">🧾 Quote</div>
       <div class="tab" data-page="couple" role="tab" aria-selected="false">💍 Couple</div>
       <div class="tab" data-page="food" role="tab" aria-selected="false">🍽️ Food</div>
@@ -241,7 +240,7 @@
       <div class="grid">
         <div class="card">
           <h2>Indicative Quote (Live)</h2>
-          <div class="hint">Room hire + dry hire + security + food + drinks = estimate.</div>
+          <div class="hint">Room hire + dry hire + security + selected food courses + selected drinks = estimate.</div>
 
           <div class="divider"></div>
 
@@ -275,7 +274,7 @@
           <table class="table" aria-label="Quote breakdown">
             <tbody>
               <tr><td>Room hire</td><td id="qRoom">$0.00</td></tr>
-              <tr><td>Food (menu-driven)</td><td id="qFood">$0.00</td></tr>
+              <tr><td>Food (course-driven)</td><td id="qFood">$0.00</td></tr>
               <tr><td>Drinks</td><td id="qDrinks">$0.00</td></tr>
               <tr><td>Dry hire</td><td id="qDry">$0.00</td></tr>
               <tr><td>Security</td><td id="qSec">$0.00</td></tr>
@@ -300,7 +299,7 @@
           <h2>Quick Snapshot</h2>
 
           <div class="statusRow">
-            <span class="badge" id="menuBadge">Menu: Draft</span>
+            <span class="badge" id="menuBadge">Menu: Custom</span>
             <span class="badge" id="drinksBadge">Drinks: Draft</span>
           </div>
 
@@ -314,7 +313,7 @@
           <div class="divider"></div>
 
           <h2>Admin Pricing (Editable)</h2>
-          <div class="hint">These defaults are safe. Adjust anytime. Quote updates live.</div>
+          <div class="hint">Course pricing is per adult. If a course has at least 1 selection, that course price applies.</div>
 
           <div class="row">
             <div>
@@ -382,9 +381,7 @@
             Select a venue to apply branding + default costing (only fills if your cost fields are still $0).
           </div>
           <div class="divider"></div>
-          <div class="small">
-            If you want different menus per venue later (FIOR vs ALORA), we can also do that.
-          </div>
+          <div class="small">If you want different menus per venue later (FIOR vs ALORA), we can also do that.</div>
         </div>
       </div>
     </section>
@@ -392,12 +389,15 @@
     <!-- PAGE 3 -->
     <section class="page" id="page-food">
       <div class="card">
-        <h2>Food Builder (Menu-Driven)</h2>
-        <div class="hint">Selection rules are enforced (no over-selecting). “Complete menu” requires meeting all exact counts.</div>
+        <h2>Food Builder (Course-Driven)</h2>
+        <div class="hint">
+          Pick as many items as you like. If you select at least <b>one</b> item in a course, that course price is added to the quote.
+          You can do “Entrée only” or “Full package” — it will always add up correctly.
+        </div>
 
         <div class="statusRow">
-          <span class="badge" id="foodCompleteBadge">Menu: Draft</span>
-          <span class="badge" id="foodRuleBadge">Rules: Incomplete</span>
+          <span class="badge" id="foodCompleteBadge">Menu: Custom</span>
+          <span class="badge" id="foodRuleBadge">Rules: Flexible</span>
         </div>
 
         <div class="divider"></div>
@@ -405,37 +405,37 @@
         <div class="grid">
           <div class="card">
             <h2>Per-Adult Course Pricing (AUD)</h2>
-            <div class="hint">Defaults are a sensible starting point (edit anytime).</div>
+            <div class="hint">Applied when that course has 1+ selections (edit anytime).</div>
 
             <div class="row">
               <div>
-                <label for="pCanapes">Canapés (3 picks)</label>
+                <label for="pCanapes">Canapés</label>
                 <input id="pCanapes" type="number" min="0" step="0.5" value="12">
               </div>
               <div>
-                <label for="pAntipasto">Antipasto (7 plates from 12)</label>
+                <label for="pAntipasto">Antipasto</label>
                 <input id="pAntipasto" type="number" min="0" step="0.5" value="28">
               </div>
             </div>
 
             <div class="row">
               <div>
-                <label for="pPasta">Entrée / Pasta (2 picks)</label>
+                <label for="pPasta">Entrée / Pasta</label>
                 <input id="pPasta" type="number" min="0" step="0.5" value="15">
               </div>
               <div>
-                <label for="pMains">Mains (2 picks)</label>
+                <label for="pMains">Mains</label>
                 <input id="pMains" type="number" min="0" step="0.5" value="34">
               </div>
             </div>
 
             <div class="row">
               <div>
-                <label for="pDessert">Dessert (1 pick)</label>
+                <label for="pDessert">Dessert</label>
                 <input id="pDessert" type="number" min="0" step="0.5" value="10">
               </div>
               <div>
-                <label for="pSupper">Supper (fixed Pizza)</label>
+                <label for="pSupper">Supper (Pizza)</label>
                 <input id="pSupper" type="number" min="0" step="0.5" value="0">
               </div>
             </div>
@@ -444,23 +444,13 @@
 
             <label style="margin-top:0;">
               <input id="enableSupperPricing" type="checkbox">
-              Add supper pricing to food total (Pizza only)
+              Add supper pricing to food total (Pizza)
             </label>
-            <div class="small">If unchecked, supper remains “informational” and won’t affect the quote.</div>
+            <div class="small">If unchecked, supper remains informational and won’t affect the quote.</div>
           </div>
 
           <div class="card">
-            <h2>Exact Selection Rules</h2>
-            <ul class="small">
-              <li><b>Canapés:</b> exactly 3 (from 6)</li>
-              <li><b>Antipasto:</b> exactly 7 plates (from 12) — hot items marked 🔥</li>
-              <li><b>Entrée / Pasta:</b> exactly 2</li>
-              <li><b>Mains:</b> exactly 2</li>
-              <li><b>Dessert:</b> exactly 1</li>
-              <li><b>Supper:</b> fixed Pizza only</li>
-            </ul>
-
-            <div class="divider"></div>
+            <h2>Extras & Notes</h2>
 
             <label><input id="vegMain" type="checkbox"> Vegetarian option noted (as required)</label>
 
@@ -485,39 +475,39 @@
         </div>
 
         <div class="course" data-course="canapes">
-          <h3>Canapés (choose exactly 3)</h3>
+          <h3>Canapés (choose any)</h3>
           <div class="row" id="list-canapes"></div>
-          <div class="count" id="count-canapes">0/3 selected</div>
-          <div class="warnBox" id="warn-canapes">You must select exactly 3 canapés.</div>
+          <div class="count" id="count-canapes">0 selected</div>
+          <div class="warnBox" id="warn-canapes"></div>
         </div>
 
         <div class="course" data-course="antipasto">
-          <h3>Antipasto Plates (choose exactly 7)</h3>
+          <h3>Antipasto Plates (choose any)</h3>
           <div class="small">Hot items are marked 🔥 (Calamari, Cevape, Meatballs in sugo, Sausages).</div>
           <div class="row" id="list-antipasto"></div>
-          <div class="count" id="count-antipasto">0/7 selected</div>
-          <div class="warnBox" id="warn-antipasto">You must select exactly 7 antipasto plates.</div>
+          <div class="count" id="count-antipasto">0 selected</div>
+          <div class="warnBox" id="warn-antipasto"></div>
         </div>
 
         <div class="course" data-course="pasta">
-          <h3>Entrée / Pasta (choose exactly 2)</h3>
+          <h3>Entrée / Pasta (choose any)</h3>
           <div class="row" id="list-pasta"></div>
-          <div class="count" id="count-pasta">0/2 selected</div>
-          <div class="warnBox" id="warn-pasta">You must select exactly 2 pasta/entrée options.</div>
+          <div class="count" id="count-pasta">0 selected</div>
+          <div class="warnBox" id="warn-pasta"></div>
         </div>
 
         <div class="course" data-course="mains">
-          <h3>Mains (choose exactly 2)</h3>
+          <h3>Mains (choose any)</h3>
           <div class="row" id="list-mains"></div>
-          <div class="count" id="count-mains">0/2 selected</div>
-          <div class="warnBox" id="warn-mains">You must select exactly 2 mains.</div>
+          <div class="count" id="count-mains">0 selected</div>
+          <div class="warnBox" id="warn-mains"></div>
         </div>
 
         <div class="course" data-course="dessert">
-          <h3>Dessert (choose exactly 1)</h3>
+          <h3>Dessert (choose any)</h3>
           <div class="row" id="list-dessert"></div>
-          <div class="count" id="count-dessert">0/1 selected</div>
-          <div class="warnBox" id="warn-dessert">You must select exactly 1 dessert option.</div>
+          <div class="count" id="count-dessert">0 selected</div>
+          <div class="warnBox" id="warn-dessert"></div>
         </div>
 
         <div class="course">
@@ -631,21 +621,21 @@
       logo: "members.png",
       subtitle: "Reggio Calabria Club, Parkville",
       footer: "Members Lounge | Reggio Calabria Club, Parkville",
-      defaults: { roomHire: 0, dryHire: 0, security: 0 } // <-- set your real defaults here
+      defaults: { roomHire: 0, dryHire: 0, security: 0 }
     },
     fior: {
       label: "FIOR Parkville",
       logo: "fior.png",
       subtitle: "FIOR, Parkville",
       footer: "FIOR | Parkville",
-      defaults: { roomHire: 0, dryHire: 0, security: 0 } // <-- set your real defaults here
+      defaults: { roomHire: 0, dryHire: 0, security: 0 }
     },
     alora: {
       label: "ALORA Macedon",
       logo: "alora.png",
       subtitle: "ALORA, Macedon",
       footer: "ALORA | Macedon",
-      defaults: { roomHire: 0, dryHire: 0, security: 0 } // <-- set your real defaults here
+      defaults: { roomHire: 0, dryHire: 0, security: 0 }
     }
   };
 
@@ -658,7 +648,6 @@
     if(fallback) fallback.style.display = "none";
 
     img.onerror = function(){
-      // If venue logo missing, fallback to members.png, then text fallback
       if(src !== "members.png"){
         safeSetLogo("members.png");
         return;
@@ -674,24 +663,19 @@
     const key = profileKey || "members";
     const p = VENUE_PROFILES[key] || VENUE_PROFILES.members;
 
-    // Branding
-    const titleEl = $("brandTitle");
     const subtitleEl = $("brandSubtitle");
     const footerEl = $("brandFooter");
-    if(titleEl) titleEl.textContent = "Wedding Signature Series";
     if(subtitleEl) subtitleEl.textContent = p.subtitle;
     if(footerEl) footerEl.textContent = p.footer;
 
     safeSetLogo(p.logo);
 
-    // Info text on couple tab
     const info = $("venueProfileText");
     if(info){
       info.innerHTML = `<b>Active venue:</b> ${escapeHtml(p.label)}<br>
         Branding switches automatically. Default costing fills only if your cost fields are still $0.`;
     }
 
-    // Default costing (only fill if fields still 0 to avoid overwriting manual values)
     const roomHireEl = $("roomHire");
     const dryHireEl = $("dryHire");
     const securityEl = $("security");
@@ -706,7 +690,7 @@
   }
 
   // -----------------------------
-  // MENU DATA (ASCII KEYS)
+  // MENU DATA
   // -----------------------------
   const COURSE_LABEL = {
     canapes: "Canapés",
@@ -755,7 +739,7 @@
     dessert: [
       "Roaming assorted desserts (mini cannoli & baklava)",
       "Tiramisu & cheese cake (alternating)",
-      "Gelato selection"
+      "Gelato station"
     ]
   };
 
@@ -766,12 +750,13 @@
     "Italian pork sausages": true
   };
 
+  // FLEXIBLE RULES: no exact requirements, only prevent selecting more than exists
   const RULES = {
-    canapes:   { exact: 3, max: 3 },
-    antipasto: { exact: 7, max: 7 },
-    pasta:     { exact: 2, max: 2 },
-    mains:     { exact: 2, max: 2 },
-    dessert:   { exact: 1, max: 1 }
+    canapes:   { max: MENU.canapes.length },
+    antipasto: { max: MENU.antipasto.length },
+    pasta:     { max: MENU.pasta.length },
+    mains:     { max: MENU.mains.length },
+    dessert:   { max: MENU.dessert.length }
   };
 
   // -----------------------------
@@ -886,7 +871,7 @@
   // -----------------------------
   // HELPERS
   // -----------------------------
-  const STORAGE_KEY = "memberslounge_wedding_signature_series_v4_venues";
+  const STORAGE_KEY = "memberslounge_event_signature_selection_clean_v1";
 
   function aud(n){
     const x = Number(n || 0);
@@ -951,13 +936,8 @@
     const countEl = document.getElementById(`count-${courseKey}`);
     const warnEl  = document.getElementById(`warn-${courseKey}`);
 
-    if(countEl) countEl.textContent = `${checked2.length}/${rule.max} selected`;
-    if(warnEl) warnEl.style.display = (checked2.length === rule.exact) ? "none" : "block";
-  }
-
-  function menuIsComplete(){
-    const sel = getSelections();
-    return Object.keys(RULES).every(k => (sel[k]||[]).length === RULES[k].exact);
+    if(countEl) countEl.textContent = `${checked2.length} selected`;
+    if(warnEl) warnEl.style.display = "none"; // flexible rules = no warnings
   }
 
   // -----------------------------
@@ -984,12 +964,14 @@
     const sel = getSelections();
     const prices = coursePricesAdult();
 
+    // ✅ Course-driven pricing:
+    // If at least 1 item is selected in that course, add that course price once (per adult).
     let perAdult = 0;
-    if(sel.canapes.length   === RULES.canapes.exact)   perAdult += prices.canapes;
-    if(sel.antipasto.length === RULES.antipasto.exact) perAdult += prices.antipasto;
-    if(sel.pasta.length     === RULES.pasta.exact)     perAdult += prices.pasta;
-    if(sel.mains.length     === RULES.mains.exact)     perAdult += prices.mains;
-    if(sel.dessert.length   === RULES.dessert.exact)   perAdult += prices.dessert;
+    if(sel.canapes.length   > 0) perAdult += prices.canapes;
+    if(sel.antipasto.length > 0) perAdult += prices.antipasto;
+    if(sel.pasta.length     > 0) perAdult += prices.pasta;
+    if(sel.mains.length     > 0) perAdult += prices.mains;
+    if(sel.dessert.length   > 0) perAdult += prices.dessert;
 
     if(enableSupperPricingEl.checked) perAdult += prices.supper;
 
@@ -1062,23 +1044,10 @@
   }
 
   function renderMenuStatus(){
-    const sel = getSelections();
-    const incomplete = [];
-    Object.keys(RULES).forEach(k => {
-      const need = RULES[k].exact;
-      const got = (sel[k]||[]).length;
-      if(got !== need) incomplete.push(`${COURSE_LABEL[k]} ${got}/${need}`);
-    });
-
-    if(incomplete.length === 0){
-      setBadge(foodCompleteBadgeEl, "ok", "Menu: Complete");
-      setBadge(foodRuleBadgeEl, "ok", "Rules: Complete");
-      setBadge(menuBadgeEl, "ok", "Menu: Complete");
-    }else{
-      setBadge(foodCompleteBadgeEl, "warn", "Menu: Draft");
-      setBadge(foodRuleBadgeEl, "warn", "Rules: Incomplete");
-      setBadge(menuBadgeEl, "warn", "Menu: Draft");
-    }
+    // Flexible rules: Always “Custom”
+    setBadge(foodCompleteBadgeEl, "ok", "Menu: Custom");
+    setBadge(foodRuleBadgeEl, "ok", "Rules: Flexible");
+    setBadge(menuBadgeEl, "ok", "Menu: Custom");
   }
 
   function renderQuote(){
@@ -1130,17 +1099,16 @@
     lines.push(`<b>Dry hire:</b> ${aud(dryHireEl.value)}`);
     lines.push(`<b>Security:</b> ${aud(securityEl.value)}`);
 
-    lines.push(`<b>Food total:</b> ${aud(q.food.total)} <span class="small">(per-adult: ${aud(q.food.perAdult)})</span>`);
+    lines.push(`<b>Food total:</b> ${aud(q.food.total)} <span class="small">(per-adult selected courses: ${aud(q.food.perAdult)})</span>`);
     if(q.food.addOns > 0) lines.push(`<b>Food add-ons:</b> ${aud(q.food.addOns)} <span class="small">(fruit platters)</span>`);
     lines.push(`<b>Drinks total:</b> ${aud(q.drinks.total)} <span class="small">(${escapeHtml(q.drinks.note)})</span>`);
 
     lines.push(`<div class="total"><div>Total Estimated Cost</div><div class="mono">${aud(q.total)}</div></div>`);
     lines.push(`<hr style="border:none;border-top:1px solid rgba(0,0,0,.10);margin:12px 0">`);
-    lines.push(`<b>Menu completion:</b> ${menuIsComplete() ? "✅ Complete" : "⚠️ Incomplete (finish required picks)"}<br>`);
 
     lines.push(`<b>Selections:</b>`);
     lines.push(`<b>Canapés:</b> ${sel.canapes.length ? sel.canapes.map(escapeHtml).join(", ") : "—"}`);
-    lines.push(`<b>Antipasto (7 plates):</b> ${sel.antipasto.length ? sel.antipasto.map(escapeHtml).join(", ") : "—"}`);
+    lines.push(`<b>Antipasto:</b> ${sel.antipasto.length ? sel.antipasto.map(escapeHtml).join(", ") : "—"}`);
     lines.push(`<b>Pasta:</b> ${sel.pasta.length ? sel.pasta.map(escapeHtml).join(", ") : "—"}`);
     lines.push(`<b>Mains:</b> ${sel.mains.length ? sel.mains.map(escapeHtml).join(", ") : "—"}${vegMainEl.checked ? " + Vegetarian option" : ""}`);
     lines.push(`<b>Dessert:</b> ${sel.dessert.length ? sel.dessert.map(escapeHtml).join(", ") : "—"}${fruitPlatterEl.checked ? " + Fruit platter add-on" : ""}`);
@@ -1325,7 +1293,6 @@
   addCheckboxList("dessert","list-dessert");
   ["canapes","antipasto","pasta","mains","dessert"].forEach(bindCourse);
 
-  // Default venue profile at load
   applyVenueProfile(venueSpaceEl?.value || "members");
   renderAll();
 </script>
