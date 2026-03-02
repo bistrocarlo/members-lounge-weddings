@@ -918,3 +918,226 @@
     const out = { canapes:[], antipasto:[], pasta:[], mains:[], dessert:[] };
     document.querySelectorAll('input[type="checkbox"][data-course]:checked').forEach(cb => {
       const c = cb.dataset.course;
+      
+            if(out[c]) out[c].push(cb.value);
+    });
+    return out;
+  }
+
+  function enforceLimit(courseKey){
+    const rule = RULES[courseKey];
+    if(!rule) return;
+
+    const checked = Array.from(
+      document.querySelectorAll(`input[type="checkbox"][data-course="${courseKey}"]:checked`)
+    );
+
+    if(checked.length > rule.max){
+      checked[checked.length - 1].checked = false;
+    }
+
+    const checkedNow = Array.from(
+      document.querySelectorAll(`input[type="checkbox"][data-course="${courseKey}"]:checked`)
+    );
+
+    const countEl = document.getElementById(`count-${courseKey}`);
+    const warnEl  = document.getElementById(`warn-${courseKey}`);
+
+    if(countEl) countEl.textContent = `${checkedNow.length} selected (max ${rule.max})`;
+
+    if(warnEl){
+      if(checkedNow.length >= rule.max){
+        warnEl.style.display = "block";
+        warnEl.textContent = `Maximum ${rule.max} selections for ${COURSE_LABEL[courseKey]}.`;
+      } else {
+        warnEl.style.display = "none";
+        warnEl.textContent = "";
+      }
+    }
+  }
+
+  function attachLimitListeners(){
+    document.querySelectorAll('input[type="checkbox"][data-course]').forEach(cb=>{
+      cb.addEventListener("change", ()=>{
+        enforceLimit(cb.dataset.course);
+        renderAll();
+      });
+    });
+  }
+
+  // -----------------------------
+  // CALCULATIONS
+  // -----------------------------
+  function calculateFood(){
+    const adults = Number(adultsEl.value||0);
+    const children = Number(childrenEl.value||0);
+    const adultFactor = Number(adultFactorEl.value||1);
+    const childFactor = Number(childFactorEl.value||0);
+
+    const sel = getSelections();
+
+    let perAdult = 0;
+
+    if(sel.canapes.length) perAdult += Number(pCanapesEl.value||0);
+    if(sel.antipasto.length) perAdult += Number(pAntipastoEl.value||0);
+    if(sel.pasta.length) perAdult += Number(pPastaEl.value||0);
+    if(sel.mains.length) perAdult += Number(pMainsEl.value||0);
+    if(sel.dessert.length) perAdult += Number(pDessertEl.value||0);
+    if(enableSupperPricingEl.checked) perAdult += Number(pSupperEl.value||0);
+
+    const adultTotal = adults * perAdult * adultFactor;
+    const childTotal = children * perAdult * childFactor;
+
+    let fruitTotal = 0;
+    if(fruitPlatterEl.checked){
+      fruitTotal = Number(tablesEl.value||0) * Number(fruitPerTableEl.value||0);
+    }
+
+    return adultTotal + childTotal + fruitTotal;
+  }
+
+  function calculateDrinks(){
+    const adults = Number(adultsEl.value||0);
+    const mode = drinkModeEl.value;
+
+    if(mode === "pkg20") return adults * 20;
+    if(mode === "custom") return adults * Number(customDrinkPriceEl.value||0);
+    return 0;
+  }
+
+  function renderAll(){
+    const adults = Number(adultsEl.value||0);
+    const children = Number(childrenEl.value||0);
+
+    const room = Number(roomHireEl.value||0);
+    const dry = Number(dryHireEl.value||0);
+    const sec = Number(securityEl.value||0);
+
+    const food = calculateFood();
+    const drinks = calculateDrinks();
+
+    const total = room + dry + sec + food + drinks;
+
+    qRoomEl.textContent = aud(room);
+    qDryEl.textContent = aud(dry);
+    qSecEl.textContent = aud(sec);
+    qFoodEl.textContent = aud(food);
+    qDrinksEl.textContent = aud(drinks);
+    qTotalEl.textContent = aud(total);
+
+    kpiAdultsEl.textContent = adults;
+    kpiChildrenEl.textContent = children;
+    kpiFoodEl.textContent = aud(food);
+
+    const guestTotal = adults + children;
+    kpiAvgEl.textContent = guestTotal ? aud(total/guestTotal) : aud(0);
+
+    // Badge updates
+    const sel = getSelections();
+    const anyFood = Object.values(sel).some(a=>a.length);
+    setBadge(foodCompleteBadgeEl, anyFood ? "ok":"warn", anyFood?"Menu Ready":"Menu Empty");
+
+    const drinkMode = drinkModeEl.value;
+    setBadge(drinksCompleteBadgeEl,
+      drinkMode==="bar"?"warn":"ok",
+      drinkMode==="bar"?"Bar Pricing":"Drinks Package");
+
+    // Summary
+    finalSummaryEl.innerHTML = `
+      <b>${escapeHtml(coupleNameEl.value||"Event")}</b><br>
+      Date: ${escapeHtml(weddingDateEl.value||"-")}<br>
+      Adults: ${adults} | Children: ${children}<br><br>
+      Food: ${aud(food)}<br>
+      Drinks: ${aud(drinks)}<br>
+      Room: ${aud(room)}<br>
+      Dry Hire: ${aud(dry)}<br>
+      Security: ${aud(sec)}<br><br>
+      <b>Total: ${aud(total)}</b>
+    `;
+
+    // Chips
+    chipsEl.innerHTML="";
+    Object.entries(sel).forEach(([course,items])=>{
+      items.forEach(item=>{
+        const chip=document.createElement("span");
+        chip.className="pill";
+        chip.textContent=item;
+        chipsEl.appendChild(chip);
+      });
+    });
+  }
+
+  // -----------------------------
+  // SAVE / LOAD
+  // -----------------------------
+  function saveDraft(){
+    const data = {
+      adults: adultsEl.value,
+      children: childrenEl.value,
+      room: roomHireEl.value,
+      dry: dryHireEl.value,
+      sec: securityEl.value,
+      sel: getSelections()
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    alert("Draft Saved");
+  }
+
+  function loadDraft(){
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return alert("No draft found");
+    const d = JSON.parse(raw);
+
+    adultsEl.value = d.adults||0;
+    childrenEl.value = d.children||0;
+    roomHireEl.value = d.room||0;
+    dryHireEl.value = d.dry||0;
+    securityEl.value = d.sec||0;
+
+    document.querySelectorAll('input[type="checkbox"][data-course]').forEach(cb=>cb.checked=false);
+    Object.entries(d.sel||{}).forEach(([course,items])=>{
+      items.forEach(item=>{
+        const cb = document.querySelector(`input[data-course="${course}"][value="${CSS.escape(item)}"]`);
+        if(cb) cb.checked=true;
+      });
+    });
+
+    renderAll();
+  }
+
+  function resetAll(){
+    if(!confirm("Reset everything?")) return;
+    document.querySelectorAll("input").forEach(i=>{
+      if(i.type==="checkbox") i.checked=false;
+      else if(i.type==="number") i.value=0;
+      else i.value="";
+    });
+    renderAll();
+  }
+
+  // -----------------------------
+  // INIT
+  // -----------------------------
+  addCheckboxList("canapes","list-canapes");
+  addCheckboxList("antipasto","list-antipasto");
+  addCheckboxList("pasta","list-pasta");
+  addCheckboxList("mains","list-mains");
+  addCheckboxList("dessert","list-dessert");
+
+  attachLimitListeners();
+
+  document.querySelectorAll("input,select").forEach(el=>{
+    el.addEventListener("input", renderAll);
+    el.addEventListener("change", renderAll);
+  });
+
+  on($("saveDraft"),"click",saveDraft);
+  on($("loadDraft"),"click",loadDraft);
+  on($("resetAll"),"click",resetAll);
+  on($("printQuote"),"click",()=>window.print());
+
+  applyVenueProfile("members");
+  renderAll();
+</script>
+</body>
+</html>
