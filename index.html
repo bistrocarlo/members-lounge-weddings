@@ -452,22 +452,9 @@
           </div>
 
           <div class="card">
-            <h2>Extras & Notes</h2>
+            <h2>Extras (Optional)</h2>
 
-            <label><input id="vegMain" type="checkbox"> Vegetarian option noted (as required)</label>
-
-            <label style="margin-top:12px;"><input id="fruitPlatter" type="checkbox"> Add Fruit Platter (optional add-on)</label>
-
-            <div class="row">
-              <div>
-                <label for="tables">Estimated Tables</label>
-                <input id="tables" type="number" min="0" step="1" value="10">
-              </div>
-              <div>
-                <label for="fruitPerTable">Fruit platter per table (AUD)</label>
-                <input id="fruitPerTable" type="number" min="0" step="1" value="35">
-              </div>
-            </div>
+            <div class="small">Extras moved to the bottom under Supper (as requested).</div>
 
             <div class="actions">
               <button class="btn ghost" id="backF1">⬅️ Back</button>
@@ -516,6 +503,22 @@
           <h3>Supper / Late Night (fixed)</h3>
           <div class="small">Pizza Only (fixed). No selection required.</div>
           <div class="count">Included: Pizza</div>
+
+          <!-- ✅ FRUIT PLATTER MOVED HERE (BOTTOM UNDER SUPPER) -->
+          <div class="divider"></div>
+          <h3 style="margin-top:0;">Optional Add-on: Fruit Platter</h3>
+          <label><input id="fruitPlatter" type="checkbox"> Add Fruit Platter (per table)</label>
+          <div class="row">
+            <div>
+              <label for="tables">Estimated Tables</label>
+              <input id="tables" type="number" min="0" step="1" value="10">
+            </div>
+            <div>
+              <label for="fruitPerTable">Fruit platter per table (AUD)</label>
+              <input id="fruitPerTable" type="number" min="0" step="1" value="35">
+            </div>
+          </div>
+          <div class="small">This add-on is added to food total when checked.</div>
         </div>
 
         <div class="actions">
@@ -535,7 +538,6 @@
           <label for="drinkMode">Drinks Option</label>
           <select id="drinkMode">
             <option value="bar">Bar Prices (no package)</option>
-            <option value="pkg20">$20 per Adult Package (4 hrs)</option>
             <option value="custom">Custom per Adult (set price)</option>
           </select>
 
@@ -546,7 +548,7 @@
             </div>
             <div>
               <label for="customDrinkNote">Custom drink notes</label>
-              <input id="customDrinkNote" placeholder="e.g., Premium package details…">
+              <input id="customDrinkNote" placeholder="e.g., beer/wine/spirits, 4hrs, premium…">
             </div>
           </div>
 
@@ -565,7 +567,7 @@
             <span class="badge" id="drinksCompleteBadge">Drinks: Draft</span>
           </div>
           <div class="divider"></div>
-          <div class="small">“Bar prices” shows $0 for drinks (indicative). Package/custom adds into the quote.</div>
+          <div class="small">“Bar prices” shows $0 for drinks (indicative). Custom adds into the quote.</div>
         </div>
       </div>
     </section>
@@ -610,7 +612,6 @@
       .replace(/"/g,"&quot;")
       .replace(/'/g,"&#039;");
   }
-  function sum(arr){ return arr.reduce((a,b)=>a+Number(b||0),0); }
   const $ = (id) => document.getElementById(id);
   function on(el, ev, fn){ if(el) el.addEventListener(ev, fn); }
 
@@ -702,7 +703,6 @@
     dessert: "Dessert"
   };
 
-  // ✅ Edit / add items here later (modular)
   const MENU = {
     canapes: [
       "Arancini",
@@ -743,7 +743,7 @@
     dessert: [
       "Roaming assorted desserts (mini cannoli & baklava)",
       "Tiramisu & cheese cake (alternating)",
-      "Gelato dessert ( cassata, tartufo, baci"
+      "Gelato dessert (cassata, tartufo, baci)"
     ]
   };
 
@@ -754,8 +754,6 @@
     "Italian pork sausages": true
   };
 
-  // ✅ UPDATED RULES (your request)
-  // min is allowed to be 0 for all. max as specified.
   const RULES = {
     canapes:   { min: 0, max: 3 },
     antipasto: { min: 0, max: 7 },
@@ -834,7 +832,6 @@
   const pSupperEl   = $("pSupper");
   const enableSupperPricingEl = $("enableSupperPricing");
 
-  const vegMainEl = $("vegMain");
   const fruitPlatterEl = $("fruitPlatter");
   const tablesEl = $("tables");
   const fruitPerTableEl = $("fruitPerTable");
@@ -867,16 +864,13 @@
   const finalSummaryEl = $("finalSummary");
   const chipsEl = $("chips");
 
-  const menuBadgeEl = $("menuBadge");
-  const drinksBadgeEl = $("drinksBadge");
   const foodCompleteBadgeEl = $("foodCompleteBadge");
-  const foodRuleBadgeEl = $("foodRuleBadge");
   const drinksCompleteBadgeEl = $("drinksCompleteBadge");
 
   // -----------------------------
   // HELPERS
   // -----------------------------
-  const STORAGE_KEY = "memberslounge_event_signature_selection_clean_v1";
+  const STORAGE_KEY = "memberslounge_event_signature_selection_clean_v2";
 
   function aud(n){
     const x = Number(n || 0);
@@ -888,6 +882,23 @@
     el.classList.remove("ok","warn","bad");
     if(state) el.classList.add(state);
     el.textContent = text;
+  }
+
+  function updateDrinkUI(){
+    const mode = drinkModeEl.value;
+
+    if(customDrinkRow){
+      customDrinkRow.style.display = (mode === "custom") ? "grid" : "none";
+    }
+
+    if(drinkInfoEl){
+      if(mode === "bar"){
+        drinkInfoEl.textContent = "Bar pricing is indicative only (drinks = $0 in the quote).";
+      } else {
+        drinkInfoEl.textContent = "Custom price adds your set amount per adult into the quote.";
+      }
+    }
+    renderAll();
   }
 
   // -----------------------------
@@ -918,8 +929,7 @@
     const out = { canapes:[], antipasto:[], pasta:[], mains:[], dessert:[] };
     document.querySelectorAll('input[type="checkbox"][data-course]:checked').forEach(cb => {
       const c = cb.dataset.course;
-      
-            if(out[c]) out[c].push(cb.value);
+      if(out[c]) out[c].push(cb.value);
     });
     return out;
   }
@@ -975,7 +985,6 @@
     const childFactor = Number(childFactorEl.value||0);
 
     const sel = getSelections();
-
     let perAdult = 0;
 
     if(sel.canapes.length) perAdult += Number(pCanapesEl.value||0);
@@ -1000,7 +1009,6 @@
     const adults = Number(adultsEl.value||0);
     const mode = drinkModeEl.value;
 
-    if(mode === "pkg20") return adults * 20;
     if(mode === "custom") return adults * Number(customDrinkPriceEl.value||0);
     return 0;
   }
@@ -1039,8 +1047,8 @@
 
     const drinkMode = drinkModeEl.value;
     setBadge(drinksCompleteBadgeEl,
-      drinkMode==="bar"?"warn":"ok",
-      drinkMode==="bar"?"Bar Pricing":"Drinks Package");
+      drinkMode==="bar" ? "warn" : "ok",
+      drinkMode==="bar" ? "Bar Pricing" : "Custom Drinks");
 
     // Summary
     finalSummaryEl.innerHTML = `
@@ -1077,6 +1085,25 @@
       room: roomHireEl.value,
       dry: dryHireEl.value,
       sec: securityEl.value,
+
+      drinkMode: drinkModeEl.value,
+      customDrinkPrice: customDrinkPriceEl.value,
+      customDrinkNote: customDrinkNoteEl.value,
+
+      enableSupperPricing: enableSupperPricingEl.checked,
+      fruitPlatter: fruitPlatterEl.checked,
+      tables: tablesEl.value,
+      fruitPerTable: fruitPerTableEl.value,
+      adultFactor: adultFactorEl.value,
+      childFactor: childFactorEl.value,
+
+      coupleName: coupleNameEl.value,
+      weddingDate: weddingDateEl.value,
+      venueSpace: venueSpaceEl.value,
+      email: emailEl.value,
+      phone: phoneEl.value,
+      notes: notesEl.value,
+
       sel: getSelections()
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -1094,6 +1121,27 @@
     dryHireEl.value = d.dry||0;
     securityEl.value = d.sec||0;
 
+    enableSupperPricingEl.checked = !!d.enableSupperPricing;
+    fruitPlatterEl.checked = !!d.fruitPlatter;
+    tablesEl.value = d.tables ?? tablesEl.value;
+    fruitPerTableEl.value = d.fruitPerTable ?? fruitPerTableEl.value;
+    adultFactorEl.value = d.adultFactor ?? adultFactorEl.value;
+    childFactorEl.value = d.childFactor ?? childFactorEl.value;
+
+    drinkModeEl.value = d.drinkMode || "bar";
+    customDrinkPriceEl.value = d.customDrinkPrice || 0;
+    customDrinkNoteEl.value = d.customDrinkNote || "";
+    updateDrinkUI();
+
+    coupleNameEl.value = d.coupleName || "";
+    weddingDateEl.value = d.weddingDate || "";
+    venueSpaceEl.value = d.venueSpace || "members";
+    emailEl.value = d.email || "";
+    phoneEl.value = d.phone || "";
+    notesEl.value = d.notes || "";
+
+    applyVenueProfile(venueSpaceEl.value);
+
     document.querySelectorAll('input[type="checkbox"][data-course]').forEach(cb=>cb.checked=false);
     Object.entries(d.sel||{}).forEach(([course,items])=>{
       items.forEach(item=>{
@@ -1102,18 +1150,58 @@
       });
     });
 
+    Object.keys(RULES).forEach(enforceLimit);
     renderAll();
   }
 
   function resetAll(){
     if(!confirm("Reset everything?")) return;
+
+    // reset inputs (keep reasonable defaults for some)
     document.querySelectorAll("input").forEach(i=>{
       if(i.type==="checkbox") i.checked=false;
       else if(i.type==="number") i.value=0;
       else i.value="";
     });
+
+    // restore default values you want
+    adultsEl.value = 120;
+    childrenEl.value = 20;
+    adultFactorEl.value = 1.00;
+    childFactorEl.value = 0.30;
+
+    pCanapesEl.value = 12;
+    pAntipastoEl.value = 28;
+    pPastaEl.value = 15;
+    pMainsEl.value = 34;
+    pDessertEl.value = 10;
+    pSupperEl.value = 0;
+
+    tablesEl.value = 10;
+    fruitPerTableEl.value = 35;
+
+    drinkModeEl.value = "bar";
+    customDrinkPriceEl.value = 0;
+    customDrinkNoteEl.value = "";
+
+    updateDrinkUI();
+
     renderAll();
   }
+
+  // -----------------------------
+  // SUMMARY ACTIONS
+  // -----------------------------
+  on($("copySummary"), "click", async ()=>{
+    const text = finalSummaryEl.innerText;
+    try{
+      await navigator.clipboard.writeText(text);
+      alert("Summary copied");
+    }catch(e){
+      alert("Copy failed (browser blocked clipboard).");
+    }
+  });
+  on($("printSummary"), "click", ()=>window.print());
 
   // -----------------------------
   // INIT
@@ -1126,7 +1214,7 @@
 
   attachLimitListeners();
 
-  document.querySelectorAll("input,select").forEach(el=>{
+  document.querySelectorAll("input,select,textarea").forEach(el=>{
     el.addEventListener("input", renderAll);
     el.addEventListener("change", renderAll);
   });
@@ -1136,7 +1224,11 @@
   on($("resetAll"),"click",resetAll);
   on($("printQuote"),"click",()=>window.print());
 
+  on(drinkModeEl, "change", updateDrinkUI);
+  on(venueSpaceEl, "change", ()=> applyVenueProfile(venueSpaceEl.value));
+
   applyVenueProfile("members");
+  updateDrinkUI();
   renderAll();
 </script>
 </body>
