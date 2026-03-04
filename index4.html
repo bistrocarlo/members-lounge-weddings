@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Members Lounge — Font Sample (Montserrat)</title>
+
+  <!-- Montserrat (Google Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#0b0c10;
+      --muted:#4b5563;
+      --line:rgba(0,0,0,.10);
+      --gold:#b08d2a;
+      --goldSoft:rgba(176,141,42,.10);
+      --shadow:0 10px 26px rgba(0,0,0,.06);
+      --radius:16px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      padding:26px;
+    }
+
+    .card{
+      max-width:980px;
+      margin:0 auto;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:22px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+      padding-bottom:14px;
+      border-bottom:1px solid var(--line);
+    }
+
+    .title{
+      font-weight:900;
+      letter-spacing:-0.02em;
+      font-size:28px;
+      margin:0;
+    }
+    .subtitle{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-weight:600;
+      font-size:13px;
+    }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(176,141,42,.45);
+      background:var(--goldSoft);
+      font-weight:800;
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    /* This block mimics the “EGG SANDWICH” vibe */
+    .overlaySample{
+      margin-top:18px;
+      padding:18px 18px 16px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:linear-gradient(to bottom, #fff, rgba(176,141,42,.06));
+      position:relative;
+      overflow:hidden;
+    }
+    .overlayBar{
+      position:absolute;
+      left:0;
+      top:16px;
+      width:4px;
+      height:44px;
+      background:var(--gold);
+      border-radius:999px;
+    }
+    .overlayTitle{
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:0.02em;
+      font-size:22px;
+      margin:0 0 4px 14px;
+    }
+    .overlayPrice{
+      margin:0 0 0 14px;
+      font-weight:700;
+      font-size:14px;
+      color:var(--muted);
+    }
+
+    .samples{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+    }
+    @media(min-width:840px){
+      .samples{grid-template-columns:1fr 1fr;}
+    }
+
+    .box{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+    }
+    .box h3{
+      margin:0 0 8px;
+      font-weight:900;
+      font-size:14px;
+    }
+    .box p{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+      font-weight:600;
+    }
+
+    .gold{color:var(--gold)}
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <div class="brand">
+      <div>
+        <h1 class="title"><span class="gold">The Members Lounge</span> — Font Sample</h1>
+        <div class="subtitle">Showing how Montserrat looks in your UI headings + labels</div>
+      </div>
+      <div class="tag">Montserrat • 400 / 600 / 800 / 900</div>
+    </div>
+
+    <div class="overlaySample">
+      <div class="overlayBar"></div>
+      <p class="overlayTitle">EGG SANDWICH</p>
+      <p class="overlayPrice">¥250 / $1.73</p>
+    </div>
+
+    <div class="samples">
+      <div class="box">
+        <h3>Headings (900)</h3>
+        <p style="font-weight:900; font-size:20px; color:var(--text); margin-bottom:6px;">
+          Event Signature Selection
+        </p>
+        <p>Strong, clean, modern. Great for titles.</p>
+      </div>
+
+      <div class="box">
+        <h3>Body / Labels (600)</h3>
+        <p style="font-weight:600;">
+          Adults • Children • Room Hire • Dry Hire • Security • Food • Drinks
+        </p>
+        <p>Very readable on mobile. Nice for UI labels and helper text.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
