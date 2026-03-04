@@ -280,6 +280,40 @@
       margin:0;
       cursor:pointer;
     }
+
+    /* Summary table */
+    .summary-section {
+      margin: 15px 0;
+    }
+    .summary-section h3 {
+      font-size: 16px;
+      margin: 10px 0 5px;
+      font-family: 'Montserrat', sans-serif;
+      border-bottom: 1px dashed var(--line);
+      padding-bottom: 4px;
+    }
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      padding: 4px 0;
+    }
+    .summary-line.total {
+      font-weight: 700;
+      border-top: 2px solid var(--gold);
+      margin-top: 10px;
+      padding-top: 10px;
+    }
+    .summary-items {
+      list-style: none;
+      padding: 0;
+      margin: 5px 0 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .summary-items li {
+      padding: 2px 0;
+    }
   </style>
 </head>
 
@@ -462,10 +496,10 @@
         </div>
 
         <div class="course" data-course="antipasto">
-          <h3>Antipasto Plates (choose up to 7)</h3>
-          <div class="small">Hot items are marked (Calamari, Cevape, Meatballs in sugo, Sausages).</div>
+          <h3>Antipasto Plates (max 2 hot, max 5 non‑hot)</h3>
+          <div class="small">Hot items are marked. You may select up to 2 hot and up to 5 cold items.</div>
           <div class="optionsGrid" id="list-antipasto"></div>
-          <div class="count" id="count-antipasto">0 selected</div>
+          <div class="count" id="count-antipasto">Hot: 0/2 · Cold: 0/5</div>
           <div class="warnBox" id="warn-antipasto"></div>
         </div>
 
@@ -556,7 +590,7 @@
         <div class="card">
           <h2>Status</h2>
           <div class="statusRow">
-            <span class="badge" id="drinksCompleteBadge">Drinks: Draft</span>
+            <span class="badge" id="drinksCompleteBadge2">Drinks: Draft</span>
           </div>
           <div class="divider"></div>
           <div class="small">Bar prices show $0 for drinks (indicative). Custom adds into the quote.</div>
@@ -586,6 +620,8 @@
         <div class="card">
           <h2>Selected Items</h2>
           <div id="chips"></div>
+          <div class="divider"></div>
+          <div class="small" id="summaryCourseCounts"></div>
           <div class="divider"></div>
           <div class="small">Save 'members_lounge_logo.png' in the same folder as this file.</div>
         </div>
@@ -747,7 +783,7 @@
 
   const RULES = {
     canapes:   { max: 3 },
-    antipasto: { max: 7 },
+    antipasto: { max: 7 },          // overall max not used directly now, but kept for reference
     pasta:     { max: 2 },
     mains:     { max: 2 },
     dessert:   { max: 1 }
@@ -834,6 +870,7 @@
 
   const finalSummaryEl = $("finalSummary");
   const chipsEl = $("chips");
+  const summaryCourseCountsEl = $("summaryCourseCounts");
 
   const foodCompleteBadgeEl = $("foodCompleteBadge");
   const drinksCompleteBadgeEl = $("drinksCompleteBadge");
@@ -894,7 +931,61 @@
     return out;
   }
 
+  // Enhanced limit enforcement for antipasto (hot/cold)
+  function enforceAntipastoLimit() {
+    const course = 'antipasto';
+    const checkboxes = document.querySelectorAll('input[type="checkbox"][data-course="' + course + '"]');
+    let hotChecked = [], coldChecked = [];
+    checkboxes.forEach(cb => {
+      if (!cb.checked) return;
+      if (HOT_ANTIPASTO[cb.value]) hotChecked.push(cb);
+      else coldChecked.push(cb);
+    });
+
+    const hotOver = hotChecked.length > 2;
+    const coldOver = coldChecked.length > 5;
+
+    // If either limit exceeded, we need to uncheck some.
+    // We'll uncheck the last checked in the offending category (by DOM order, not perfect but simple)
+    if (hotOver) {
+      // uncheck the last hot item (closest to bottom)
+      const lastHot = hotChecked[hotChecked.length - 1];
+      if (lastHot) lastHot.checked = false;
+    }
+    if (coldOver) {
+      const lastCold = coldChecked[coldChecked.length - 1];
+      if (lastCold) lastCold.checked = false;
+    }
+
+    // Recount after potential unchecks
+    hotChecked = []; coldChecked = [];
+    checkboxes.forEach(cb => {
+      if (!cb.checked) return;
+      if (HOT_ANTIPASTO[cb.value]) hotChecked.push(cb);
+      else coldChecked.push(cb);
+    });
+
+    const countEl = document.getElementById("count-antipasto");
+    if (countEl) {
+      countEl.textContent = `Hot: ${hotChecked.length}/2 · Cold: ${coldChecked.length}/5`;
+    }
+
+    const warnEl = document.getElementById("warn-antipasto");
+    if (warnEl) {
+      if (hotChecked.length === 2 || coldChecked.length === 5) {
+        warnEl.style.display = "block";
+        warnEl.textContent = "Maximum selections reached for one or both categories.";
+      } else {
+        warnEl.style.display = "none";
+      }
+    }
+  }
+
   function enforceLimit(courseKey){
+    if (courseKey === 'antipasto') {
+      enforceAntipastoLimit();
+      return;
+    }
     const rule = RULES[courseKey];
     if(!rule) return;
 
@@ -930,17 +1021,29 @@
   }
 
   window.selectAll = function(checked){
-    Object.keys(RULES).forEach(courseKey => {
-      const items = document.querySelectorAll('input[type="checkbox"][data-course="' + courseKey + '"]');
-      if(checked){
+    // For antipasto, we must respect hot/cold limits. Select up to 2 hot and 5 cold.
+    if (checked) {
+      // Canapés, pasta, mains, dessert: select up to max
+      ['canapes', 'pasta', 'mains', 'dessert'].forEach(courseKey => {
+        const items = document.querySelectorAll('input[type="checkbox"][data-course="' + courseKey + '"]');
         for(let i=0;i<Math.min(items.length, RULES[courseKey].max); i++){
           items[i].checked = true;
         }
-      }else{
-        items.forEach(i => i.checked = false);
-      }
-      enforceLimit(courseKey);
-    });
+        enforceLimit(courseKey);
+      });
+
+      // Antipasto: select first 2 hot, first 5 cold
+      const hotItems = Array.from(document.querySelectorAll('input[type="checkbox"][data-course="antipasto"]')).filter(cb => HOT_ANTIPASTO[cb.value]);
+      const coldItems = Array.from(document.querySelectorAll('input[type="checkbox"][data-course="antipasto"]')).filter(cb => !HOT_ANTIPASTO[cb.value]);
+      hotItems.slice(0,2).forEach(cb => cb.checked = true);
+      coldItems.slice(0,5).forEach(cb => cb.checked = true);
+      enforceAntipastoLimit();
+    } else {
+      document.querySelectorAll('input[type="checkbox"][data-course]').forEach(i => i.checked = false);
+      // re-enforce limits to update UI
+      Object.keys(RULES).forEach(enforceLimit);
+      enforceAntipastoLimit();
+    }
     renderAll();
   };
 
@@ -978,6 +1081,7 @@
   function renderAll(){
     const adults = Number(adultsEl.value||0);
     const children = Number(childrenEl.value||0);
+    const totalGuests = adults + children;
 
     const room = Number(roomHireEl.value||0);
     const dry = Number(dryHireEl.value||0);
@@ -987,6 +1091,7 @@
     const drinks = calculateDrinks();
     const total = room + dry + sec + food + drinks;
 
+    // Update quote page fields
     qRoomEl.textContent = aud(room);
     qDryEl.textContent  = aud(dry);
     qSecEl.textContent  = aud(sec);
@@ -997,29 +1102,85 @@
     kpiAdultsEl.textContent = adults;
     kpiChildrenEl.textContent = children;
     kpiFoodEl.textContent = aud(food);
-
-    const guestTotal = adults + children;
-    kpiAvgEl.textContent = guestTotal ? aud(total/guestTotal) : aud(0);
+    kpiAvgEl.textContent = totalGuests ? aud(total/totalGuests) : aud(0);
 
     const sel = getSelections();
     const anyFood = Object.values(sel).some(a=>a.length);
     setBadge(foodCompleteBadgeEl, anyFood ? "ok":"warn", anyFood ? "Menu Ready" : "Menu Empty");
-
     setBadge(drinksCompleteBadgeEl, (drinkModeEl.value==="bar") ? "warn":"ok",
       (drinkModeEl.value==="bar") ? "Bar Pricing" : "Custom Drinks");
 
-    finalSummaryEl.innerHTML =
-      "<b>" + escapeHtml(coupleNameEl.value||"Event") + "</b><br>" +
-      "Date: " + escapeHtml(weddingDateEl.value||"-") + "<br>" +
-      "Adults: " + adults + " | Children: " + children + "<br><br>" +
-      "Food: " + aud(food) + "<br>" +
-      "Drinks: " + aud(drinks) + "<br>" +
-      "Room: " + aud(room) + "<br>" +
-      "Dry Hire: " + aud(dry) + "<br>" +
-      "Security: " + aud(sec) + "<br><br>" +
-      "<b>Total: " + aud(total) + "</b>";
+    // Also update the drinks badge on the drinks page
+    const drinksBadge2 = $("drinksCompleteBadge2");
+    if(drinksBadge2) setBadge(drinksBadge2, (drinkModeEl.value==="bar") ? "warn":"ok",
+      (drinkModeEl.value==="bar") ? "Bar Pricing" : "Custom Drinks");
 
-    chipsEl.innerHTML = "";
+    // ---- Build detailed summary for the Summary page ----
+    const coupleName = coupleNameEl.value.trim() || "Event";
+    const weddingDate = weddingDateEl.value || "Not set";
+    const venueSelect = $("venueSpace");
+    const venueText = venueSelect.options[venueSelect.selectedIndex]?.text || "Not selected";
+
+    // Food items per course
+    const foodItemsHtml = Object.keys(COURSE_LABEL).map(courseKey => {
+      const items = sel[courseKey];
+      if(items.length === 0) return '';
+      return `<li><strong>${COURSE_LABEL[courseKey]}:</strong> ${items.map(escapeHtml).join(', ')}</li>`;
+    }).filter(s => s).join('');
+
+    const fruitHtml = fruitPlatterEl.checked
+      ? `<li><strong>Fruit platter:</strong> ${tablesEl.value} tables x $35 = ${aud(Number(tablesEl.value)*35)}</li>`
+      : '';
+
+    // Drink mode details
+    let drinkDetails = '';
+    if(drinkModeEl.value === 'bar') {
+      drinkDetails = 'Bar prices (no package cost)';
+    } else {
+      const price = Number(customDrinkPriceEl.value || 0);
+      const note = customDrinkNoteEl.value.trim();
+      drinkDetails = `Custom package: ${aud(price)} per adult × ${adults} = ${aud(price * adults)}`;
+      if(note) drinkDetails += ` (${escapeHtml(note)})`;
+    }
+
+    // Build the summary HTML
+    const summaryHtml = `
+      <div class="summary-section">
+        <div class="summary-line"><span>Event:</span> <span>${escapeHtml(coupleName)}</span></div>
+        <div class="summary-line"><span>Date:</span> <span>${escapeHtml(weddingDate)}</span></div>
+        <div class="summary-line"><span>Venue:</span> <span>${escapeHtml(venueText)}</span></div>
+        <div class="summary-line"><span>Guests:</span> <span>${adults} adults, ${children} children</span></div>
+      </div>
+
+      <div class="summary-section">
+        <h3>🍽️ Food</h3>
+        ${foodItemsHtml ? `<ul class="summary-items">${foodItemsHtml}${fruitHtml}</ul>` : '<p>No food items selected</p>'}
+        <div class="summary-line"><span>Food subtotal:</span> <span>${aud(food)}</span></div>
+      </div>
+
+      <div class="summary-section">
+        <h3>🥂 Drinks</h3>
+        <div class="summary-line"><span>Mode:</span> <span>${drinkDetails}</span></div>
+        <div class="summary-line"><span>Drinks total:</span> <span>${aud(drinks)}</span></div>
+      </div>
+
+      <div class="summary-section">
+        <h3>🏛️ Other costs</h3>
+        <div class="summary-line"><span>Room hire:</span> <span>${aud(room)}</span></div>
+        <div class="summary-line"><span>Dry hire:</span> <span>${aud(dry)}</span></div>
+        <div class="summary-line"><span>Security:</span> <span>${aud(sec)}</span></div>
+      </div>
+
+      <div class="summary-line total">
+        <span>Grand total</span>
+        <span>${aud(total)}</span>
+      </div>
+    `;
+
+    finalSummaryEl.innerHTML = summaryHtml;
+
+    // Update chips and course counts
+    chipsEl.innerHTML = '';
     Object.entries(sel).forEach(([course, items]) => {
       items.forEach(item => {
         const chip = document.createElement("span");
@@ -1028,6 +1189,24 @@
         chipsEl.appendChild(chip);
       });
     });
+    if(fruitPlatterEl.checked) {
+      const chip = document.createElement("span");
+      chip.className = "pill";
+      chip.textContent = `Fruit platter (${tablesEl.value} tables)`;
+      chipsEl.appendChild(chip);
+    }
+
+    // Show counts per course
+    const counts = Object.keys(COURSE_LABEL).map(c => {
+      if (c === 'antipasto') {
+        const hot = (sel.antipasto.filter(i => HOT_ANTIPASTO[i])).length;
+        const cold = sel.antipasto.length - hot;
+        return `Antipasto: ${hot} hot, ${cold} cold`;
+      } else {
+        return `${COURSE_LABEL[c]}: ${sel[c].length}`;
+      }
+    }).join(' · ');
+    summaryCourseCountsEl.textContent = counts;
   }
 
   function resetAll(){
@@ -1048,7 +1227,9 @@
     customDrinkPriceEl.value = 0;
     customDrinkNoteEl.value = "";
 
+    // Re-enforce limits to reset UI
     Object.keys(RULES).forEach(enforceLimit);
+    enforceAntipastoLimit();
     updateDrinkUI();
     renderAll();
   }
@@ -1068,6 +1249,8 @@
   addCheckboxList("dessert","list-dessert");
 
   attachLimitListeners();
+  // Initial enforcement for antipasto to set correct count display
+  enforceAntipastoLimit();
   Object.keys(RULES).forEach(enforceLimit);
 
   document.querySelectorAll("input,select,textarea").forEach(el=>{
