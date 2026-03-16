@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>George Theodoropoulos · Master of Ceremonies</title>
-    <meta name="description" content="Prestigious MC services by George Theodoropoulos. Warm, engaging, and impeccably professional.">
+    <meta name="description" content="Prestigious MC services by George Theodoropoulos. Warm, engaging, and impeccably professional. Bilingual: English & Greek.">
     <!-- Fancy fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -360,6 +360,18 @@
             .card { border: 1px solid #d4af37; break-inside: avoid; }
             h2 { color: #000; border-bottom-color: #d4af37; }
         }
+
+        /* Summary page for print */
+        #print-summary {
+            display: none;
+        }
+        @media print {
+            #print-summary {
+                display: block;
+            }
+            .no-print, .nav, .lang-switcher, .btn, .footer, .nav-btn, .saved-msg { display: none !important; }
+            .section { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -392,11 +404,15 @@
         <section id="home-section" class="section active">
             <div class="card">
                 <h2 data-en="About" data-el="Σχετικά">About</h2>
-                <p data-en="Warm, confident, and impeccably professional — George ensures your celebration is seamless and heartfelt without ever overshadowing your special moments. With years of experience and a dedication to personalisation, he becomes the calm, charismatic thread that weaves your event together." data-el="Ζεστός, σίγουρος και άψογα επαγγελματίας — ο George εξασφαλίζει ότι η γιορτή σας είναι άψογη και εγκάρδια χωρίς ποτέ να επισκιάζει τις ξεχωριστές σας στιγμές. Με χρόνια εμπειρίας και αφοσίωση στην εξατομίκευση, γίνεται η ήρεμη, χαρισματική παρουσία που δένει την εκδήλωσή σας.">Warm, confident, and impeccably professional — George ensures your celebration is seamless and heartfelt without ever overshadowing your special moments. With years of experience and a dedication to personalisation, he becomes the calm, charismatic thread that weaves your event together.</p>
+                <p data-en="Warm, confident, and impeccably professional — George ensures your celebration is seamless and heartfelt without ever overshadowing your special moments. With years of experience and a dedication to personalisation, he becomes the calm, charismatic thread that weaves your event together. Fully bilingual: fluent in English and Greek, offering seamless MC services in both languages." data-el="Ζεστός, σίγουρος και άψογα επαγγελματίας — ο George εξασφαλίζει ότι η γιορτή σας είναι άψογη και εγκάρδια χωρίς ποτέ να επισκιάζει τις ξεχωριστές σας στιγμές. Με χρόνια εμπειρίας και αφοσίωση στην εξατομίκευση, γίνεται η ήρεμη, χαρισματική παρουσία που δένει την εκδήλωσή σας. Απόλυτα δίγλωσσος: άπταιστα Αγγλικά και Ελληνικά, προσφέροντας άψογες υπηρεσίες τελετάρχη και στις δύο γλώσσες.">Warm, confident, and impeccably professional — George ensures your celebration is seamless and heartfelt without ever overshadowing your special moments. With years of experience and a dedication to personalisation, he becomes the calm, charismatic thread that weaves your event together. Fully bilingual: fluent in English and Greek, offering seamless MC services in both languages.</p>
             </div>
 
             <div class="card">
                 <h2 data-en="Services" data-el="Υπηρεσίες">Services</h2>
+                <div class="service-item">
+                    <div class="service-title" data-en="Bilingual MC (English & Greek)" data-el="Δίγλωσσος Τελετάρχης (Αγγλικά & Ελληνικά)">Bilingual MC (English & Greek)</div>
+                    <p data-en="Seamlessly host your event in both English and Greek, ensuring all guests feel included and engaged." data-el="Φιλοξενήστε άψογα την εκδήλωσή σας στα Αγγλικά και στα Ελληνικά, διασφαλίζοντας ότι όλοι οι καλεσμένοι αισθάνονται ότι συμμετέχουν.">Seamlessly host your event in both English and Greek, ensuring all guests feel included and engaged.</p>
+                </div>
                 <div class="service-item">
                     <div class="service-title" data-en="Pre-Event Planning" data-el="Προγραμματισμός">Pre-Event Planning</div>
                     <p data-en="Face-to-face or Zoom meetings to understand your vision, prepare the run sheet, and align with venue food timelines." data-el="Συναντήσεις διά ζώσης ή μέσω Zoom για να κατανοήσουμε το όραμά σας, να προετοιμάσουμε το χρονοδιάγραμμα και να ευθυγραμμιστούμε με τα ωράρια φαγητού του χώρου.">Face-to-face or Zoom meetings to understand your vision, prepare the run sheet, and align with venue food timelines.</p>
@@ -419,7 +435,7 @@
                 <h2 data-en="Pricing" data-el="Τιμολόγηση">Pricing</h2>
                 <div class="price-tag">$1,650 AUD</div>
                 <div class="price-note" data-en="per night · base rate" data-el="ανά βραδιά · βασική τιμή">per night · base rate</div>
-                <p style="margin-top: 1.5rem; color: #555;" data-en="Variables affecting price: parking, travel, extended hours, additional responsibilities. (Fior venue excludes parking/travel.)" data-el="Παράγοντες που επηρεάζουν την τιμή: πάρκινγκ, ταξίδι, παρατεταμένες ώρες, επιπλέον ευθύνες. (Ο χώρος Fior εξαιρεί πάρκινγκ/ταξίδι.)">Variables affecting price: parking, travel, extended hours, additional responsibilities. (Fior venue excludes parking/travel.)</p>
+                <p style="margin-top: 1.5rem; color: #555;" data-en="Variables affecting price: parking, travel, extended hours, additional responsibilities." data-el="Παράγοντες που επηρεάζουν την τιμή: πάρκινγκ, ταξίδι, παρατεταμένες ώρες, επιπλέον ευθύνες.">Variables affecting price: parking, travel, extended hours, additional responsibilities.</p>
             </div>
 
             <div class="contact-info">
@@ -502,7 +518,7 @@
             </div>
         </section>
 
-        <!-- Event Journal Section (includes love story + logistics) -->
+        <!-- Event Journal Section (includes love story, venue & team, logistics) -->
         <section id="journal-section" class="section">
             <div class="card">
                 <h2 data-en="Love Story & Journal" data-el="Ιστορία Αγάπης & Ημερολόγιο">Love Story & Journal</h2>
@@ -545,21 +561,59 @@
                         <textarea id="avoid" placeholder="e.g. certain jokes, exclusions, etc."></textarea>
                     </div>
 
+                    <!-- Venue & Team -->
+                    <div style="margin-top: 3rem; border-top: 2px solid #d4af37; padding-top: 2rem;">
+                        <h2 style="border-bottom: none;" data-en="Venue & Team" data-el="Χώρος & Ομάδα">Venue & Team</h2>
+                        <p data-en="Key contacts and venue details." data-el="Σημαντικές επαφές και λεπτομέρειες χώρου.">Key contacts and venue details.</p>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label data-en="Venue Name" data-el="Όνομα Χώρου">Venue Name</label>
+                                <input type="text" id="venue-name" placeholder="e.g. The Great Hall">
+                            </div>
+                            <div class="form-group">
+                                <label data-en="Room Name" data-el="Όνομα Αίθουσας">Room Name</label>
+                                <input type="text" id="room-name" placeholder="e.g. Ballroom, Garden Terrace">
+                            </div>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label data-en="Wedding Date" data-el="Ημερομηνία Γάμου">Wedding Date</label>
+                                <input type="date" id="wedding-date">
+                            </div>
+                            <div class="form-group">
+                                <label data-en="DJ Name" data-el="Όνομα DJ">DJ Name</label>
+                                <input type="text" id="dj-name" placeholder="e.g. DJ Alex">
+                            </div>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label data-en="Venue Manager Name" data-el="Όνομα Υπεύθυνου Χώρου">Venue Manager Name</label>
+                                <input type="text" id="venue-manager" placeholder="e.g. Sarah Johnson">
+                            </div>
+                            <div class="form-group">
+                                <label data-en="Caterer Name" data-el="Όνομα Caterer">Caterer Name</label>
+                                <input type="text" id="caterer" placeholder="e.g. Elite Events">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label data-en="List of Activities / Key Moments" data-el="Λίστα Δραστηριοτήτων / Βασικές Στιγμές">List of Activities / Key Moments</label>
+                            <textarea id="activities" placeholder="e.g. Ceremony, Cocktail hour, Speeches, First dance, Cake cutting, Bouquet toss, etc."></textarea>
+                        </div>
+
+                        <!-- Note about running sheet on last page -->
+                        <p style="font-style: italic; color: #d4af37; margin-top: 1rem;" data-en="(The detailed running sheet will be developed on the final page.)" data-el="(Το λεπτομερές χρονοδιάγραμμα θα αναπτυχθεί στην τελική σελίδα.)">(The detailed running sheet will be developed on the final page.)</p>
+                    </div>
+
                     <!-- Logistics & Timeline -->
                     <div style="margin-top: 3rem; border-top: 2px solid #d4af37; padding-top: 2rem;">
                         <h2 style="border-bottom: none;" data-en="Logistics & Timeline" data-el="Logistics & Χρονοδιάγραμμα">Logistics & Timeline</h2>
                         <p data-en="Essential details for the MC to plan the perfect flow." data-el="Απαραίτητες λεπτομέρειες για τον MC να σχεδιάσει την τέλεια ροή.">Essential details for the MC to plan the perfect flow.</p>
 
-                        <div class="form-group">
-                            <label data-en="Reception Centre / Venue Name" data-el="Όνομα Χώρου Δεξίωσης">Reception Centre / Venue Name</label>
-                            <input type="text" id="venue" placeholder="e.g. Fior, The Gallery, etc.">
-                        </div>
-
                         <div class="grid-3">
-                            <div class="form-group">
-                                <label data-en="Wedding Date" data-el="Ημερομηνία Γάμου">Wedding Date</label>
-                                <input type="date" id="wedding-date">
-                            </div>
                             <div class="form-group">
                                 <label data-en="Ceremony Start Time" data-el="Ώρα Έναρξης Τελετής">Ceremony Start Time</label>
                                 <input type="time" id="ceremony-time">
@@ -568,15 +622,321 @@
                                 <label data-en="Expected Finish Time" data-el="Αναμενόμενη Ώρα Λήξης">Expected Finish Time</label>
                                 <input type="time" id="finish-time">
                             </div>
-                        </div>
-
-                        <div class="grid-2">
                             <div class="form-group">
                                 <label data-en="Number of Guests" data-el="Αριθμός Καλεσμένων">Number of Guests</label>
                                 <input type="number" id="guest-count" placeholder="e.g. 150" min="1">
                             </div>
+                        </div>
+
+                        <div class="grid-2">
                             <div class="form-group">
                                 <label data-en="Scope / Style of Wedding" data-el="Τύπος / Στυλ Γάμου">Scope / Style of Wedding</label>
                                 <select id="wedding-scope">
                                     <option value="" disabled selected data-en="Select one" data-el="Επιλέξτε ένα">Select one</option>
-                                    <option value="Formal / Black Tie" data-en
+                                    <option value="Formal / Black Tie" data-en="Formal / Black Tie" data-el="Επίσημος / Black Tie">Formal / Black Tie</option>
+                                    <option value="Semi-formal" data-en="Semi-formal" data-el="Ημιεπίσημος">Semi-formal</option>
+                                    <option value="Casual / Rustic" data-en="Casual / Rustic" data-el="Ανεπίσημος / Ρουστίκ">Casual / Rustic</option>
+                                    <option value="Themed" data-en="Themed" data-el="Θεματικός">Themed</option>
+                                    <option value="Intimate / Elopement" data-en="Intimate / Elopement" data-el="Οικείος / Μυστικός">Intimate / Elopement</option>
+                                    <option value="Other" data-en="Other" data-el="Άλλο">Other</option>
+                                </select>
+                                <input type="text" id="scope-other" placeholder='If "Other", describe...' style="margin-top: 0.5rem;">
+                            </div>
+
+                            <div class="form-group">
+                                <label data-en="Does George need to attend the house / preparation location during the day?" data-el="Χρειάζεται ο George να παρευρεθεί στο σπίτι / χώρο ετοιμασίας κατά τη διάρκεια της ημέρας;">Does George need to attend the house / preparation location during the day?</label>
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="house-visit" value="yes"> <span data-en="Yes" data-el="Ναι">Yes</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="house-visit" value="no" checked> <span data-en="No" data-el="Όχι">No</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label data-en="Additional Logistics Notes" data-el="Επιπλέον Σημειώσεις Logistics">Additional Logistics Notes</label>
+                            <textarea id="logistics-notes" placeholder="e.g. specific timing requests, special entrances, etc."></textarea>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn" id="save-journal" data-en="Save Event Journal" data-el="Αποθήκευση Ημερολογίου">Save Event Journal</button>
+                    <div id="journal-saved-msg" class="saved-msg"></div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Print Summary Page (hidden until print) -->
+        <div id="print-summary">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h1 style="font-size: 2.5rem;">GEORGE THEODOROPOULOS</h1>
+                <p style="font-size: 1.2rem; color: #d4af37; font-weight: 600;" id="print-title">Master of Ceremonies</p>
+            </div>
+
+            <!-- Wedding Party Summary -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <h2 data-en="Wedding Party Details" data-el="Λεπτομέρειες Γαμήλιας Παρέας">Wedding Party Details</h2>
+                <div id="print-party"></div>
+            </div>
+
+            <!-- Love Story Summary -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <h2 data-en="Love Story & Journal" data-el="Ιστορία Αγάπης & Ημερολόγιο">Love Story & Journal</h2>
+                <div id="print-love"></div>
+            </div>
+
+            <!-- Venue & Team Summary -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <h2 data-en="Venue & Team" data-el="Χώρος & Ομάδα">Venue & Team</h2>
+                <div id="print-venue"></div>
+            </div>
+
+            <!-- Logistics Summary -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <h2 data-en="Logistics & Timeline" data-el="Logistics & Χρονοδιάγραμμα">Logistics & Timeline</h2>
+                <div id="print-logistics"></div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer no-print">
+            © George Theodoropoulos · Master of Ceremonies
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            let currentLang = 'en';
+
+            // Language switcher
+            const langEn = document.getElementById('lang-en');
+            const langEl = document.getElementById('lang-el');
+            const langBtns = [langEn, langEl];
+
+            function setLanguage(lang) {
+                currentLang = lang;
+                langBtns.forEach(btn => btn.classList.remove('active'));
+                if (lang === 'en') langEn.classList.add('active');
+                else langEl.classList.add('active');
+
+                document.querySelectorAll('[data-en]').forEach(el => {
+                    if (el.tagName === 'OPTION') {
+                        el.textContent = el.getAttribute(`data-${lang}`) || el.textContent;
+                    } else {
+                        el.textContent = el.getAttribute(`data-${lang}`) || el.textContent;
+                    }
+                });
+            }
+
+            langEn.addEventListener('click', () => setLanguage('en'));
+            langEl.addEventListener('click', () => setLanguage('el'));
+
+            // Navigation
+            const btnHome = document.getElementById('btn-home');
+            const btnParty = document.getElementById('btn-party');
+            const btnJournal = document.getElementById('btn-journal');
+            const homeSection = document.getElementById('home-section');
+            const partySection = document.getElementById('party-section');
+            const journalSection = document.getElementById('journal-section');
+            const navBtns = [btnHome, btnParty, btnJournal];
+
+            function showSection(sectionToShow) {
+                homeSection.classList.remove('active');
+                partySection.classList.remove('active');
+                journalSection.classList.remove('active');
+                sectionToShow.classList.add('active');
+                navBtns.forEach(btn => btn.classList.remove('active'));
+                if (sectionToShow === homeSection) btnHome.classList.add('active');
+                if (sectionToShow === partySection) btnParty.classList.add('active');
+                if (sectionToShow === journalSection) btnJournal.classList.add('active');
+            }
+
+            btnHome.addEventListener('click', () => showSection(homeSection));
+            btnParty.addEventListener('click', () => showSection(partySection));
+            btnJournal.addEventListener('click', () => showSection(journalSection));
+
+            // Load saved data
+            function loadPartyData() {
+                const data = JSON.parse(localStorage.getItem('george_mc_party') || '{}');
+                document.getElementById('groom').value = data.groom || '';
+                document.getElementById('bride').value = data.bride || '';
+                document.getElementById('matron').value = data.matron || '';
+                document.getElementById('bestman').value = data.bestman || '';
+                document.getElementById('groomsmen').value = data.groomsmen || '';
+                document.getElementById('bridesmaids').value = data.bridesmaids || '';
+                document.getElementById('flowerboy').value = data.flowerboy || '';
+                document.getElementById('pagegirl').value = data.pagegirl || '';
+                document.getElementById('parents-groom').value = data.parentsGroom || '';
+                document.getElementById('parents-bride').value = data.parentsBride || '';
+                document.getElementById('other-people').value = data.otherPeople || '';
+            }
+
+            function loadJournalData() {
+                const data = JSON.parse(localStorage.getItem('george_mc_journal') || '{}');
+                document.getElementById('how-met').value = data.howMet || '';
+                document.getElementById('proposal').value = data.proposal || '';
+                document.getElementById('traditions').value = data.traditions || '';
+                document.getElementById('first-dance').value = data.firstDance || '';
+                document.getElementById('other-songs').value = data.otherSongs || '';
+                document.getElementById('messages').value = data.messages || '';
+                document.getElementById('avoid').value = data.avoid || '';
+                // Venue & Team
+                document.getElementById('venue-name').value = data.venueName || '';
+                document.getElementById('room-name').value = data.roomName || '';
+                document.getElementById('wedding-date').value = data.weddingDate || '';
+                document.getElementById('dj-name').value = data.djName || '';
+                document.getElementById('venue-manager').value = data.venueManager || '';
+                document.getElementById('caterer').value = data.caterer || '';
+                document.getElementById('activities').value = data.activities || '';
+                // Logistics
+                document.getElementById('ceremony-time').value = data.ceremonyTime || '';
+                document.getElementById('finish-time').value = data.finishTime || '';
+                document.getElementById('guest-count').value = data.guestCount || '';
+                document.getElementById('wedding-scope').value = data.weddingScope || '';
+                document.getElementById('scope-other').value = data.scopeOther || '';
+                if (data.houseVisit === 'yes') {
+                    document.querySelector('input[name="house-visit"][value="yes"]').checked = true;
+                } else {
+                    document.querySelector('input[name="house-visit"][value="no"]').checked = true;
+                }
+                document.getElementById('logistics-notes').value = data.logisticsNotes || '';
+            }
+
+            // Save party data
+            document.getElementById('save-party').addEventListener('click', function() {
+                const partyData = {
+                    groom: document.getElementById('groom').value,
+                    bride: document.getElementById('bride').value,
+                    matron: document.getElementById('matron').value,
+                    bestman: document.getElementById('bestman').value,
+                    groomsmen: document.getElementById('groomsmen').value,
+                    bridesmaids: document.getElementById('bridesmaids').value,
+                    flowerboy: document.getElementById('flowerboy').value,
+                    pagegirl: document.getElementById('pagegirl').value,
+                    parentsGroom: document.getElementById('parents-groom').value,
+                    parentsBride: document.getElementById('parents-bride').value,
+                    otherPeople: document.getElementById('other-people').value
+                };
+                localStorage.setItem('george_mc_party', JSON.stringify(partyData));
+                document.getElementById('party-saved-msg').innerText = currentLang === 'en' ? '✓ Saved' : '✓ Αποθηκεύτηκε';
+                setTimeout(() => document.getElementById('party-saved-msg').innerText = '', 2000);
+            });
+
+            // Save journal data
+            document.getElementById('save-journal').addEventListener('click', function() {
+                const houseVisit = document.querySelector('input[name="house-visit"]:checked')?.value || 'no';
+                const journalData = {
+                    howMet: document.getElementById('how-met').value,
+                    proposal: document.getElementById('proposal').value,
+                    traditions: document.getElementById('traditions').value,
+                    firstDance: document.getElementById('first-dance').value,
+                    otherSongs: document.getElementById('other-songs').value,
+                    messages: document.getElementById('messages').value,
+                    avoid: document.getElementById('avoid').value,
+                    venueName: document.getElementById('venue-name').value,
+                    roomName: document.getElementById('room-name').value,
+                    weddingDate: document.getElementById('wedding-date').value,
+                    djName: document.getElementById('dj-name').value,
+                    venueManager: document.getElementById('venue-manager').value,
+                    caterer: document.getElementById('caterer').value,
+                    activities: document.getElementById('activities').value,
+                    ceremonyTime: document.getElementById('ceremony-time').value,
+                    finishTime: document.getElementById('finish-time').value,
+                    guestCount: document.getElementById('guest-count').value,
+                    weddingScope: document.getElementById('wedding-scope').value,
+                    scopeOther: document.getElementById('scope-other').value,
+                    houseVisit: houseVisit,
+                    logisticsNotes: document.getElementById('logistics-notes').value
+                };
+                localStorage.setItem('george_mc_journal', JSON.stringify(journalData));
+                document.getElementById('journal-saved-msg').innerText = currentLang === 'en' ? '✓ Saved' : '✓ Αποθηκεύτηκε';
+                setTimeout(() => document.getElementById('journal-saved-msg').innerText = '', 2000);
+            });
+
+            // Print function
+            document.getElementById('print-btn').addEventListener('click', function() {
+                // Populate print summary
+                const party = JSON.parse(localStorage.getItem('george_mc_party') || '{}');
+                const journal = JSON.parse(localStorage.getItem('george_mc_journal') || '{}');
+
+                let partyHtml = '';
+                if (party.groom) partyHtml += `<p><strong>Groom:</strong> ${party.groom}</p>`;
+                if (party.bride) partyHtml += `<p><strong>Bride:</strong> ${party.bride}</p>`;
+                if (party.matron) partyHtml += `<p><strong>Matron of Honour:</strong> ${party.matron}</p>`;
+                if (party.bestman) partyHtml += `<p><strong>Best Man:</strong> ${party.bestman}</p>`;
+                if (party.groomsmen) partyHtml += `<p><strong>Groomsmen:</strong> ${party.groomsmen}</p>`;
+                if (party.bridesmaids) partyHtml += `<p><strong>Bridesmaids:</strong> ${party.bridesmaids}</p>`;
+                if (party.flowerboy) partyHtml += `<p><strong>Flower Boy:</strong> ${party.flowerboy}</p>`;
+                if (party.pagegirl) partyHtml += `<p><strong>Page Girl:</strong> ${party.pagegirl}</p>`;
+                if (party.parentsGroom) partyHtml += `<p><strong>Parents of Groom:</strong> ${party.parentsGroom}</p>`;
+                if (party.parentsBride) partyHtml += `<p><strong>Parents of Bride:</strong> ${party.parentsBride}</p>`;
+                if (party.otherPeople) partyHtml += `<p><strong>Other Important People:</strong> ${party.otherPeople}</p>`;
+                document.getElementById('print-party').innerHTML = partyHtml || '<p>No data entered.</p>';
+
+                let loveHtml = '';
+                if (journal.howMet) loveHtml += `<p><strong>How They Met:</strong> ${journal.howMet}</p>`;
+                if (journal.proposal) loveHtml += `<p><strong>The Proposal:</strong> ${journal.proposal}</p>`;
+                if (journal.traditions) loveHtml += `<p><strong>Traditions:</strong> ${journal.traditions}</p>`;
+                if (journal.firstDance) loveHtml += `<p><strong>First Dance:</strong> ${journal.firstDance}</p>`;
+                if (journal.otherSongs) loveHtml += `<p><strong>Other Songs:</strong> ${journal.otherSongs}</p>`;
+                if (journal.messages) loveHtml += `<p><strong>Messages:</strong> ${journal.messages}</p>`;
+                if (journal.avoid) loveHtml += `<p><strong>Avoid:</strong> ${journal.avoid}</p>`;
+                document.getElementById('print-love').innerHTML = loveHtml || '<p>No data entered.</p>';
+
+                let venueHtml = '';
+                if (journal.venueName) venueHtml += `<p><strong>Venue:</strong> ${journal.venueName}</p>`;
+                if (journal.roomName) venueHtml += `<p><strong>Room:</strong> ${journal.roomName}</p>`;
+                if (journal.weddingDate) venueHtml += `<p><strong>Date:</strong> ${journal.weddingDate}</p>`;
+                if (journal.djName) venueHtml += `<p><strong>DJ:</strong> ${journal.djName}</p>`;
+                if (journal.venueManager) venueHtml += `<p><strong>Venue Manager:</strong> ${journal.venueManager}</p>`;
+                if (journal.caterer) venueHtml += `<p><strong>Caterer:</strong> ${journal.caterer}</p>`;
+                if (journal.activities) venueHtml += `<p><strong>Activities:</strong> ${journal.activities}</p>`;
+                document.getElementById('print-venue').innerHTML = venueHtml || '<p>No data entered.</p>';
+
+                let logisticsHtml = '';
+                if (journal.ceremonyTime) logisticsHtml += `<p><strong>Ceremony Start:</strong> ${journal.ceremonyTime}</p>`;
+                if (journal.finishTime) logisticsHtml += `<p><strong>Finish Time:</strong> ${journal.finishTime}</p>`;
+                if (journal.guestCount) logisticsHtml += `<p><strong>Guests:</strong> ${journal.guestCount}</p>`;
+                if (journal.weddingScope) logisticsHtml += `<p><strong>Scope:</strong> ${journal.weddingScope}</p>`;
+                if (journal.scopeOther) logisticsHtml += `<p><strong>Scope (other):</strong> ${journal.scopeOther}</p>`;
+                if (journal.houseVisit) logisticsHtml += `<p><strong>House Visit:</strong> ${journal.houseVisit === 'yes' ? 'Yes' : 'No'}</p>`;
+                if (journal.logisticsNotes) logisticsHtml += `<p><strong>Notes:</strong> ${journal.logisticsNotes}</p>`;
+                document.getElementById('print-logistics').innerHTML = logisticsHtml || '<p>No data entered.</p>';
+
+                // Set title language
+                document.getElementById('print-title').innerText = currentLang === 'en' ? 'Master of Ceremonies' : 'Τελετάρχης';
+
+                window.print();
+            });
+
+            // Initial load
+            loadPartyData();
+            loadJournalData();
+
+            // Clear messages on input
+            const partyInputs = document.querySelectorAll('#party-form input, #party-form textarea');
+            partyInputs.forEach(input => {
+                input.addEventListener('input', () => document.getElementById('party-saved-msg').innerText = '');
+            });
+
+            const journalInputs = document.querySelectorAll('#journal-form input, #journal-form textarea, #journal-form select');
+            journalInputs.forEach(input => {
+                input.addEventListener('input', () => document.getElementById('journal-saved-msg').innerText = '');
+            });
+
+            setLanguage('en');
+        })();
+    </script>
+
+    <!-- Simple service worker for PWA (optional) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('data:application/javascript,%23%20simple%20service%20worker%20for%20caching%0Aself.addEventListener%28%27install%27%2C%20e%20%3D%3E%20%7B%0A%20%20e.waitUntil%28%0A%20%20%20%20caches.open%28%27george-mc-v1%27%29.then%28cache%20%3D%3E%20cache.addAll%28%5B%27.%2F%27%5D%29%29%0A%20%20%29%3B%0A%7D%29%3B%0Aself.addEventListener%28%27fetch%27%2C%20e%20%3D%3E%20%7B%0A%20%20e.respondWith%28%0A%20%20%20%20caches.match%28e.request%29.then%28response%20%3D%3E%20response%20%7C%7C%20fetch%28e.request%29%29%0A%20%20%29%3B%0A%7D%29%3B').catch(err => console.log('SW registration failed', err));
+            });
+        }
+    </script>
+</body>
+</html>
