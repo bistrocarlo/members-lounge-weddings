@@ -287,6 +287,7 @@
             font-size: 1rem;
             border-radius: 30px;
             margin-bottom: 1rem;
+            cursor: pointer;
         }
         .btn-add:hover {
             background: #d4af37;
@@ -469,11 +470,11 @@
             </div>
         </section>
 
-        <!-- Wedding Party Section (with paired groomsmen/bridesmaids) -->
+        <!-- Wedding Party Section (with Bridal Party Pairs and Flower Kids Pairs) -->
         <section id="party-section" class="section">
             <div class="card">
                 <h2 data-en="Wedding Party Details" data-el="Λεπτομέρειες Γαμήλιας Παρέας">Wedding Party Details</h2>
-                <p data-en="Please fill in the names and roles. Add multiple pairs for groomsmen and bridesmaids." data-el="Συμπληρώστε τα ονόματα και τους ρόλους. Προσθέστε πολλά ζευγάρια για παράνυμφους.">Please fill in the names and roles. Add multiple pairs for groomsmen and bridesmaids.</p>
+                <p data-en="Add pairs for the bridal party and for flower kids." data-el="Προσθέστε ζευγάρια για τη γαμήλια παρέα και για τα παιδιά με λουλούδια.">Add pairs for the bridal party and for flower kids.</p>
                 <form id="party-form">
                     <div class="grid-2">
                         <div class="form-group">
@@ -497,26 +498,21 @@
                         </div>
                     </div>
 
-                    <!-- Paired Groomsmen & Bridesmaids -->
-                    <div id="pairs-container">
-                        <h3 style="color: #d4af37; margin: 1.5rem 0 1rem;" data-en="Groomsmen & Bridesmaids Pairs" data-el="Ζευγάρια Παράνυμφων">Groomsmen & Bridesmaids Pairs</h3>
+                    <!-- Bridal Party Pairs -->
+                    <div id="bridal-pairs-container">
+                        <h3 style="color: #d4af37; margin: 1.5rem 0 1rem;" data-en="Bridal Party Pairs" data-el="Ζευγάρια Γαμήλιας Παρέας">Bridal Party Pairs</h3>
                         <!-- Pairs will be added here dynamically -->
                     </div>
-                    <button type="button" class="btn-add" id="add-pair" data-en="+ Add Pair" data-el="+ Προσθήκη Ζευγαριού">+ Add Pair</button>
+                    <button type="button" class="btn-add" id="add-bridal-pair" data-en="+ Add Bridal Pair" data-el="+ Προσθήκη Ζευγαριού Παρέας">+ Add Bridal Pair</button>
 
-                    <!-- Flower Girls and Page Boys (plural) -->
-                    <div style="margin-top: 2rem;">
-                        <div class="form-group">
-                            <label data-en="Flower Girls (list all names)" data-el="Κοριτσάκια με λουλούδια (όλα τα ονόματα)">Flower Girls (list all names)</label>
-                            <textarea id="flower-girls" placeholder="Separate names with commas"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label data-en="Page Boys (list all names)" data-el="Αγοράκια με λουλούδια (όλα τα ονόματα)">Page Boys (list all names)</label>
-                            <textarea id="page-boys" placeholder="Separate names with commas"></textarea>
-                        </div>
+                    <!-- Flower Kids Pairs -->
+                    <div id="flower-pairs-container" style="margin-top: 2rem;">
+                        <h3 style="color: #d4af37; margin: 1.5rem 0 1rem;" data-en="Flower Kids Pairs" data-el="Ζευγάρια Παιδιών με Λουλούδια">Flower Kids Pairs</h3>
+                        <!-- Pairs will be added here dynamically -->
                     </div>
+                    <button type="button" class="btn-add" id="add-flower-pair" data-en="+ Add Flower Kids Pair" data-el="+ Προσθήκη Ζευγαριού Παιδιών">+ Add Flower Kids Pair</button>
 
-                    <div class="grid-2">
+                    <div class="grid-2" style="margin-top: 2rem;">
                         <div class="form-group">
                             <label data-en="Parents of Groom" data-el="Γονείς Γαμπρού">Parents of Groom</label>
                             <input type="text" id="parents-groom" placeholder="e.g. John & Mary Smith">
@@ -729,7 +725,6 @@
     <script>
         (function() {
             let currentLang = 'en';
-            let pairCount = 0;
 
             // Language switcher
             const langEn = document.getElementById('lang-en');
@@ -778,51 +773,98 @@
             btnParty.addEventListener('click', () => showSection(partySection));
             btnJournal.addEventListener('click', () => showSection(journalSection));
 
-            // Dynamic pairs
-            const pairsContainer = document.getElementById('pairs-container');
-            const addPairBtn = document.getElementById('add-pair');
+            // Dynamic pairs for bridal party
+            const bridalContainer = document.getElementById('bridal-pairs-container');
+            const addBridalBtn = document.getElementById('add-bridal-pair');
 
-            function createPair(groomsman = '', bridesmaid = '') {
+            function createBridalPair(person1 = '', person2 = '') {
                 const pairDiv = document.createElement('div');
                 pairDiv.className = 'paired-row';
                 pairDiv.innerHTML = `
                     <div class="form-group">
-                        <label data-en="Groomsman" data-el="Παράνυμφος">Groomsman</label>
-                        <input type="text" class="groomsman-input" value="${groomsman}" placeholder="Full name">
+                        <label data-en="Person 1" data-el="Άτομο 1">Person 1</label>
+                        <input type="text" class="bridal-person1" value="${person1}" placeholder="Full name">
                     </div>
                     <div class="form-group">
-                        <label data-en="Bridesmaid" data-el="Παράνυμφη">Bridesmaid</label>
-                        <input type="text" class="bridesmaid-input" value="${bridesmaid}" placeholder="Full name">
+                        <label data-en="Person 2" data-el="Άτομο 2">Person 2</label>
+                        <input type="text" class="bridal-person2" value="${person2}" placeholder="Full name">
                     </div>
                 `;
                 return pairDiv;
             }
 
-            function loadPairs(pairs) {
-                pairsContainer.innerHTML = ''; // clear existing
+            function loadBridalPairs(pairs) {
+                bridalContainer.innerHTML = ''; // clear existing
                 if (pairs && pairs.length) {
                     pairs.forEach(p => {
-                        pairsContainer.appendChild(createPair(p.groomsman, p.bridesmaid));
+                        bridalContainer.appendChild(createBridalPair(p.person1, p.person2));
                     });
                 } else {
                     // default one empty pair
-                    pairsContainer.appendChild(createPair('', ''));
+                    bridalContainer.appendChild(createBridalPair('', ''));
                 }
             }
 
-            function getPairs() {
+            function getBridalPairs() {
                 const pairs = [];
-                const rows = pairsContainer.querySelectorAll('.paired-row');
+                const rows = bridalContainer.querySelectorAll('.paired-row');
                 rows.forEach(row => {
-                    const groomsman = row.querySelector('.groomsman-input')?.value || '';
-                    const bridesmaid = row.querySelector('.bridesmaid-input')?.value || '';
-                    pairs.push({ groomsman, bridesmaid });
+                    const person1 = row.querySelector('.bridal-person1')?.value || '';
+                    const person2 = row.querySelector('.bridal-person2')?.value || '';
+                    pairs.push({ person1, person2 });
                 });
                 return pairs;
             }
 
-            addPairBtn.addEventListener('click', () => {
-                pairsContainer.appendChild(createPair('', ''));
+            addBridalBtn.addEventListener('click', () => {
+                bridalContainer.appendChild(createBridalPair('', ''));
+            });
+
+            // Dynamic pairs for flower kids
+            const flowerContainer = document.getElementById('flower-pairs-container');
+            const addFlowerBtn = document.getElementById('add-flower-pair');
+
+            function createFlowerPair(person1 = '', person2 = '') {
+                const pairDiv = document.createElement('div');
+                pairDiv.className = 'paired-row';
+                pairDiv.innerHTML = `
+                    <div class="form-group">
+                        <label data-en="Flower Kid 1" data-el="Παιδί 1">Flower Kid 1</label>
+                        <input type="text" class="flower-person1" value="${person1}" placeholder="Full name">
+                    </div>
+                    <div class="form-group">
+                        <label data-en="Flower Kid 2" data-el="Παιδί 2">Flower Kid 2</label>
+                        <input type="text" class="flower-person2" value="${person2}" placeholder="Full name">
+                    </div>
+                `;
+                return pairDiv;
+            }
+
+            function loadFlowerPairs(pairs) {
+                flowerContainer.innerHTML = ''; // clear existing
+                if (pairs && pairs.length) {
+                    pairs.forEach(p => {
+                        flowerContainer.appendChild(createFlowerPair(p.person1, p.person2));
+                    });
+                } else {
+                    // default one empty pair
+                    flowerContainer.appendChild(createFlowerPair('', ''));
+                }
+            }
+
+            function getFlowerPairs() {
+                const pairs = [];
+                const rows = flowerContainer.querySelectorAll('.paired-row');
+                rows.forEach(row => {
+                    const person1 = row.querySelector('.flower-person1')?.value || '';
+                    const person2 = row.querySelector('.flower-person2')?.value || '';
+                    pairs.push({ person1, person2 });
+                });
+                return pairs;
+            }
+
+            addFlowerBtn.addEventListener('click', () => {
+                flowerContainer.appendChild(createFlowerPair('', ''));
             });
 
             // Load saved data
@@ -832,9 +874,8 @@
                 document.getElementById('bride').value = data.bride || '';
                 document.getElementById('matron').value = data.matron || '';
                 document.getElementById('bestman').value = data.bestman || '';
-                loadPairs(data.pairs || []);
-                document.getElementById('flower-girls').value = data.flowerGirls || '';
-                document.getElementById('page-boys').value = data.pageBoys || '';
+                loadBridalPairs(data.bridalPairs || []);
+                loadFlowerPairs(data.flowerPairs || []);
                 document.getElementById('parents-groom').value = data.parentsGroom || '';
                 document.getElementById('parents-bride').value = data.parentsBride || '';
                 document.getElementById('other-people').value = data.otherPeople || '';
@@ -873,15 +914,15 @@
 
             // Save party data
             document.getElementById('save-party').addEventListener('click', function() {
-                const pairs = getPairs();
+                const bridalPairs = getBridalPairs();
+                const flowerPairs = getFlowerPairs();
                 const partyData = {
                     groom: document.getElementById('groom').value,
                     bride: document.getElementById('bride').value,
                     matron: document.getElementById('matron').value,
                     bestman: document.getElementById('bestman').value,
-                    pairs: pairs,
-                    flowerGirls: document.getElementById('flower-girls').value,
-                    pageBoys: document.getElementById('page-boys').value,
+                    bridalPairs: bridalPairs,
+                    flowerPairs: flowerPairs,
                     parentsGroom: document.getElementById('parents-groom').value,
                     parentsBride: document.getElementById('parents-bride').value,
                     otherPeople: document.getElementById('other-people').value
@@ -933,15 +974,20 @@
                 if (party.bride) partyHtml += `<p><strong>Bride:</strong> ${party.bride}</p>`;
                 if (party.matron) partyHtml += `<p><strong>Matron of Honour:</strong> ${party.matron}</p>`;
                 if (party.bestman) partyHtml += `<p><strong>Best Man:</strong> ${party.bestman}</p>`;
-                if (party.pairs && party.pairs.length) {
-                    party.pairs.forEach((pair, index) => {
-                        if (pair.groomsman || pair.bridesmaid) {
-                            partyHtml += `<p><strong>Pair ${index+1}:</strong> ${pair.groomsman || '?'} & ${pair.bridesmaid || '?'}</p>`;
+                if (party.bridalPairs && party.bridalPairs.length) {
+                    party.bridalPairs.forEach((pair, index) => {
+                        if (pair.person1 || pair.person2) {
+                            partyHtml += `<p><strong>Bridal Pair ${index+1}:</strong> ${pair.person1 || '?'} & ${pair.person2 || '?'}</p>`;
                         }
                     });
                 }
-                if (party.flowerGirls) partyHtml += `<p><strong>Flower Girls:</strong> ${party.flowerGirls}</p>`;
-                if (party.pageBoys) partyHtml += `<p><strong>Page Boys:</strong> ${party.pageBoys}</p>`;
+                if (party.flowerPairs && party.flowerPairs.length) {
+                    party.flowerPairs.forEach((pair, index) => {
+                        if (pair.person1 || pair.person2) {
+                            partyHtml += `<p><strong>Flower Kids Pair ${index+1}:</strong> ${pair.person1 || '?'} & ${pair.person2 || '?'}</p>`;
+                        }
+                    });
+                }
                 if (party.parentsGroom) partyHtml += `<p><strong>Parents of Groom:</strong> ${party.parentsGroom}</p>`;
                 if (party.parentsBride) partyHtml += `<p><strong>Parents of Bride:</strong> ${party.parentsBride}</p>`;
                 if (party.otherPeople) partyHtml += `<p><strong>Other Important People:</strong> ${party.otherPeople}</p>`;
